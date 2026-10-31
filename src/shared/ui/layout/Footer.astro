@@ -19,6 +19,11 @@ import { resolveHref } from '@/shared/routing'
     <p class="flex items-center gap-2 text-body-sm text-text-muted">
       <img src="/logo-mark.svg" alt="" width="24" height="24" />
       {SITE.name}
+      {import.meta.env.DEV && (
+        <a href="/charte-graphique" class="ml-auto underline">
+          Charte graphique
+        </a>
+      )}
     </p>
   </div>
 </footer>

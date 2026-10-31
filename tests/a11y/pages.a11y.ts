@@ -10,6 +10,7 @@ const EXTRA_ROUTES = [
   '/catalogue?exposition=mi-ombre&taille=M&vue=liste',
   '/route-inexistante',
   '/erreur-test',
+  '/charte-graphique',
 ]
 
 const expectNoViolations = async (page: Page) => {

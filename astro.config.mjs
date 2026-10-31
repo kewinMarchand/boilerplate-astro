@@ -13,5 +13,9 @@ export default defineConfig({
   integrations: [svelte(), precompress()],
   server: { port: 4321, host: true },
   devToolbar: { enabled: false },
-  vite: { plugins: [tailwindcss()] },
+  vite: {
+    plugins: [tailwindcss()],
+    // Dépendance Git : compilée dans le serveur, pour que l'image de production n'ait pas à l'installer.
+    ssr: { noExternal: ['@kewinmarchand/csp'] },
+  },
 })

@@ -1,0 +1,9 @@
+---
+import { areDevRoutesEnabled } from '@/shared/errors'
+
+import { StyleguideView } from '@/views/styleguide'
+
+if (!areDevRoutesEnabled()) return Astro.rewrite('/404')
+---
+
+<StyleguideView />

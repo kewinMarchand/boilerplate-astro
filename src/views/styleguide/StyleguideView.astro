@@ -1,0 +1,22 @@
+---
+import PageLayout from '@/shared/ui/layout/PageLayout.astro'
+
+import StyleguideSections from './StyleguideSections.svelte'
+---
+
+<PageLayout
+  title="Charte graphique"
+  description="Charte graphique de développement : tokens, typographie, composants et états, rendus avec les vrais composants du projet."
+  seo={{ noindex: true }}
+>
+  <p class="lead">
+    Page de développement, absente en production. Le bouton « Accessibilité renforcée » de l’en-tête
+    permet de comparer les deux modes. Les composants génériques viennent de boilerplates-ui,
+    documentés dans son{' '}
+    <a class="bui-link" href="https://kewinmarchand.github.io/boilerplates-ui/" rel="external">
+      Storybook
+    </a>
+    .
+  </p>
+  <StyleguideSections client:load />
+</PageLayout>

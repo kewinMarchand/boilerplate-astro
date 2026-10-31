@@ -39,6 +39,7 @@
   "dependencies": {
     "@astrojs/node": "^11.1.9",
     "@astrojs/svelte": "^9.1.2",
+    "@sentry/astro": "^11.10.0",
     "astro": "^7.4.4",
     "openapi-fetch": "^0.17.0",
     "svelte": "^5.57.3",
@@ -53,6 +54,7 @@
     "@fontsource-variable/inter": "^5.3.0",
     "@iconify-json/lucide": "^1.2.143",
     "@kewinmarchand/boilerplates-ui": "github:kewinMarchand/boilerplates-ui#v0.11.1",
+    "@kewinmarchand/csp": "github:kewinMarchand/csp#v0.1.1",
     "@lhci/cli": "^0.15.1",
     "@playwright/test": "1.64.0",
     "@tailwindcss/vite": "^4.3.3",

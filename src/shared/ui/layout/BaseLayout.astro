@@ -1,4 +1,6 @@
 ---
+import { OBSERVABILITY_CONFIG_ID } from '@/shared/observability'
+import { observabilityConfig } from '@/shared/observability/index.server'
 import { SeoHead } from '@/shared/seo'
 import { A11Y_MODE_SCRIPT } from '@/shared/ui/a11y-mode'
 import { COLOR_SCHEME_SCRIPT } from '@/shared/ui/color-scheme'
@@ -39,6 +41,16 @@ const BOOT_SCRIPT = `(()=>{const boot=()=>{${BOOT}};boot();if(!window.__boot){wi
     <script is:inline set:html={BOOT_SCRIPT} />
     <SeoHead {meta} />
     <slot name="head" />
+    <script
+      type="application/json"
+      id={OBSERVABILITY_CONFIG_ID}
+      set:html={JSON.stringify(observabilityConfig()).replace(/</g, '\\u003c')}
+    />
+    <script>
+      import { startObservability } from '@/shared/observability/client'
+
+      startObservability()
+    </script>
   </head>
   <body>
     <div class="flex min-h-screen flex-col">
