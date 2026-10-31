@@ -12,7 +12,7 @@
   "scripts": {
     "dev": "astro dev --port 4321 --host 0.0.0.0",
     "build": "astro build",
-    "start": "node --env-file-if-exists=.env dist/server/entry.mjs",
+    "start": "node --env-file-if-exists=.env server.mjs",
     "prepare": "husky",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

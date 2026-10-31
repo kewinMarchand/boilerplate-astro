@@ -21,6 +21,7 @@ ENV NODE_ENV=production PORT=3000 HOST=0.0.0.0
 COPY --from=prod-deps --chown=node:node /app/node_modules ./node_modules
 COPY --from=build --chown=node:node /app/package.json ./
 COPY --from=build --chown=node:node /app/dist ./dist
+COPY --from=build --chown=node:node /app/server.mjs ./
 USER node
 EXPOSE 3000
-CMD ["node", "dist/server/entry.mjs"]
+CMD ["node", "server.mjs"]

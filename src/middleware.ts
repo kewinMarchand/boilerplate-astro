@@ -1,6 +1,7 @@
 import { defineMiddleware } from 'astro:middleware'
 
 import { withRequestScenario } from '@/shared/api/client.server'
+import { compressHtml } from '@/shared/http'
 
 import { getCategoryMenu } from '@/modules/catalog/index.server'
 
@@ -23,6 +24,6 @@ export const onRequest = defineMiddleware((context, next) => {
 
   return withRequestScenario(context.request, async () => {
     context.locals.categoryMenu = await getCategoryMenu()
-    return next()
+    return compressHtml(context.request, await next())
   })
 })

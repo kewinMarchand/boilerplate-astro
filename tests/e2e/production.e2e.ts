@@ -13,7 +13,7 @@ test.describe('Build de production sans routes de développement', () => {
   let server: ChildProcess
 
   test.beforeAll(async () => {
-    server = spawn('node', ['dist/server/entry.mjs'], {
+    server = spawn('node', ['server.mjs'], {
       env: { ...process.env, PORT: String(PORT), HOST: '127.0.0.1', DEV_ROUTES: '0' },
       stdio: 'ignore',
     })

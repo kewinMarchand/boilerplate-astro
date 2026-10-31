@@ -3,6 +3,7 @@
 
   import { formatPrice } from '../domain/price'
   import { EXPOSURE_LABELS, SIZE_LABELS } from './labels'
+  import { PRODUCT_IMAGE } from './productImage'
 
   import type { Catalog } from '../domain/catalog'
 
@@ -24,9 +25,9 @@
 <article id={product.slug} class="product-card" data-testid="catalog-product">
   <div class="product-card-body">
     <ResponsiveImage
-      basePath={`/images/product-${product.image}`}
-      widths={[400, 800]}
-      sizes="(min-width: 1024px) 300px, (min-width: 536px) calc(50vw - 36px), calc(100vw - 32px)"
+      basePath={PRODUCT_IMAGE.basePath(product.image)}
+      widths={PRODUCT_IMAGE.widths}
+      sizes={PRODUCT_IMAGE.sizes}
       width={800}
       height={800}
       alt={product.name}
