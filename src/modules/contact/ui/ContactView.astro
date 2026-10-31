@@ -41,5 +41,5 @@ const status = sent
     Formulaire validé par un schéma zod, envoyé par une action serveur Astro. Il fonctionne aussi
     sans JavaScript.
   </p>
-  <ContactForm client:load formAction={actions.contact} {values} {errors} {status} />
+  <ContactForm client:load formAction={String(actions.contact)} {values} {errors} {status} />
 </PageLayout>

@@ -65,6 +65,8 @@
 
   .page-grid {
     @apply grid py-8 has-[>.full-bleed:first-child]:pt-0;
+    /* Page courte : les rangées restent en haut au lieu de se partager la hauteur de <main>. */
+    align-content: start;
     grid-template-columns:
       [full-start] minmax(var(--gutter), 1fr)
       [content-start] minmax(0, var(--container-content))

@@ -23,7 +23,9 @@ export const SITE: SiteConfig = {
   name: 'Boilerplate Astro',
   description:
     'Boilerplate Astro pour sites de contenu, rendu serveur et composants boilerplates-ui, outillé pour la QA et les tests end-to-end.',
-  url: import.meta.env.SITE,
+  // Lue à l'exécution sur le serveur (image Docker), repli sur `site` d'Astro figé au build ; aussi importée
+  // par des îlots, d'où globalThis.process (absent du navigateur, qui n'utilise pas d'URL absolue).
+  url: globalThis.process?.env['PUBLIC_SITE_URL'] ?? import.meta.env.SITE,
   locale: 'fr_FR',
   publisher: {
     name: 'Exemple SAS (société fictive)',
