@@ -16,10 +16,12 @@ interface Props {
   categoryMenu?: NavigationNode[] | undefined
 }
 
-const { meta, categoryMenu = [] } = Astro.props
+const { meta, categoryMenu = Astro.locals.categoryMenu } = Astro.props
 
 // Amorçage avant le premier rendu : classe js (amélioration progressive), mode renforcé, thème mémorisé.
-const BOOT_SCRIPT = `document.documentElement.classList.add('js');${A11Y_MODE_SCRIPT}${COLOR_SCHEME_SCRIPT}`
+// Rejoué après chaque navigation du routeur client (catalogue), qui remplace les attributs de <html>.
+const BOOT = `document.documentElement.classList.add('js');${A11Y_MODE_SCRIPT}${COLOR_SCHEME_SCRIPT}`
+const BOOT_SCRIPT = `(()=>{const boot=()=>{${BOOT}};boot();if(!window.__boot){window.__boot=true;document.addEventListener('astro:after-swap',boot)}})()`
 ---
 
 <!doctype html>

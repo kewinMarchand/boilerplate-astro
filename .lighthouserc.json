@@ -3,7 +3,16 @@
     "collect": {
       "startServerCommand": "PORT=3270 HOST=127.0.0.1 yarn start",
       "startServerReadyPattern": "listening",
-      "url": ["http://localhost:3270/"],
+      "url": [
+        "http://localhost:3270/",
+        "http://localhost:3270/catalogue",
+        "http://localhost:3270/catalogue/plantes-interieur",
+        "http://localhost:3270/catalogue/plantes-interieur/feuillages",
+        "http://localhost:3270/mentions-legales",
+        "http://localhost:3270/donnees-personnelles",
+        "http://localhost:3270/accessibilite",
+        "http://localhost:3270/plan-du-site"
+      ],
       "numberOfRuns": 3,
       "settings": {
         "chromeFlags": "--headless=new --no-sandbox"

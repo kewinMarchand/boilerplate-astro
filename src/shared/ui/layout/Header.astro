@@ -3,6 +3,7 @@ import { CATALOG_NAVIGATION, MAIN_NAVIGATION, SITE } from '@/shared/config'
 import { A11yModeToggle } from '@/shared/ui/a11y-mode'
 import { ColorSchemeToggle } from '@/shared/ui/color-scheme'
 
+import CategoryMenu from './CategoryMenu.svelte'
 import MobileMenu from './MobileMenu.svelte'
 import NavLink from './NavLink.astro'
 
@@ -35,8 +36,11 @@ const [home, ...otherLinks] = MAIN_NAVIGATION
             <NavLink {...home} />
           </li>
         )}
-        <li>
+        <li class="js:hidden">
           <NavLink {...CATALOG_NAVIGATION} />
+        </li>
+        <li class="hidden js:block">
+          <CategoryMenu client:media="(min-width: 1024px)" nodes={categoryMenu} />
         </li>
         {otherLinks.map((item) => (
           <li>

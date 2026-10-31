@@ -40,9 +40,20 @@ test.describe('SEO', () => {
     expect(html).toContain('"@type":"WebSite"')
   })
 
-  test('le sitemap liste les pages publiques et robots.txt y renvoie', async ({ request }) => {
+  test('une page filtrée est en noindex avec une canonique sans filtre', async ({ request }) => {
+    const html = await (
+      await request.get('/catalogue/plantes-interieur?exposition=soleil&page=1')
+    ).text()
+    expect(html).toContain('<meta name="robots" content="noindex, follow"')
+    expect(html).toMatch(
+      /<link rel="canonical" href="http:\/\/localhost:3170\/catalogue\/plantes-interieur"/,
+    )
+    expect(html).toContain('"@type":"ItemList"')
+  })
+
+  test('le sitemap liste chaque catégorie et robots.txt y renvoie', async ({ request }) => {
     const sitemap = await (await request.get('/sitemap.xml')).text()
-    expect(sitemap).toContain('/mentions-legales</loc>')
+    expect(sitemap).toContain('/catalogue/plantes-interieur/feuillages/monstera</loc>')
     expect(sitemap).not.toContain('charte-graphique')
 
     const robots = await (await request.get('/robots.txt')).text()

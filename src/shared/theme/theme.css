@@ -71,11 +71,14 @@
       [content-end] minmax(var(--gutter), 1fr)
       [full-end];
 
-    & > * {
+    /* Un îlot Astro (<astro-island>, display: contents) ne doit pas sortir ses enfants de la grille. */
+    & > *,
+    & > astro-island > * {
       grid-column: content;
     }
 
-    & > .full-bleed {
+    & > .full-bleed,
+    & > astro-island > .full-bleed {
       grid-column: full;
     }
   }

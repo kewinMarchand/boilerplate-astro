@@ -1,0 +1,23 @@
+---
+import { ClientRouter } from 'astro:transitions'
+
+import PageLayout from '@/shared/ui/layout/PageLayout.astro'
+
+import { describeCatalogPage } from './catalogPage'
+import CatalogView from './CatalogView.svelte'
+
+import type { Catalog } from '../domain/catalog'
+
+interface Props {
+  query: Catalog.Query
+  result: Catalog.Result
+}
+
+const { query, result } = Astro.props
+const { title, description, parents, seo } = describeCatalogPage(query, result)
+---
+
+<PageLayout {title} {description} {parents} {seo}>
+  <ClientRouter slot="head" />
+  <CatalogView client:load transition:persist="catalogue" {query} {result} />
+</PageLayout>

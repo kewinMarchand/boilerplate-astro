@@ -1,0 +1,139 @@
+<script lang="ts">
+  import { resolveHref } from '@/shared/routing'
+  import { Button, Checkbox, Icon, Switch } from '@/shared/ui/kit'
+
+  import { queryEntries } from '../domain/catalogQuery'
+  import { EXPOSURE_LABELS, SIZE_LABELS } from './labels'
+
+  import type { Catalog } from '../domain/catalog'
+
+  interface Props {
+    query: Catalog.Query
+    listing: Catalog.Listing
+    onsubmit: (event: Event) => void
+  }
+
+  const { query, listing, onsubmit }: Props = $props()
+
+  const uid = $props.id()
+
+  const keptFields = $derived(
+    queryEntries(query, ['exposition', 'taille', 'prix_min', 'prix_max', 'en_stock']),
+  )
+</script>
+
+<form
+  method="GET"
+  class="flex flex-col gap-4"
+  data-testid="catalog-filters"
+  onchange={onsubmit}
+  {onsubmit}
+>
+  {#each keptFields as [name, value] (name)}
+    <input type="hidden" {name} {value} />
+  {/each}
+
+  <div class="bui-accordion">
+    {#if listing.children.length > 0}
+      <details open class="bui-accordion__item">
+        <summary class="bui-accordion__summary">
+          Catégorie<Icon name="chevron-down" class="bui-accordion__icon" />
+        </summary>
+        <ul class="bui-accordion__content flex flex-col">
+          {#each listing.children as child (child.slug)}
+            <li>
+              <a href={resolveHref(child.path)} class="facet-link">
+                {child.name} <span class="text-text-muted">({child.count})</span>
+              </a>
+            </li>
+          {/each}
+        </ul>
+      </details>
+    {/if}
+
+    <details open class="bui-accordion__item">
+      <summary class="bui-accordion__summary">
+        Exposition<Icon name="chevron-down" class="bui-accordion__icon" />
+      </summary>
+      <fieldset class="bui-accordion__content flex flex-col gap-2">
+        <legend class="sr-only">Exposition</legend>
+        {#each listing.facets.exposure as { value, count } (value)}
+          {@const checked = query.exposures.includes(value)}
+          <Checkbox
+            id="{uid}-exposition-{value}"
+            label="{EXPOSURE_LABELS[value]} ({count})"
+            name="exposition"
+            {value}
+            {checked}
+            disabled={count === 0 && !checked}
+            data-testid={`catalog-filter-exposure-${value}`}
+          />
+        {/each}
+      </fieldset>
+    </details>
+
+    <details open class="bui-accordion__item">
+      <summary class="bui-accordion__summary">
+        Taille<Icon name="chevron-down" class="bui-accordion__icon" />
+      </summary>
+      <fieldset class="bui-accordion__content flex flex-col gap-2">
+        <legend class="sr-only">Taille</legend>
+        {#each listing.facets.size as { value, count } (value)}
+          {@const checked = query.sizes.includes(value)}
+          <Checkbox
+            id="{uid}-taille-{value}"
+            label="{SIZE_LABELS[value]} ({count})"
+            name="taille"
+            {value}
+            {checked}
+            disabled={count === 0 && !checked}
+            data-testid={`catalog-filter-size-${value}`}
+          />
+        {/each}
+      </fieldset>
+    </details>
+
+    <details open class="bui-accordion__item">
+      <summary class="bui-accordion__summary">
+        Prix<Icon name="chevron-down" class="bui-accordion__icon" />
+      </summary>
+      <fieldset class="bui-accordion__content flex flex-wrap gap-3">
+        <legend class="sr-only">Prix en euros</legend>
+        {#each [{ name: 'prix_min', label: 'Minimum (€)', value: query.priceMin, testId: 'catalog-filter-price-min' }, { name: 'prix_max', label: 'Maximum (€)', value: query.priceMax, testId: 'catalog-filter-price-max' }] as field (field.name)}
+          <div class="bui-field w-28">
+            <label class="bui-field__label" for="{uid}-{field.name}">{field.label}</label>
+            <input
+              class="bui-field__input"
+              type="number"
+              id="{uid}-{field.name}"
+              name={field.name}
+              min="0"
+              inputmode="numeric"
+              value={field.value ?? ''}
+              data-testid={field.testId}
+            />
+          </div>
+        {/each}
+      </fieldset>
+    </details>
+
+    <details open class="bui-accordion__item">
+      <summary class="bui-accordion__summary">
+        Disponibilité<Icon name="chevron-down" class="bui-accordion__icon" />
+      </summary>
+      <fieldset class="bui-accordion__content">
+        <legend class="sr-only">Disponibilité</legend>
+        <Switch
+          id="{uid}-en-stock"
+          label="En stock uniquement"
+          name="en_stock"
+          value="1"
+          checked={query.inStock}
+          data-testid="catalog-filter-in-stock"
+        />
+      </fieldset>
+    </details>
+  </div>
+
+  <Button type="submit" class="js:hidden">Appliquer les filtres</Button>
+</form>

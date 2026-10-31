@@ -6,7 +6,11 @@ import { gotoHydrated, useMode } from '../e2e/support'
 
 import type { Page } from '@playwright/test'
 
-const EXTRA_ROUTES: string[] = []
+const EXTRA_ROUTES = [
+  '/catalogue?exposition=mi-ombre&taille=M&vue=liste',
+  '/route-inexistante',
+  '/erreur-test',
+]
 
 const expectNoViolations = async (page: Page) => {
   const results = await new AxeBuilder({ page })
@@ -32,11 +36,21 @@ for (const mode of MODES) {
       })
     }
 
-    test('le menu mobile ouvert ne présente aucune violation axe', async ({ page, isMobile }) => {
-      test.skip(!isMobile, 'Menu latéral réservé au mobile.')
+    test('le menu ouvert ne présente aucune violation axe', async ({ page, isMobile }) => {
       await gotoHydrated(page, '/')
-      await page.getByTestId('layout-mobile-menu-toggle').click()
-      await expect(page.getByTestId('layout-mobile-menu')).toBeVisible()
+      if (isMobile) {
+        await page.getByTestId('layout-mobile-menu-toggle').click()
+        await page
+          .getByTestId('layout-mobile-menu')
+          .getByRole('button', { name: 'Catalogue' })
+          .click()
+      } else {
+        await page.getByTestId('layout-category-menu-toggle').click()
+        await page
+          .getByTestId('layout-category-menu')
+          .getByRole('link', { name: 'Plantes d’intérieur' })
+          .hover()
+      }
       await expectNoViolations(page)
     })
   })

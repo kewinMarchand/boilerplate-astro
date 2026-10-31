@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 const TECHNICAL_WORDS = /Error|stack|undefined|Internal|failed/
 
 test.describe('Pages d’erreur', () => {
-  for (const url of ['/route-inexistante']) {
+  for (const url of ['/route-inexistante', '/catalogue/categorie-inconnue']) {
     test(`${url} répond 404 avec la page introuvable`, async ({ page }) => {
       const response = await page.goto(url)
 

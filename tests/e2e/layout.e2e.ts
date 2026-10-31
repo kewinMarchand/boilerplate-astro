@@ -4,7 +4,7 @@ import { MODES, ROUTES } from './routes'
 import { gotoHydrated, useMode } from './support'
 
 const WIDTHS = [375, 768, 1280] as const
-const SCREENSHOT_ROUTES = { accueil: '/' } as const
+const SCREENSHOT_ROUTES = { accueil: '/', catalogue: '/catalogue' } as const
 
 test.describe('Mise en page', () => {
   test.skip(({ isMobile }) => isMobile, 'Les largeurs sont pilotées explicitement.')

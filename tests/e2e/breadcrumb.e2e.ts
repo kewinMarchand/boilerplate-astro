@@ -16,24 +16,31 @@ test.describe('Fil d’Ariane', () => {
   })
 
   test('est présent sur une page interne, dernier élément en aria-current', async ({ page }) => {
-    await page.goto('/mentions-legales')
+    await page.goto('/catalogue/plantes-interieur/feuillages')
     const breadcrumb = page.getByTestId('layout-breadcrumb')
 
-    await expect(breadcrumb.getByRole('listitem')).toHaveText(['Accueil', 'Mentions légales'])
-    await expect(breadcrumb.locator('[aria-current="page"]')).toHaveText('Mentions légales')
-    await expect(breadcrumb.getByRole('link')).toHaveCount(1)
+    await expect(breadcrumb.getByRole('listitem')).toHaveText([
+      'Accueil',
+      'Catalogue',
+      'Plantes d’intérieur',
+      'Feuillages',
+    ])
+    await expect(breadcrumb.locator('[aria-current="page"]')).toHaveText('Feuillages')
+    await expect(breadcrumb.getByRole('link')).toHaveCount(3)
   })
 
   test('produit un JSON-LD BreadcrumbList cohérent avec le fil visible', async ({ page }) => {
-    await page.goto('/mentions-legales')
+    await page.goto('/catalogue/plantes-interieur/feuillages')
 
     const breadcrumbList = (await readJsonLd(page)).find(
       (data) => data['@type'] === 'BreadcrumbList',
     )
     const items = breadcrumbList?.itemListElement as { position: number; item: string }[]
-    expect(items).toHaveLength(2)
-    expect(items.map((item) => item.position)).toEqual([1, 2])
-    expect(items[1]?.item).toMatch(/^http:\/\/localhost:3170\/mentions-legales$/)
+    expect(items).toHaveLength(4)
+    expect(items.map((item) => item.position)).toEqual([1, 2, 3, 4])
+    expect(items[3]?.item).toMatch(
+      /^http:\/\/localhost:3170\/catalogue\/plantes-interieur\/feuillages$/,
+    )
   })
 
   test('la 404 affiche « Accueil › Page introuvable »', async ({ page }) => {

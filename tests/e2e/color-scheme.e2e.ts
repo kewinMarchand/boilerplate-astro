@@ -42,6 +42,18 @@ test.describe('Thème', () => {
     }
   })
 
+  test('le choix et la classe js survivent à une navigation client du catalogue', async ({
+    page,
+  }) => {
+    await gotoHydrated(page, '/catalogue')
+    await choose(page, 'dark')
+
+    await page.getByTestId('catalog-view-list').click()
+    await expect(page).toHaveURL(/vue=liste/)
+    await expect(html(page)).toHaveAttribute('data-color-scheme', 'dark')
+    await expect(html(page)).toHaveClass(/\bjs\b/)
+  })
+
   test('« système » retire le choix mémorisé et remet auto', async ({ page }) => {
     await page.addInitScript(() => {
       if (!sessionStorage.getItem('init')) {

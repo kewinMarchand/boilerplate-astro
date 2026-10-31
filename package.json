@@ -40,7 +40,9 @@
     "@astrojs/node": "^11.1.9",
     "@astrojs/svelte": "^9.1.2",
     "astro": "^7.4.4",
-    "svelte": "^5.57.3"
+    "openapi-fetch": "^0.17.0",
+    "svelte": "^5.57.3",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
@@ -71,6 +73,7 @@
     "husky": "^9.1.7",
     "jsdom": "^29",
     "lint-staged": "^17.6.0",
+    "openapi-typescript": "^7.13.0",
     "prettier": "^3.9.9",
     "prettier-plugin-astro": "^1.1.2",
     "prettier-plugin-svelte": "^4.1.1",
