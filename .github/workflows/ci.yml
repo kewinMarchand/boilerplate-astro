@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: make install
+      - run: make qa
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: qa
+    env:
+      API_URL: http://localhost:8091
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: kewinMarchand/boilerplate-hono
+          path: .api
+      - name: API de test (Hono + MongoDB, port 8091)
+        run: make -C .api install db-reset
+      - run: make install
+      - run: make test-e2e test-a11y
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7
+      - run: make metrics
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci
+          include-hidden-files: true
+          retention-days: 7

@@ -1,0 +1,29 @@
+# dependencies
+/node_modules
+
+# astro
+/.astro/
+/dist/
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# env files
+.env*
+!.env.example
+
+
+# qa
+/coverage
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/.lighthouseci/
+/screenshots/

@@ -1,0 +1,40 @@
+services:
+  web:
+    build: .
+    ports:
+      - '${PORT:-3000}:3000'
+    environment:
+      PUBLIC_SITE_URL: ${PUBLIC_SITE_URL:-http://localhost:3000}
+      API_URL: ${API_URL:-http://localhost:8090}
+      MAINTENANCE: ${MAINTENANCE:-0}
+      PUBLIC_GLITCHTIP_DSN: ${PUBLIC_GLITCHTIP_DSN:-}
+      PUBLIC_GLITCHTIP_ENVIRONMENT: ${PUBLIC_GLITCHTIP_ENVIRONMENT:-}
+      PUBLIC_MATOMO_URL: ${PUBLIC_MATOMO_URL:-}
+      PUBLIC_MATOMO_SITE_ID: ${PUBLIC_MATOMO_SITE_ID:-}
+
+  node:
+    profiles: [dev]
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        PLAYWRIGHT_VERSION: ${PLAYWRIGHT_VERSION:-}
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    user: '${UID:-1000}:${GID:-1000}'
+    init: true
+    ipc: host
+    network_mode: host
+    environment:
+      HOME: /tmp
+      CI: ${CI:-}
+      ASTRO_TELEMETRY_DISABLED: 1
+      API_URL: ${API_URL:-}
+      API_SCHEMA_URL: ${API_SCHEMA_URL:-http://localhost:8090/api/docs.jsonopenapi}
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+      - ${GIT_COMMUN:-/dev/null}:${GIT_COMMUN:-/tmp/sans-git} # dépôt git d'un worktree (Makefile)
+
+volumes:
+  node_modules:
