@@ -1,5 +1,9 @@
 ---
+import { loadLatestArticles } from '@/modules/blog/index.server'
+
 import { HomeView } from '@/views/home'
+
+const blog = await loadLatestArticles()
 ---
 
-<HomeView />
+<HomeView {blog} />

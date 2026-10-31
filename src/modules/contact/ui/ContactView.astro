@@ -1,0 +1,45 @@
+---
+import { actions, isInputError } from 'astro:actions'
+
+import PageLayout from '@/shared/ui/layout/PageLayout.astro'
+
+import ContactForm from './ContactForm.svelte'
+
+import type { Contact } from '../domain/contactSchema'
+
+// Envoi sans JavaScript : l'action a traité le POST, la page affiche son résultat.
+const result = Astro.getActionResult(actions.contact)
+const submitted = Astro.request.method === 'POST' ? await Astro.request.formData() : undefined
+const valueOf = (field: Contact.Field) => {
+  const value = submitted?.get(field)
+  return typeof value === 'string' ? value : ''
+}
+
+const outcome = result?.data
+const sent = outcome?.status === 'sent'
+const values: Contact.FormValues = sent
+  ? { name: '', email: '', message: '' }
+  : { name: valueOf('name'), email: valueOf('email'), message: valueOf('message') }
+const errors: Contact.FieldErrors =
+  result?.error && isInputError(result.error)
+    ? result.error.fields
+    : outcome?.status === 'invalid'
+      ? outcome.fieldErrors
+      : {}
+const status = sent
+  ? 'sent'
+  : outcome?.status === 'error' || (result?.error && !isInputError(result.error))
+    ? 'error'
+    : undefined
+---
+
+<PageLayout
+  title="Contact"
+  description="Démo de formulaire : validation par schéma zod, erreurs liées aux champs, envoi par une action serveur Astro, avec ou sans JavaScript."
+>
+  <p class="lead">
+    Formulaire validé par un schéma zod, envoyé par une action serveur Astro. Il fonctionne aussi
+    sans JavaScript.
+  </p>
+  <ContactForm client:load formAction={actions.contact} {values} {errors} {status} />
+</PageLayout>

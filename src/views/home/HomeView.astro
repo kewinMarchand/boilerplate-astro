@@ -5,9 +5,19 @@ import { ImageCarousel } from '@/shared/ui/carousel'
 import { ImagePreload } from '@/shared/ui/kit'
 import BaseLayout from '@/shared/ui/layout/BaseLayout.astro'
 
+import { BlogSection } from '@/modules/blog'
+
 import { HOME_SLIDES } from './featuredSlides'
 import Hero from './Hero.astro'
 import { HERO_IMAGE } from './heroImage'
+
+import type { Article } from '@/modules/blog'
+
+interface Props {
+  blog: Article.Blog
+}
+
+const { blog } = Astro.props
 
 const meta = buildPageMeta({ description: SITE.description, path: '/', jsonLd: buildHomeJsonLd() })
 ---
@@ -27,4 +37,6 @@ const meta = buildPageMeta({ description: SITE.description, path: '/', jsonLd: b
     </h2>
     <ImageCarousel client:visible slides={HOME_SLIDES} label="À la une" />
   </section>
+
+  <BlogSection {blog} />
 </BaseLayout>

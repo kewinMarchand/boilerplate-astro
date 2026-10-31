@@ -3,6 +3,15 @@ import { expect, test } from '@playwright/test'
 import { gotoHydrated } from './support'
 
 test.describe('Navigation', () => {
+  test('le lien actif porte aria-current (desktop)', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'Sur mobile, la navigation principale est dans le menu latéral.')
+    await page.goto('/contact')
+
+    const nav = page.getByRole('navigation', { name: 'Navigation principale' })
+    await expect(nav.getByRole('link', { name: 'Contact' })).toHaveAttribute('aria-current', 'page')
+    await expect(nav.getByRole('link', { name: 'Accueil' })).not.toHaveAttribute('aria-current')
+  })
+
   test('le logo mène à l’accueil et porte aria-current sur l’accueil', async ({ page }) => {
     await page.goto('/')
     const logo = page.getByTestId('layout-logo')
@@ -10,6 +19,9 @@ test.describe('Navigation', () => {
     await expect(logo).toHaveAttribute('href', '/')
     await expect(logo).toHaveAccessibleName('Boilerplate Astro')
     await expect(logo).toHaveAttribute('aria-current', 'page')
+
+    await page.goto('/contact')
+    await expect(page.getByTestId('layout-logo')).not.toHaveAttribute('aria-current')
   })
 
   test('le lien d’évitement mène au contenu principal', async ({ page }) => {
@@ -35,7 +47,7 @@ test.describe('Navigation', () => {
 test.describe('Header mobile compact', () => {
   test('tient sur une ligne avec deux boutons icône nommés', async ({ page, isMobile }) => {
     test.skip(!isMobile, 'Header compact réservé au mobile.')
-    await gotoHydrated(page, '/')
+    await gotoHydrated(page, '/contact')
 
     const header = await page.locator('header').boundingBox()
     const logo = page.getByTestId('layout-logo')
@@ -72,7 +84,7 @@ test.describe('Header mobile compact', () => {
     isMobile,
   }) => {
     test.skip(isMobile, 'Vérification desktop.')
-    await gotoHydrated(page, '/')
+    await gotoHydrated(page, '/contact')
 
     await expect(page.getByTestId('layout-mobile-menu-toggle')).toBeHidden()
     await expect(page.getByTestId('a11y-mode-toggle')).toHaveText('Accessibilité renforcée')

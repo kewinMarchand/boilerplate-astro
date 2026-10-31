@@ -5,6 +5,8 @@
       "startServerReadyPattern": "listening",
       "url": [
         "http://localhost:3270/",
+        "http://localhost:3270/taches",
+        "http://localhost:3270/contact",
         "http://localhost:3270/catalogue",
         "http://localhost:3270/catalogue/plantes-interieur",
         "http://localhost:3270/catalogue/plantes-interieur/feuillages",

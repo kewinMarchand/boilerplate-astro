@@ -1,0 +1,25 @@
+---
+import BlogGrid from './BlogGrid.svelte'
+
+import type { Article } from '../domain/article'
+
+interface Props {
+  blog: Article.Blog
+}
+
+const { blog } = Astro.props
+---
+
+<section aria-labelledby="home-blog-title" class="mt-12" data-testid="home-blog">
+  <h2 id="home-blog-title" class="section-title">
+    Derniers articles
+  </h2>
+  <div aria-live="polite">
+    <BlogGrid
+      status={blog.status}
+      articles={blog.status === 'success' ? blog.articles : undefined}
+      errorMessage={blog.status === 'error' ? blog.message : undefined}
+      retryHref="/"
+    />
+  </div>
+</section>

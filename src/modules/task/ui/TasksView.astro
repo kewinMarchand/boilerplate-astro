@@ -1,0 +1,17 @@
+---
+import PageLayout from '@/shared/ui/layout/PageLayout.astro'
+
+import { tasksApiUrl } from '../infrastructure/taskRepository'
+import TasksPanel from './TasksPanel.svelte'
+---
+
+<PageLayout
+  title="Tâches"
+  description="Démo de chargement côté client : liste de tâches lue dans l’API par le navigateur, avec chargement, erreur et liste vide."
+>
+  <p class="lead">
+    Données chargées dans le navigateur par un îlot Svelte : chargement, erreur et liste vide sont
+    gérés.
+  </p>
+  <TasksPanel client:load apiUrl={tasksApiUrl()} />
+</PageLayout>

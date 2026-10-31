@@ -1,17 +1,23 @@
 import { expect, test } from '@playwright/test'
 
 test.describe('Accueil', () => {
-  test('affiche le hero et le carrousel', async ({ page }) => {
+  test('affiche le hero, le carrousel et les articles', async ({ page }) => {
     await page.goto('/')
 
     await expect(page.getByTestId('home-hero')).toBeVisible()
     await expect(page.getByTestId('home-carousel')).toBeVisible()
     await expect(page.getByTestId('carousel-slide')).toHaveCount(5)
+    await expect(page.getByTestId('home-blog-card')).toHaveCount(3)
+    await expect(page.getByTestId('home-blog-error')).toHaveCount(0)
+    await expect(page.getByTestId('home-blog-empty')).toHaveCount(0)
   })
 
-  test('l’image du hero est prioritaire et préchargée', async ({ request }) => {
+  test('l’image du hero est prioritaire et préchargée, les articles dans le HTML initial', async ({
+    request,
+  }) => {
     const html = await (await request.get('/')).text()
 
+    expect(html.match(/data-testid="home-blog-card"/g)).toHaveLength(3)
     expect(html).toMatch(
       /<link rel="preload" as="image" type="image\/avif"[^>]*fetchpriority="high"/,
     )

@@ -36,6 +36,12 @@ const VIOLATIONS: readonly Violation[] = [
     expected: 'L’application ne dépend d’aucun framework',
   },
   {
+    rule: 'module vers autre module',
+    file: 'src/modules/blog/ui/archSelftestViolation.ts',
+    source: "export { CatalogPage } from '@/modules/catalog'\n",
+    expected: 'la couche « ui » ne peut pas importer « module »',
+  },
+  {
     rule: 'interface vers infrastructure dans un module à couche application',
     file: 'src/modules/catalog/ui/archSelftestViolation.ts',
     source:

@@ -107,8 +107,7 @@ test.describe('Menu mobile', () => {
     ).toBeVisible()
   })
 
-  // Page /contact livrée au lot L5 du chantier.
-  test.fixme('le lien de la page courante porte aria-current', async ({ page }) => {
+  test('le lien de la page courante porte aria-current', async ({ page }) => {
     await gotoHydrated(page, '/contact')
     await page.getByTestId('layout-mobile-menu-toggle').click()
     const menu = page.getByTestId('layout-mobile-menu')

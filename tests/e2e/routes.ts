@@ -1,5 +1,7 @@
 export const STATIC_ROUTES = [
   '/',
+  '/taches',
+  '/contact',
   '/catalogue',
   '/mentions-legales',
   '/donnees-personnelles',
