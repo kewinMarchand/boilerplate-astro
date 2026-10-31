@@ -1,0 +1,279 @@
+@import '@kewinmarchand/boilerplates-ui/tokens/tokens.css';
+@import 'tailwindcss';
+@import '@kewinmarchand/boilerplates-ui/tokens/tailwind.css';
+@import '@kewinmarchand/boilerplates-ui/css';
+@import '@fontsource-variable/inter';
+
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Arial'), local('Liberation Sans'), local('LiberationSans-Regular');
+  size-adjust: 106.86%;
+  ascent-override: 90.66%;
+  descent-override: 22.57%;
+  line-gap-override: 0%;
+}
+
+@custom-variant js (&:where(.js, .js *));
+@custom-variant no-js (&:where(:root:not(.js), :root:not(.js) *));
+
+/* Valeurs propres au site. Couleurs, polices, tailles, rayons et points de rupture viennent des tokens de boilerplates-ui. */
+@theme {
+  --text-h1--font-weight: 700;
+  --text-h1--line-height: 1.2;
+  --text-h2--font-weight: 600;
+
+  --container-content: var(--bui-container-content);
+  --container-prose: var(--bui-container-prose);
+  --container-form: var(--bui-container-form);
+}
+
+:root {
+  --gutter: 16px;
+  --hero-overlay: linear-gradient(
+    90deg,
+    rgb(0 0 0 / 0.75) 0%,
+    rgb(0 0 0 / 0.6) 55%,
+    rgb(0 0 0 / 0.3) 100%
+  );
+
+  @variant md {
+    --gutter: 24px;
+  }
+
+  @variant lg {
+    --gutter: 32px;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-surface font-sans text-body text-text antialiased;
+    overflow-wrap: break-word;
+  }
+
+  :focus-visible {
+    @apply outline-3 outline-offset-2 outline-primary;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full;
+    max-width: calc(var(--container-content) + 2 * var(--gutter));
+    padding-inline: var(--gutter);
+  }
+
+  .page-grid {
+    @apply grid py-8 has-[>.full-bleed:first-child]:pt-0;
+    grid-template-columns:
+      [full-start] minmax(var(--gutter), 1fr)
+      [content-start] minmax(0, var(--container-content))
+      [content-end] minmax(var(--gutter), 1fr)
+      [full-end];
+
+    & > * {
+      grid-column: content;
+    }
+
+    & > .full-bleed {
+      grid-column: full;
+    }
+  }
+
+  .heading-1 {
+    @apply mb-4 text-h1;
+  }
+
+  .lead {
+    @apply mb-6 max-w-prose;
+  }
+
+  .section-title {
+    @apply mb-4 text-h2;
+  }
+
+  .header-bar {
+    @apply flex min-h-16 items-center gap-2 py-2 lg:flex-wrap max-lg:no-js:flex-wrap;
+  }
+
+  .skip-link {
+    @apply absolute -top-16 left-2 rounded-md bg-surface p-3 text-primary focus-visible:top-2;
+    z-index: var(--bui-z-index-skip-link);
+  }
+
+  .footer-link {
+    @apply inline-flex min-h-touch items-center text-body-sm text-primary underline underline-offset-4;
+  }
+
+  .hero {
+    @apply relative isolate mb-12 flex min-h-120 items-center overflow-hidden text-white md:h-[min(80vh,720px)];
+  }
+
+  .hero-media {
+    @apply absolute inset-0 -z-20 size-full object-cover;
+  }
+
+  .hero-overlay {
+    @apply absolute inset-0 -z-10;
+    background: var(--hero-overlay);
+  }
+
+  .hero-overline {
+    @apply mb-2 text-overline font-semibold tracking-wide uppercase;
+  }
+
+  .carousel-viewport {
+    @apply snap-x snap-mandatory overflow-x-auto;
+
+    &[data-embla-ready] {
+      @apply snap-none overflow-hidden;
+    }
+  }
+
+  .carousel-track {
+    @apply -ml-4 flex touch-pan-y;
+  }
+
+  .carousel-slide {
+    @apply min-w-0 shrink-0 grow-0 basis-full snap-start pl-4 md:basis-1/2 lg:basis-1/3;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 320px;
+  }
+
+  .carousel-dot {
+    @apply flex size-touch items-center justify-center rounded-full after:size-3 after:rounded-full after:border-2 after:border-primary aria-[current=true]:after:bg-primary;
+  }
+
+  .blog-grid {
+    @apply grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3;
+  }
+
+  .prose-legal {
+    @apply flex max-w-prose flex-col gap-4;
+
+    & h2 {
+      @apply mt-4 text-h2;
+    }
+
+    & ul {
+      @apply list-disc pl-6;
+    }
+
+    & a {
+      @apply text-primary underline;
+    }
+  }
+}
+
+[data-a11y-mode='enhanced'] {
+  --hero-overlay: rgb(0 0 0 / 0.85);
+
+  scroll-behavior: auto;
+
+  & main :where(p, li, dd, dt, td, th):not(:where(nav, [data-ui-chrome]) *) {
+    max-width: 70ch;
+    line-height: 1.8;
+    letter-spacing: 0.12em;
+    word-spacing: 0.16em;
+  }
+
+  & main p:not(:where(nav, [data-ui-chrome]) *) {
+    margin-bottom: 2em;
+  }
+
+  & main :where(h1, h2, h3) {
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
+
+  & a {
+    text-decoration: underline;
+  }
+
+  & :focus-visible {
+    outline-width: 4px;
+    outline-offset: 2px;
+  }
+
+  & *,
+  & *::before,
+  & *::after {
+    animation: none;
+    transition: none;
+    scroll-behavior: auto;
+  }
+}
+
+@layer components {
+  .logo-link {
+    @apply inline-flex min-h-touch items-center gap-3 font-semibold;
+  }
+}
+
+@layer components {
+  .catalog-layout {
+    @apply grid gap-12 lg:grid-cols-[280px_minmax(0,1fr)];
+  }
+
+  .catalog-aside {
+    @apply js:max-lg:hidden;
+  }
+
+  .catalog-toolbar {
+    @apply mb-4 flex flex-wrap items-end gap-4;
+  }
+
+  .catalog-grid {
+    @apply grid gap-6;
+    grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+
+    &[data-view='liste'] {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .product-card {
+    @apply @container h-full overflow-hidden rounded-md border border-border-subtle;
+  }
+
+  .product-card-body {
+    @apply flex flex-col @lg:flex-row;
+  }
+
+  .product-card-image {
+    @apply aspect-square h-auto w-full object-cover @lg:w-48 @lg:shrink-0;
+  }
+
+  .facet-link {
+    @apply flex min-h-touch items-center gap-2;
+  }
+}
+
+@layer components {
+  .category-menu {
+    @apply absolute top-full left-0 mt-2 rounded-md bg-surface p-2 text-text shadow-xl;
+    z-index: var(--bui-z-index-dropdown);
+  }
+
+  .category-menu-all {
+    @apply flex min-h-touch items-center px-3 font-semibold text-primary underline underline-offset-4;
+  }
+
+  .category-menu-column {
+    @apply w-60 border-l border-border-subtle first:border-l-0;
+  }
+
+  .category-menu-link {
+    @apply flex min-h-touch items-center justify-between gap-2 rounded-md px-3 hover:bg-info-surface aria-expanded:bg-info-surface;
+  }
+
+  .mobile-menu-item {
+    @apply flex min-h-touch w-full items-center justify-between gap-2 rounded-md px-2 text-left hover:bg-info-surface;
+  }
+}
+
+@layer components {
+  .category-menu-end {
+    @apply right-0 left-auto;
+  }
+}

@@ -1,0 +1,21 @@
+---
+import { responsiveSrcset } from './responsiveSrcset'
+
+// Préchargement de l'image LCP, posé dans le <head> par la vue (slot « head » du layout).
+interface Props {
+  basePath: string
+  widths: number[]
+  sizes: string
+}
+
+const { basePath, widths, sizes } = Astro.props
+---
+
+<link
+  rel="preload"
+  as="image"
+  type="image/avif"
+  imagesrcset={responsiveSrcset(basePath, widths, 'avif')}
+  imagesizes={sizes}
+  fetchpriority="high"
+/>

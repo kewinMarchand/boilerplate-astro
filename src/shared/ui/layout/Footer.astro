@@ -1,0 +1,24 @@
+---
+import { LEGAL_NAVIGATION, SITE } from '@/shared/config'
+import { resolveHref } from '@/shared/routing'
+---
+
+<footer class="mt-12 bg-surface-muted py-6" data-testid="app-footer">
+  <div class="container-page flex flex-col gap-4">
+    <nav aria-label="Liens légaux">
+      <ul class="flex flex-wrap gap-x-6 gap-y-2">
+        {LEGAL_NAVIGATION.map((item) => (
+          <li>
+            <a href={resolveHref(item.href)} class="footer-link">
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <p class="flex items-center gap-2 text-body-sm text-text-muted">
+      <img src="/logo-mark.svg" alt="" width="24" height="24" />
+      {SITE.name}
+    </p>
+  </div>
+</footer>

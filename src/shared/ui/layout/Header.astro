@@ -1,0 +1,54 @@
+---
+import { CATALOG_NAVIGATION, MAIN_NAVIGATION, SITE } from '@/shared/config'
+import { A11yModeToggle } from '@/shared/ui/a11y-mode'
+import { ColorSchemeToggle } from '@/shared/ui/color-scheme'
+
+import MobileMenu from './MobileMenu.svelte'
+import NavLink from './NavLink.astro'
+
+import type { NavigationNode } from '@/shared/config'
+
+interface Props {
+  categoryMenu: NavigationNode[]
+}
+
+const { categoryMenu } = Astro.props
+const { pathname } = Astro.url
+const [home, ...otherLinks] = MAIN_NAVIGATION
+---
+
+<header class="bg-primary text-on-primary">
+  <div class="container-page header-bar">
+    <a
+      href="/"
+      class="logo-link min-w-0 grow"
+      aria-current={pathname === '/' ? 'page' : undefined}
+      data-testid="layout-logo"
+    >
+      <img src="/logo-mark.svg" alt="" width="40" height="40" />
+      {SITE.name}
+    </a>
+    <nav aria-label="Navigation principale" class="js:max-lg:hidden">
+      <ul class="flex flex-wrap gap-1">
+        {home && (
+          <li>
+            <NavLink {...home} />
+          </li>
+        )}
+        <li>
+          <NavLink {...CATALOG_NAVIGATION} />
+        </li>
+        {otherLinks.map((item) => (
+          <li>
+            <NavLink {...item} />
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <div class="hidden js:max-lg:block">
+      <MobileMenu client:media="(max-width: 1023.98px)" nodes={categoryMenu} {pathname} />
+    </div>
+    <ColorSchemeToggle client:load />
+    <A11yModeToggle client:load />
+  </div>
+</header>

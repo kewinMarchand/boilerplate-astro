@@ -1,7 +1,14 @@
-import { fileURLToPath } from 'node:url'
-import { defineConfig } from 'vitest/config'
+/// <reference types="vitest/config" />
 
-export default defineConfig({
-  resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
-  test: { include: ['src/**/*.test.ts', 'tools/**/*.test.ts'], passWithNoTests: true },
+import { svelteTesting } from '@testing-library/svelte/vite'
+import { getViteConfig } from 'astro/config'
+
+export default getViteConfig({
+  plugins: [svelteTesting()],
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./vitest.setup.ts'],
+    include: ['src/**/*.test.ts', 'tools/**/*.test.ts'],
+  },
 })

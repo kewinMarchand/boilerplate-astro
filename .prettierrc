@@ -6,6 +6,14 @@
   "tabWidth": 2,
   "arrowParens": "always",
   "endOfLine": "lf",
-  "plugins": ["prettier-plugin-astro", "prettier-plugin-svelte"],
-  "overrides": [{ "files": "*.astro", "options": { "parser": "astro" } }]
+  "plugins": ["prettier-plugin-astro", "prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
+  "overrides": [
+    {
+      "files": "*.astro",
+      "options": {
+        "parser": "astro"
+      }
+    }
+  ],
+  "tailwindStylesheet": "./src/shared/theme/theme.css"
 }

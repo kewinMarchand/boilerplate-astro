@@ -1,12 +1,24 @@
 ---
-import '@/shared/theme/global.css'
+import { A11Y_MODE_SCRIPT } from '@/shared/ui/a11y-mode'
+import { COLOR_SCHEME_SCRIPT } from '@/shared/ui/color-scheme'
+
+import Footer from './Footer.astro'
+import Header from './Header.astro'
+
+import type { NavigationNode } from '@/shared/config'
+
+import '@/shared/theme/theme.css'
 
 interface Props {
   title: string
   description: string
+  categoryMenu?: NavigationNode[]
 }
 
-const { title, description } = Astro.props
+const { title, description, categoryMenu = [] } = Astro.props
+
+// Amorçage avant le premier rendu : classe js (amélioration progressive), mode renforcé, thème mémorisé.
+const BOOT_SCRIPT = `document.documentElement.classList.add('js');${A11Y_MODE_SCRIPT}${COLOR_SCHEME_SCRIPT}`
 ---
 
 <!doctype html>
@@ -14,11 +26,28 @@ const { title, description } = Astro.props
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1d4ed8" />
     <meta name="color-scheme" content="light dark" />
+    <meta name="format-detection" content="telephone=no, email=no, address=no" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <script is:inline set:html={BOOT_SCRIPT} />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <slot name="head" />
   </head>
   <body>
-    <slot />
+    <div class="flex min-h-screen flex-col">
+      <a href="#main" class="skip-link">
+        Aller au contenu principal
+      </a>
+      <Header {categoryMenu} />
+      <main id="main" tabindex="-1" class="page-grid grow">
+        <slot />
+      </main>
+      <Footer />
+    </div>
   </body>
 </html>

@@ -1,5 +1,6 @@
 import node from '@astrojs/node'
 import svelte from '@astrojs/svelte'
+import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'astro/config'
 
 export default defineConfig({
@@ -9,4 +10,5 @@ export default defineConfig({
   integrations: [svelte()],
   server: { port: 4321, host: true },
   devToolbar: { enabled: false },
+  vite: { plugins: [tailwindcss()] },
 })
