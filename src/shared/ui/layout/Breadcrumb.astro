@@ -1,0 +1,29 @@
+---
+import { resolveHref } from '@/shared/routing'
+
+import type { Seo } from '@/shared/seo'
+
+interface Props {
+  items: Seo.BreadcrumbItem[]
+}
+
+const { items } = Astro.props
+---
+
+<nav class="bui-breadcrumb mb-4" aria-label="Fil d’Ariane" data-testid="layout-breadcrumb">
+  <ol class="bui-breadcrumb__list">
+    {items.map((item, index) => (
+      <li class="bui-breadcrumb__item">
+        {index === items.length - 1 ? (
+          <span class="bui-breadcrumb__current" aria-current="page">
+            {item.label}
+          </span>
+        ) : (
+          <a class="bui-link" href={resolveHref(item.path)}>
+            {item.label}
+          </a>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>

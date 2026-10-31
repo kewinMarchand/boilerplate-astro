@@ -1,0 +1,6 @@
+---
+import { areDevRoutesEnabled } from '@/shared/errors'
+
+if (!areDevRoutesEnabled()) return Astro.rewrite('/404')
+throw new Error('Erreur volontaire de la route de test')
+---

@@ -1,5 +1,6 @@
 ---
 import { SITE } from '@/shared/config'
+import { buildHomeJsonLd, buildPageMeta } from '@/shared/seo'
 import { ImageCarousel } from '@/shared/ui/carousel'
 import { ImagePreload } from '@/shared/ui/kit'
 import BaseLayout from '@/shared/ui/layout/BaseLayout.astro'
@@ -7,9 +8,11 @@ import BaseLayout from '@/shared/ui/layout/BaseLayout.astro'
 import { HOME_SLIDES } from './featuredSlides'
 import Hero from './Hero.astro'
 import { HERO_IMAGE } from './heroImage'
+
+const meta = buildPageMeta({ description: SITE.description, path: '/', jsonLd: buildHomeJsonLd() })
 ---
 
-<BaseLayout title={SITE.name} description={SITE.description}>
+<BaseLayout {meta}>
   <ImagePreload
     slot="head"
     basePath={HERO_IMAGE.basePath}

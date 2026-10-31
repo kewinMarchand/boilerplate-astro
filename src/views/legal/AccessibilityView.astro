@@ -1,0 +1,83 @@
+---
+import { computeComplianceStatus, hasAudit, SITE } from '@/shared/config'
+import PageLayout from '@/shared/ui/layout/PageLayout.astro'
+
+const { publisher, accessibility } = SITE
+const status = computeComplianceStatus(accessibility)
+const audited = hasAudit(accessibility)
+---
+
+<PageLayout
+  title="Déclaration d'accessibilité"
+  description="Déclaration d’accessibilité RGAA 4.1.2 du site : état de conformité, résultats des tests, environnement de test et voies de recours."
+>
+  <div class="prose-legal">
+    <p>
+      {publisher.name} s’engage à rendre son site accessible conformément à l’article 47 de la loi
+      n° 2005-102 du 11 février 2005. Cette déclaration s’applique au site {SITE.name}.
+    </p>
+
+    <h2>État de conformité</h2>
+    <p data-testid="legal-compliance-status">
+      Le site est <strong>{status}</strong> avec le référentiel général d’amélioration de
+      l’accessibilité (RGAA), version 4.1.2
+      {audited ? '.' : ' : aucun audit n’a encore été réalisé.'}
+    </p>
+
+    <h2>Résultats des tests</h2>
+    {audited && (
+      <p>
+        L’audit réalisé le {accessibility.auditDate} par {accessibility.auditor} relève un taux de
+        conformité de {accessibility.complianceRate} %.
+      </p>
+    )}
+    <p>
+      Des tests automatisés axe-core sont exécutés sur chaque page (critères WCAG 2.1 niveaux A et
+      AA, en affichage standard, sombre et en mode accessibilité renforcée). Ils ne valent pas audit
+      : ils ne couvrent qu’une partie du RGAA.
+    </p>
+
+    <h2>Contenus non accessibles</h2>
+    <p>À compléter après audit.</p>
+
+    <h2>Mode accessibilité renforcée</h2>
+    <p>
+      Le bouton « Accessibilité renforcée », dans l’en-tête, agrandit le texte, augmente les
+      espacements, renforce les contrastes, souligne les liens et coupe les animations. Le choix est
+      mémorisé sur cet appareil.
+    </p>
+
+    <h2>Environnement de test</h2>
+    <ul>
+      <li>Chromium (Playwright), affichage bureau et mobile ;</li>
+      <li>axe-core, via @axe-core/playwright ;</li>
+      <li>Lighthouse.</li>
+    </ul>
+
+    <h2>Retour d’information et contact</h2>
+    <p>
+      Si vous ne parvenez pas à accéder à un contenu ou à un service, contactez-nous par
+      <a href={`mailto:${publisher.email}`}>e-mail</a> ou via le
+      <a href="/contact">formulaire de contact</a>.
+    </p>
+
+    <h2>Voies de recours</h2>
+    <p>
+      Si vous avez signalé un défaut d’accessibilité sans obtenir de réponse satisfaisante, vous
+      pouvez saisir le Défenseur des droits :
+    </p>
+    <ul>
+      <li>
+        par le <a href="https://formulaire.defenseurdesdroits.fr/">formulaire en ligne</a> ;
+      </li>
+      <li>
+        auprès d’un <a href="https://www.defenseurdesdroits.fr/carte-des-delegues">délégué</a> de
+        votre région ;
+      </li>
+      <li>
+        par courrier, gratuit et sans affranchissement : Défenseur des droits, Libre réponse 71120,
+        75342 Paris CEDEX 07.
+      </li>
+    </ul>
+  </div>
+</PageLayout>

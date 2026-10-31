@@ -1,0 +1,22 @@
+---
+import { resolveHref } from '@/shared/routing'
+
+import type { NavigationNode } from '@/shared/config'
+
+interface Props {
+  nodes: NavigationNode[]
+}
+
+const { nodes } = Astro.props
+---
+
+{nodes.length > 0 && (
+  <ul>
+    {nodes.map((node) => (
+      <li>
+        <a href={resolveHref(node.path)}>{node.label}</a>
+        <Astro.self nodes={node.children} />
+      </li>
+    ))}
+  </ul>
+)}

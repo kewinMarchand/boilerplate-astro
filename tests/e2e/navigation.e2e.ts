@@ -21,6 +21,15 @@ test.describe('Navigation', () => {
     await skipLink.press('Enter')
     await expect(page).toHaveURL(/#main$/)
   })
+
+  test('le footer mène aux quatre pages légales', async ({ page }) => {
+    await page.goto('/')
+
+    const legal = page.getByRole('navigation', { name: 'Liens légaux' })
+    await expect(legal.getByRole('link')).toHaveCount(4)
+    await legal.getByRole('link', { name: 'Mentions légales' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Mentions légales' })).toBeVisible()
+  })
 })
 
 test.describe('Header mobile compact', () => {

@@ -1,4 +1,5 @@
 ---
+import { SeoHead } from '@/shared/seo'
 import { A11Y_MODE_SCRIPT } from '@/shared/ui/a11y-mode'
 import { COLOR_SCHEME_SCRIPT } from '@/shared/ui/color-scheme'
 
@@ -6,16 +7,16 @@ import Footer from './Footer.astro'
 import Header from './Header.astro'
 
 import type { NavigationNode } from '@/shared/config'
+import type { Seo } from '@/shared/seo'
 
 import '@/shared/theme/theme.css'
 
 interface Props {
-  title: string
-  description: string
-  categoryMenu?: NavigationNode[]
+  meta: Seo.Meta
+  categoryMenu?: NavigationNode[] | undefined
 }
 
-const { title, description, categoryMenu = [] } = Astro.props
+const { meta, categoryMenu = [] } = Astro.props
 
 // Amorçage avant le premier rendu : classe js (amélioration progressive), mode renforcé, thème mémorisé.
 const BOOT_SCRIPT = `document.documentElement.classList.add('js');${A11Y_MODE_SCRIPT}${COLOR_SCHEME_SCRIPT}`
@@ -34,8 +35,7 @@ const BOOT_SCRIPT = `document.documentElement.classList.add('js');${A11Y_MODE_SC
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <script is:inline set:html={BOOT_SCRIPT} />
-    <title>{title}</title>
-    <meta name="description" content={description} />
+    <SeoHead {meta} />
     <slot name="head" />
   </head>
   <body>

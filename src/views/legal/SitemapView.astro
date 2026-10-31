@@ -1,0 +1,31 @@
+---
+import { ALL_NAVIGATION, CATALOG_NAVIGATION } from '@/shared/config'
+import { resolveHref } from '@/shared/routing'
+import PageLayout from '@/shared/ui/layout/PageLayout.astro'
+
+import SitemapTree from './SitemapTree.astro'
+
+import type { NavigationNode } from '@/shared/config'
+
+interface Props {
+  categories: NavigationNode[]
+}
+
+const { categories } = Astro.props
+---
+
+<PageLayout
+  title="Plan du site"
+  description="Plan du site : toutes les pages accessibles, dont chaque catégorie du catalogue de plantes tropicales."
+>
+  <div class="prose-legal">
+    <ul data-testid="legal-sitemap">
+      {ALL_NAVIGATION.map((item) => (
+        <li>
+          <a href={resolveHref(item.href)}>{item.label}</a>
+          {item.href === CATALOG_NAVIGATION.href && <SitemapTree nodes={categories} />}
+        </li>
+      ))}
+    </ul>
+  </div>
+</PageLayout>

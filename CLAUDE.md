@@ -13,6 +13,8 @@ Boilerplate personnel, pour les sites de contenu. Les conventions générales so
 - **Îlots** : bascules du thème et du mode renforcé en `client:load` ; menu mobile en `client:media="(max-width: 1023.98px)"` (aucun JavaScript sur desktop) ; carrousel en `client:visible`. Les composants Svelte repris de SvelteKit reçoivent en propriété ce que SvelteKit lisait dans `$app/state` (chemin courant).
 - **Amorçage** : `BaseLayout.astro` pose un script inline (`is:inline`) qui ajoute la classe `js`, puis applique le mode renforcé et le thème mémorisés avant le premier rendu.
 - **Image LCP** : Astro ne remonte pas le `<svelte:head>` d'un composant Svelte rendu sur le serveur. Le préchargement passe par `ImagePreload.astro` (façade `kit`), placé par la vue dans le slot `head` du layout ; `ResponsiveImage.svelte` ne garde que l'image.
+- **SEO** : fonctions pures de `@/shared/seo` reprises de SvelteKit ; `SeoHead.astro` les rend dans le `<head>` du layout (Astro ne remonte pas `<svelte:head>`). `PageLayout.astro` calcule fil d'Ariane et métadonnées d'une seule source, puis rend le fil et le `<h1>`. Les pages pré-rendues reçoivent leur chemin avec une barre finale : `toAppPath` la retire (canonique et fil d'Ariane).
+- **Erreurs** : `src/pages/404.astro` et `500.astro` (vue `@/views/errors`). Route de test de la 500 : `/erreur-test` (Astro ignore les fichiers de `src/pages/` préfixés par `_`), 404 hors dev sauf `DEV_ROUTES=1`. Maintenance : `MAINTENANCE=1` dans `src/middleware.ts`, 503 et `Retry-After`.
 - **Unité de police** : `px`.
 - **Langue** : français uniquement, URL en français.
 
@@ -51,4 +53,4 @@ Boilerplate personnel, pour les sites de contenu. Les conventions générales so
 
 ## Avancement
 
-Construit par lots (cadrage : section 21 de la spec commune). Fait : squelette (L1) ; layout, modes renforcé et sombre, accueil hero et carrousel (L2).
+Construit par lots (cadrage : section 21 de la spec commune). Fait : squelette (L1) ; layout, modes renforcé et sombre, accueil hero et carrousel (L2) ; SEO, fil d'Ariane, pages légales, plan du site, sitemap, robots, erreurs et maintenance (L3).

@@ -1,0 +1,33 @@
+---
+import { toAppPath } from '@/shared/routing'
+import { buildBreadcrumb, buildPageMeta } from '@/shared/seo'
+
+import BaseLayout from './BaseLayout.astro'
+import Breadcrumb from './Breadcrumb.astro'
+
+import type { NavigationNode } from '@/shared/config'
+import type { Seo } from '@/shared/seo'
+
+// Page interne : fil d'Ariane et métadonnées calculés d'une seule source, puis le <h1>.
+interface Props {
+  title: string
+  description: string
+  parents?: Seo.BreadcrumbItem[]
+  seo?: Omit<Seo.Input, 'title' | 'description' | 'path' | 'breadcrumb'>
+  categoryMenu?: NavigationNode[] | undefined
+}
+
+const { title, description, parents = [], seo = {}, categoryMenu } = Astro.props
+const path = toAppPath(Astro.url.pathname)
+const breadcrumb = buildBreadcrumb({ label: title, path }, parents)
+const meta = buildPageMeta({ ...seo, title, description, path, breadcrumb })
+---
+
+<BaseLayout {meta} {categoryMenu}>
+  <slot name="head" slot="head" />
+  <Breadcrumb items={breadcrumb} />
+  <h1 id="page-title" tabindex="-1" class="heading-1">
+    {title}
+  </h1>
+  <slot />
+</BaseLayout>

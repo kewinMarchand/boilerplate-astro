@@ -1,0 +1,39 @@
+---
+import { Button } from '@/shared/ui/kit'
+import PageLayout from '@/shared/ui/layout/PageLayout.astro'
+
+interface Props {
+  status: number
+}
+
+const { status } = Astro.props
+const isNotFound = status === 404
+const title = isNotFound ? 'Page introuvable' : 'Une erreur est survenue'
+const description = isNotFound
+  ? "La page demandée n'existe pas ou a été déplacée. Utilisez le plan du site ou le catalogue pour retrouver votre chemin."
+  : 'Une erreur inattendue nous empêche d’afficher cette page. Réessayez dans quelques instants ou revenez à l’accueil.'
+---
+
+<PageLayout {title} {description} seo={{ noindex: true }}>
+  <p class="lead">{description}</p>
+  <div class="flex flex-wrap gap-4">
+    {!isNotFound && (
+      <Button href={Astro.url.pathname} data-testid="error-retry">
+        Réessayer
+      </Button>
+    )}
+    <Button href="/" variant={isNotFound ? 'primary' : 'outline'} data-testid="error-home-link">
+      Retour à l'accueil
+    </Button>
+    {isNotFound && (
+      <Button href="/plan-du-site" variant="outline" data-testid="error-sitemap-link">
+        Plan du site
+      </Button>
+    )}
+    {isNotFound && (
+      <Button href="/catalogue" variant="outline" data-testid="error-catalog-link">
+        Catalogue
+      </Button>
+    )}
+  </div>
+</PageLayout>
