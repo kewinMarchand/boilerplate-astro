@@ -57,7 +57,7 @@
     "@kewinmarchand/boilerplates-ui": "github:kewinMarchand/boilerplates-ui#v0.11.1",
     "@kewinmarchand/csp": "github:kewinMarchand/csp#v0.1.1",
     "@lhci/cli": "^0.15.1",
-    "@playwright/test": "1.64.0",
+    "@playwright/test": "1.64.1",
     "@tailwindcss/vite": "^4.3.3",
     "@testing-library/dom": "^10",
     "@testing-library/jest-dom": "^7.0.1",
