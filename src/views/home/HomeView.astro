@@ -1,23 +1,24 @@
 ---
 import { SITE } from '@/shared/config'
 import { buildHomeJsonLd, buildPageMeta } from '@/shared/seo'
-import { ImageCarousel } from '@/shared/ui/carousel'
 import { ImagePreload } from '@/shared/ui/kit'
 import BaseLayout from '@/shared/ui/layout/BaseLayout.astro'
 
 import { BlogSection } from '@/modules/blog'
+import { FeaturedCarousel } from '@/modules/content'
 
-import { HOME_SLIDES } from './featuredSlides'
 import Hero from './Hero.astro'
 import { HERO_IMAGE } from './heroImage'
 
 import type { Article } from '@/modules/blog'
+import type { Slide } from '@/modules/content'
 
 interface Props {
+  carousel: Slide.Carousel
   blog: Article.Blog
 }
 
-const { blog } = Astro.props
+const { carousel, blog } = Astro.props
 
 const meta = buildPageMeta({ description: SITE.description, path: '/', jsonLd: buildHomeJsonLd() })
 ---
@@ -31,12 +32,7 @@ const meta = buildPageMeta({ description: SITE.description, path: '/', jsonLd: b
   />
   <Hero />
 
-  <section aria-labelledby="home-carousel-title" data-testid="home-carousel">
-    <h2 id="home-carousel-title" class="section-title">
-      À la une
-    </h2>
-    <ImageCarousel client:visible slides={HOME_SLIDES} label="À la une" />
-  </section>
+  <FeaturedCarousel {carousel} />
 
   <BlogSection {blog} />
 </BaseLayout>

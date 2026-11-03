@@ -9,9 +9,6 @@ export type ComplianceStatus = 'non conforme' | 'partiellement conforme' | 'tota
 const PARTIAL_COMPLIANCE_THRESHOLD = 50
 const FULL_COMPLIANCE_RATE = 100
 
-export const hasAudit = ({ auditDate, complianceRate }: AccessibilityAudit) =>
-  auditDate !== null && complianceRate !== null
-
 export const computeComplianceStatus = ({
   auditDate,
   complianceRate,

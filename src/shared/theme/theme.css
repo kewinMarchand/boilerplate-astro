@@ -164,8 +164,13 @@
       @apply list-disc pl-6;
     }
 
+    & ol {
+      @apply list-decimal pl-6;
+    }
+
+    /* Liens sans classe (HTML des pages légales venu de l'API) : rendu de .bui-link */
     & a {
-      @apply text-primary underline;
+      @apply text-primary underline decoration-1 underline-offset-[0.2em] hover:text-primary-dark hover:decoration-2;
     }
   }
 }

@@ -1,0 +1,28 @@
+---
+import { Alert } from '@/shared/ui/kit'
+
+import type { LegalPage } from '../domain/legalPage'
+
+interface Props {
+  page: LegalPage.Content
+}
+
+// HTML venu de l'API, qui échappe le HTML saisi dans l'admin et retire les liens dangereux : injecté tel quel.
+const { page } = Astro.props
+---
+
+{page.status === 'error' ? (
+  <Alert variant="error" data-testid="legal-error">
+    {page.message}
+  </Alert>
+) : (
+  <>
+    <Fragment set:html={page.page.introduction} />
+    {page.page.sections.map((section) => (
+      <section class="flex flex-col gap-4" data-testid="legal-section">
+        <h2>{section.title}</h2>
+        <Fragment set:html={section.html} />
+      </section>
+    ))}
+  </>
+)}

@@ -1,5 +1,5 @@
 export type { AccessibilityAudit, ComplianceStatus } from './accessibility'
-export { computeComplianceStatus, hasAudit } from './accessibility'
+export { computeComplianceStatus } from './accessibility'
 export type { NavigationItem, NavigationNode } from './navigation'
 export {
   ALL_NAVIGATION,

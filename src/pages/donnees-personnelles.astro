@@ -1,5 +1,10 @@
 ---
+import { loadLegalPage } from '@/modules/content/index.server'
+
 import { PersonalDataView } from '@/views/legal'
+
+const legalPage = await loadLegalPage('donnees-personnelles')
+if (legalPage.status === 'not-found') return Astro.rewrite('/404')
 ---
 
-<PersonalDataView />
+<PersonalDataView {legalPage} />

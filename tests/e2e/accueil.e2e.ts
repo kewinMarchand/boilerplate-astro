@@ -7,6 +7,7 @@ test.describe('Accueil', () => {
     await expect(page.getByTestId('home-hero')).toBeVisible()
     await expect(page.getByTestId('home-carousel')).toBeVisible()
     await expect(page.getByTestId('carousel-slide')).toHaveCount(5)
+    await expect(page.getByTestId('home-carousel-error')).toHaveCount(0)
     await expect(page.getByTestId('home-blog-card')).toHaveCount(3)
     await expect(page.getByTestId('home-blog-error')).toHaveCount(0)
     await expect(page.getByTestId('home-blog-empty')).toHaveCount(0)
@@ -61,6 +62,31 @@ test.describe('Carrousel', () => {
     await page.mouse.up()
 
     await expect(page.getByTestId('carousel-prev')).toBeEnabled()
+  })
+})
+
+test.describe('Carrousel, API en erreur (X-Scenario: error)', () => {
+  test.use({ extraHTTPHeaders: { 'X-Scenario': 'error' } })
+
+  test('affiche le message à la place des diapositives', async ({ page }) => {
+    await page.goto('/')
+
+    await expect(page.getByTestId('home-carousel-error')).toContainText(
+      'Impossible de charger le carrousel pour le moment.',
+    )
+    await expect(page.getByTestId('carousel-slide')).toHaveCount(0)
+  })
+})
+
+test.describe('Carrousel, API sans diapositive (X-Scenario: empty)', () => {
+  test.use({ extraHTTPHeaders: { 'X-Scenario': 'empty' } })
+
+  test('la section disparaît de l’accueil', async ({ page }) => {
+    await page.goto('/')
+
+    await expect(page.getByTestId('home-hero')).toBeVisible()
+    await expect(page.getByTestId('home-carousel')).toHaveCount(0)
+    await expect(page.getByTestId('home-carousel-error')).toHaveCount(0)
   })
 })
 

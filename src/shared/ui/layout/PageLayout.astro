@@ -11,13 +11,15 @@ import type { Seo } from '@/shared/seo'
 // Page interne : fil d'Ariane et métadonnées calculés d'une seule source, puis le <h1>.
 interface Props {
   title: string
+  /** Texte du <h1> s'il diffère du titre (contenu administré dans l'API). */
+  heading?: string | undefined
   description: string
   parents?: Seo.BreadcrumbItem[]
   seo?: Omit<Seo.Input, 'title' | 'description' | 'path' | 'breadcrumb'>
   categoryMenu?: NavigationNode[] | undefined
 }
 
-const { title, description, parents = [], seo = {}, categoryMenu } = Astro.props
+const { title, heading = title, description, parents = [], seo = {}, categoryMenu } = Astro.props
 const path = toAppPath(Astro.url.pathname)
 const breadcrumb = buildBreadcrumb({ label: title, path }, parents)
 const meta = buildPageMeta({ ...seo, title, description, path, breadcrumb })
@@ -27,7 +29,7 @@ const meta = buildPageMeta({ ...seo, title, description, path, breadcrumb })
   <slot name="head" slot="head" />
   <Breadcrumb items={breadcrumb} />
   <h1 id="page-title" tabindex="-1" class="heading-1">
-    {title}
+    {heading}
   </h1>
   <slot />
 </BaseLayout>

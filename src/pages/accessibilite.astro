@@ -1,5 +1,10 @@
 ---
+import { loadLegalPage } from '@/modules/content/index.server'
+
 import { AccessibilityView } from '@/views/legal'
+
+const legalPage = await loadLegalPage('accessibilite')
+if (legalPage.status === 'not-found') return Astro.rewrite('/404')
 ---
 
-<AccessibilityView />
+<AccessibilityView {legalPage} />

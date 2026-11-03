@@ -1,5 +1,10 @@
 ---
+import { loadLegalPage } from '@/modules/content/index.server'
+
 import { LegalNoticeView } from '@/views/legal'
+
+const legalPage = await loadLegalPage('mentions-legales')
+if (legalPage.status === 'not-found') return Astro.rewrite('/404')
 ---
 
-<LegalNoticeView />
+<LegalNoticeView {legalPage} />

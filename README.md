@@ -71,7 +71,7 @@ git fetch boilerplate
 git cherry-pick <sha>
 ```
 
-À personnaliser : `src/shared/config/` (nom, description, éditeur, hébergeur, navigation, audit d'accessibilité), `public/` (logo, favicons, manifeste, image de partage), `src/views/home/` (hero, carrousel), puis les modules.
+À personnaliser : `src/shared/config/` (nom, description, éditeur, hébergeur, navigation, audit d'accessibilité), `public/` (logo, favicons, manifeste, image de partage), `src/views/home/` (hero), puis les modules. Le carrousel de l'accueil et le texte des pages légales se modifient dans l'admin de l'API Platform (`/admin`).
 
 ## Commandes
 
@@ -97,7 +97,7 @@ Découpage commun aux boilerplates (`boilerplates-commun/ARCHITECTURE-DDD.md`), 
 src/
   pages/        couche de routage : un fichier par route, qui délègue
   views/        pages qui composent des modules ou sans métier (accueil, légal, erreurs, charte)
-  modules/      un dossier par sous-domaine : catalog, blog, task, contact
+  modules/      un dossier par sous-domaine : catalog, blog, task, contact, content
     <module>/domain, application, infrastructure, ui, index.ts (seul export public)
   shared/       socle sans métier : config, SEO, API, observabilité, sécurité, thème, kit d'interface
   actions/      actions serveur Astro (formulaire de contact)
@@ -111,7 +111,7 @@ server.mjs      serveur de production : statiques précompressés, puis Astro
 
 ## Tests
 
-- **Unitaires** : `src/**/*.test.ts` (domaine du catalogue, URL, prix, conformité, SEO, Matomo, CSP, composants des bascules).
+- **Unitaires** : `src/**/*.test.ts` (domaine du catalogue, URL, prix, conformité, chargement du carrousel et des pages légales, SEO, Matomo, CSP, composants des bascules).
 - **End-to-end** : `tests/e2e/`, un fichier par page ou par brique, ciblage par `data-testid`, rendus conditionnels testés présents et absents, scénarios sans JavaScript (carrousel, catalogue, contact, thème), états d'erreur et de liste vide par l'en-tête `X-Scenario`, envois vers un GlitchTip et un Matomo factices.
 - **Accessibilité** : `tests/a11y/`, axe-core sur chaque route, en standard, sombre et renforcé, desktop et mobile, menus ouverts compris. Axe ne couvre qu'une partie du RGAA : la déclaration reste « non conforme » sans audit.
 
