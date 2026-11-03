@@ -107,7 +107,7 @@ server.mjs      serveur de production : statiques précompressés, puis Astro
 
 ## Production
 
-`make docker-build` construit l'image (Node 24 Alpine, dépendances d'exécution seulement). `server.mjs` sert `dist/client` dans la variante précompressée que le navigateur accepte, avec un cache d'un an sur les fichiers versionnés de `/_astro/`, puis confie le reste à Astro, dont les pages sont compressées à la volée. Au démarrage, `[boilerplate-astro] serveur démarré (production)` permet de retrouver le bon fichier de log. La CSP est en mode Report-Only : chaque écart est signalé à `POST /api/csp-report` et écrit sur la sortie standard.
+`make docker-build` construit l'image (Node 26 Alpine, dépendances d'exécution seulement). `server.mjs` sert `dist/client` dans la variante précompressée que le navigateur accepte, avec un cache d'un an sur les fichiers versionnés de `/_astro/`, puis confie le reste à Astro, dont les pages sont compressées à la volée. Au démarrage, `[boilerplate-astro] serveur démarré (production)` permet de retrouver le bon fichier de log. La CSP est en mode Report-Only : chaque écart est signalé à `POST /api/csp-report` et écrit sur la sortie standard.
 
 ## Tests
 

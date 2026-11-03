@@ -65,7 +65,7 @@ Boilerplate personnel, pour les sites de contenu. Les conventions générales so
 
 - Dev 4321 (`make up`), e2e 3170 (Playwright, dans le conteneur), Lighthouse 3270 (section 7 de la spec commune).
 - Seuls prérequis : Docker avec Compose, `make` et git. Le service `node` (image officielle Playwright à la version exacte de `@playwright/test`) porte Node, Yarn et Chromium, dépendances dans le volume nommé `node_modules`. `ASTRO_TELEMETRY_DISABLED=1` dans les conteneurs.
-- Image de production : `Dockerfile` multi-étapes, `node dist/server/entry.mjs` sur le port 3000.
+- Image de production : `Dockerfile` multi-étapes sur Node 26 Alpine (même version majeure que l'image de dev ; Node 26 ne livre plus Yarn, installé par npm dans l'étape `base`, absent de l'image finale), `node dist/server/entry.mjs` sur le port 3000.
 
 ## Règles de lint propres au projet
 
