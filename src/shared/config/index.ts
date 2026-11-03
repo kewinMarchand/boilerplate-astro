@@ -8,5 +8,5 @@ export {
   LEGAL_NAVIGATION,
   MAIN_NAVIGATION,
 } from './navigation'
-export type { LegalEntity, SiteConfig } from './site'
+export type { SiteConfig } from './site'
 export { SITE } from './site'

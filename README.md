@@ -71,7 +71,7 @@ git fetch boilerplate
 git cherry-pick <sha>
 ```
 
-À personnaliser : `src/shared/config/` (nom, description, éditeur, hébergeur, navigation, audit d'accessibilité), `public/` (logo, favicons, manifeste, image de partage), `src/views/home/` (hero), puis les modules. Le carrousel de l'accueil et le texte des pages légales se modifient dans l'admin de l'API Platform (`/admin`).
+À personnaliser : `src/shared/config/` (nom, description, éditeur pour le SEO, navigation, audit d'accessibilité), `public/` (logo, favicons, manifeste, image de partage), `src/views/home/` (hero), puis les modules. Le carrousel de l'accueil et le texte des pages légales se modifient dans l'admin de l'API Platform (`/admin`).
 
 ## Commandes
 
