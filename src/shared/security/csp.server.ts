@@ -7,7 +7,7 @@ export { CSP_HEADER } from '@kewinmarchand/csp'
 /** En-tête Report-Only, calculé à l'exécution depuis les variables : rien à reconstruire pour les changer. */
 export const siteCspHeader = () =>
   siteCsp({
-    apiUrl: process.env['API_URL'] ?? 'http://localhost:8090',
+    apiUrl: process.env['API_URL'] || 'http://localhost:8090',
     matomoUrl: process.env['PUBLIC_MATOMO_URL'],
     glitchtipDsn: process.env['PUBLIC_GLITCHTIP_DSN'],
   })
