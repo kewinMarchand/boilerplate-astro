@@ -3,7 +3,7 @@
 
   import { formatPrice } from '../domain/price'
   import { EXPOSURE_LABELS, SIZE_LABELS } from './labels'
-  import { PRODUCT_IMAGE } from './productImage'
+  import { PRODUCT_IMAGE_SIZES } from './productImage'
 
   import type { Catalog } from '../domain/catalog'
 
@@ -24,18 +24,18 @@
 
 <article id={product.slug} class="product-card" data-testid="catalog-product">
   <div class="product-card-body">
-    <ResponsiveImage
-      basePath={PRODUCT_IMAGE.basePath(product.image)}
-      widths={PRODUCT_IMAGE.widths}
-      sizes={PRODUCT_IMAGE.sizes}
-      width={800}
-      height={800}
-      alt={product.name}
-      {eager}
-      {priority}
-      {fetchPriority}
-      class="product-card-image"
-    />
+    {#if product.image}
+      <ResponsiveImage
+        image={product.image}
+        sizes={PRODUCT_IMAGE_SIZES}
+        {eager}
+        {priority}
+        {fetchPriority}
+        class="product-card-image"
+      />
+    {:else}
+      <div class="product-card-image bg-surface-muted"></div>
+    {/if}
     <div class="flex flex-col gap-1 p-4">
       <h2 class="text-title font-semibold">{product.name}</h2>
       <p class="font-semibold" data-testid="catalog-product-price">{formatPrice(product.price)}</p>

@@ -1,5 +1,6 @@
 import type { Price } from './price'
 import type { AppPath } from '@/shared/routing'
+import type { ImageView } from '@/shared/ui/kit'
 
 export const EXPOSURES = ['soleil', 'mi-ombre', 'ombre'] as const
 export const SIZES = ['S', 'M', 'L'] as const
@@ -23,7 +24,7 @@ export declare namespace Catalog {
     exposure: Exposure
     size: Size
     inStock: boolean
-    image: number
+    image: ImageView | null
   }
 
   interface Category {

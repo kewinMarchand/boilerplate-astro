@@ -7,6 +7,6 @@ export const toArticle = (dto: ArticleDto): Article.Entity => ({
   id: String(dto.id),
   title: dto.title,
   excerpt: dto.excerpt,
-  imageBasePath: `/images/blog-${dto.id}`,
+  image: dto.image,
   publishedAt: dto.publishedAt,
 })

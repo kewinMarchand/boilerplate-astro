@@ -1,3 +1,5 @@
+import type { ImageView } from '@/shared/ui/kit'
+
 export declare namespace Article {
   type Id = string
 
@@ -5,7 +7,7 @@ export declare namespace Article {
     id: Id
     title: string
     excerpt: string
-    imageBasePath: string
+    image: ImageView | null
     publishedAt: string
   }
 

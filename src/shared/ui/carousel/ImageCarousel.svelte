@@ -38,15 +38,13 @@
           aria-label={`${position + 1} sur ${slides.length}`}
           data-testid="carousel-slide"
         >
-          <ResponsiveImage
-            basePath={slide.imageBasePath}
-            widths={[640, 960, 1280]}
-            sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-            width={1280}
-            height={720}
-            alt=""
-            class="aspect-video h-auto w-full rounded-md object-cover"
-          />
+          {#if slide.image}
+            <ResponsiveImage
+              image={slide.image}
+              sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+              class="aspect-video h-auto w-full rounded-md object-cover"
+            />
+          {/if}
           <h3 class="mt-3 text-title font-semibold">{slide.title}</h3>
           <p class="text-text-muted">{slide.text}</p>
         </div>

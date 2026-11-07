@@ -1,21 +1,23 @@
 ---
-import { responsiveSrcset } from './responsiveSrcset'
+import type { ImageView } from './image'
 
-// Préchargement de l'image LCP, posé dans le <head> par la vue (slot « head » du layout).
+// Préchargement de l'image LCP, posé dans le <head> par la vue (slot « head » du layout) : sa première source (AVIF).
 interface Props {
-  basePath: string
-  widths: number[]
+  image: ImageView
   sizes: string
 }
 
-const { basePath, widths, sizes } = Astro.props
+const { image, sizes } = Astro.props
+const [first] = image.sources
 ---
 
-<link
-  rel="preload"
-  as="image"
-  type="image/avif"
-  imagesrcset={responsiveSrcset(basePath, widths, 'avif')}
-  imagesizes={sizes}
-  fetchpriority="high"
-/>
+{first && (
+  <link
+    rel="preload"
+    as="image"
+    type={first.type}
+    imagesrcset={first.srcset}
+    imagesizes={sizes}
+    fetchpriority="high"
+  />
+)}

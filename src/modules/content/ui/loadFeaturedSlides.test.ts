@@ -7,7 +7,7 @@ const HELICONIA = {
   id: 'heliconia',
   title: 'Heliconia',
   text: 'Des bractées rouges et jaunes.',
-  imageBasePath: '/images/slide-1',
+  image: null,
 }
 
 describe('loadFeaturedSlides', () => {

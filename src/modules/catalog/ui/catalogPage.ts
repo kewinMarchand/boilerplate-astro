@@ -1,5 +1,6 @@
 import { CATALOG_NAVIGATION } from '@/shared/config'
 import { absoluteUrl } from '@/shared/seo'
+import { largestWebp } from '@/shared/ui/kit'
 
 import { isFiltered } from '../domain/catalogQuery'
 import { CATALOG_ROOT_PATH, categoryTrail } from '../domain/categoryPath'
@@ -43,12 +44,14 @@ export const describeCatalogPage = (
         listing && query.page < listing.totalPages
           ? catalogHref(path, { ...query, page: query.page + 1 })
           : undefined,
-      image: firstProduct && {
-        path: `/images/product-${firstProduct.image}-800.webp`,
-        width: 800,
-        height: 800,
-        alt: firstProduct.name,
-      },
+      image: firstProduct?.image
+        ? {
+            path: largestWebp(firstProduct.image),
+            width: firstProduct.image.width,
+            height: firstProduct.image.height,
+            alt: firstProduct.image.alt,
+          }
+        : undefined,
       jsonLd: listing && [
         {
           '@context': 'https://schema.org',

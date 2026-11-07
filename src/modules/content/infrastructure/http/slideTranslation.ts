@@ -7,5 +7,5 @@ export const toSlide = (dto: SlideDto): Slide.Entity => ({
   id: dto.slug,
   title: dto.title,
   text: dto.text,
-  imageBasePath: `/images/slide-${dto.image}`,
+  image: dto.image,
 })

@@ -1,13 +1,9 @@
 <script lang="ts">
-  import { responsiveSrcset } from './responsiveSrcset'
+  import type { ImageView } from './image'
 
   interface Props {
-    basePath: string
-    widths: number[]
+    image: ImageView
     sizes: string
-    width: number
-    height: number
-    alt: string
     priority?: boolean
     eager?: boolean
     fetchPriority?: 'high' | 'low' | 'auto'
@@ -15,31 +11,24 @@
   }
 
   const {
-    basePath,
-    widths,
+    image,
     sizes,
-    width,
-    height,
-    alt,
     priority = false,
     eager = false,
     fetchPriority = priority ? 'high' : 'auto',
     class: className,
   }: Props = $props()
-
-  const srcset = (format: 'avif' | 'webp') => responsiveSrcset(basePath, widths, format)
-
-  const fallback = $derived(`${basePath}-${widths.at(-1)}.webp`)
 </script>
 
 <picture>
-  <source type="image/avif" srcset={srcset('avif')} {sizes} />
-  <source type="image/webp" srcset={srcset('webp')} {sizes} />
+  {#each image.sources as source (source.type)}
+    <source type={source.type} srcset={source.srcset} {sizes} />
+  {/each}
   <img
-    src={fallback}
-    {alt}
-    {width}
-    {height}
+    src={image.src}
+    alt={image.alt}
+    width={image.width}
+    height={image.height}
     loading={priority || eager ? 'eager' : 'lazy'}
     fetchpriority={fetchPriority}
     decoding={priority ? 'sync' : 'async'}

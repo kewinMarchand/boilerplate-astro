@@ -1,16 +1,23 @@
 <script lang="ts">
-  import { ResponsiveImage } from '@/shared/ui/kit'
+  import { ResponsiveImage, staticImage } from '@/shared/ui/kit'
 
   import { BlogCard } from '@/modules/blog'
   import { eurosToCents, ProductCard } from '@/modules/catalog'
 
   import Section from './Section.svelte'
 
+  /** Photo du site : la charte graphique est statique, elle ne lit pas l'API. */
+  const PHOTO = staticImage('/images/hero', [640, 1280], {
+    width: 1280,
+    height: 720,
+    alt: 'Jardin tropical, image au ratio 16:9',
+  })
+
   const ARTICLE = {
     id: 'exemple',
     title: 'Carte de blog',
     excerpt: 'Illustration, titre, date de publication et extrait.',
-    imageBasePath: '/images/blog-1',
+    image: { ...PHOTO, alt: '' },
     publishedAt: '2026-10-01',
   }
 
@@ -23,7 +30,7 @@
     exposure: 'mi-ombre',
     size: 'L',
     inStock: false,
-    image: 1,
+    image: null,
   } as const
 </script>
 
@@ -37,12 +44,8 @@
   </ul>
   <div class="max-w-prose">
     <ResponsiveImage
-      basePath="/images/slide-1"
-      widths={[640, 1280]}
+      image={PHOTO}
       sizes="(min-width: 768px) 720px, 100vw"
-      width={1280}
-      height={720}
-      alt="Heliconia en fleur, image au ratio 16:9"
       class="aspect-video h-auto w-full rounded-md object-cover"
     />
   </div>

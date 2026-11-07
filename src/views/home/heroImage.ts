@@ -1,6 +1,11 @@
 // Image LCP de l'accueil : préchargée dans le <head> (HomeView) et affichée par le hero.
+import { staticImage } from '@/shared/ui/kit'
+
 export const HERO_IMAGE = {
-  basePath: '/images/hero',
-  widths: [640, 960, 1280, 1920],
+  image: staticImage('/images/hero', [640, 960, 1280, 1920], {
+    width: 1920,
+    height: 1080,
+    alt: '',
+  }),
   sizes: '100vw',
 }
