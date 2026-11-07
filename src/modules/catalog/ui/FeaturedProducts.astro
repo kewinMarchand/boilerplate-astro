@@ -1,0 +1,42 @@
+---
+import { ImageCarousel } from '@/shared/ui/carousel'
+import { Alert } from '@/shared/ui/kit'
+
+import { productHref } from '../domain/catalog'
+import { formatPrice } from '../domain/price'
+
+import type { Catalog } from '../domain/catalog'
+
+interface Props {
+  featured: Catalog.Featured
+}
+
+const { featured } = Astro.props
+const slides =
+  featured.status === 'success'
+    ? featured.products.map((product) => ({
+        id: product.id,
+        title: product.name,
+        text: formatPrice(product.price),
+        image: product.image,
+        href: productHref(product.slug),
+      }))
+    : []
+// Sans produit à la une, le carrousel n'a rien à montrer : la section disparaît de l'accueil.
+const visible = featured.status === 'error' || slides.length > 0
+---
+
+{visible && (
+  <section aria-labelledby="home-carousel-title" data-testid="home-carousel">
+    <h2 id="home-carousel-title" class="section-title">
+      À la une
+    </h2>
+    {featured.status === 'error' ? (
+      <Alert variant="error" data-testid="home-carousel-error">
+        {featured.message}
+      </Alert>
+    ) : (
+      <ImageCarousel client:visible {slides} label="À la une" />
+    )}
+  </section>
+)}

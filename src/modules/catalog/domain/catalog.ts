@@ -7,6 +7,10 @@ export const SIZES = ['S', 'M', 'L'] as const
 export const SORTS = ['pertinence', 'prix-asc', 'prix-desc', 'nom'] as const
 export const VIEWS = ['grille', 'liste'] as const
 export const PAGE_SIZE = 12
+/** Plus grande page acceptée par l'API. */
+export const MAX_PAGE_SIZE = 48
+
+export const productHref = (slug: string): AppPath => `/produit/${slug}`
 
 export declare namespace Catalog {
   type Exposure = (typeof EXPOSURES)[number]
@@ -26,6 +30,21 @@ export declare namespace Catalog {
     inStock: boolean
     image: ImageView | null
   }
+
+  /** Fiche : le produit et le chemin de sa catégorie, de la racine à elle (fil d'Ariane). */
+  interface ProductDetail extends Product {
+    categoryPath: CategoryPath
+  }
+
+  type ProductLoad =
+    | { status: 'success'; product: ProductDetail }
+    | { status: 'not-found' }
+    | { status: 'error'; message: string }
+
+  /** Ce qu'affiche la fiche : le produit, ou le message d'erreur de l'API. */
+  type ProductPage = Exclude<ProductLoad, { status: 'not-found' }>
+
+  type Featured = { status: 'success'; products: Product[] } | { status: 'error'; message: string }
 
   interface Category {
     slug: string

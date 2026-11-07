@@ -1,0 +1,135 @@
+---
+import { CATALOG_NAVIGATION } from '@/shared/config'
+import { absoluteUrl } from '@/shared/seo'
+import { Alert, Badge, ImagePreload, largestWebp, ResponsiveImage } from '@/shared/ui/kit'
+import PageLayout from '@/shared/ui/layout/PageLayout.astro'
+
+import { productHref } from '../domain/catalog'
+import { CATALOG_ROOT_PATH } from '../domain/categoryPath'
+import { formatPrice } from '../domain/price'
+import { EXPOSURE_LABELS } from './labels'
+
+import type { Catalog } from '../domain/catalog'
+import type { Seo } from '@/shared/seo'
+
+interface Props {
+  product: Catalog.ProductPage
+}
+
+const { product } = Astro.props
+const IMAGE_SIZES = '(min-width: 1440px) 680px, (min-width: 768px) 50vw, calc(100vw - 32px)'
+const CATALOG: Seo.BreadcrumbItem = { label: CATALOG_NAVIGATION.label, path: CATALOG_ROOT_PATH }
+const detail = product.status === 'success' ? product.product : null
+const image = detail?.image ?? null
+const category = detail?.categoryPath.at(-1)
+const parents: Seo.BreadcrumbItem[] = [
+  CATALOG,
+  ...(detail?.categoryPath ?? []).map((link) => ({ label: link.name, path: link.path })),
+]
+const description = detail
+  ? `${detail.name} : exposition ${EXPOSURE_LABELS[detail.exposure].toLowerCase()}, taille ${detail.size}, ${formatPrice(detail.price)}. ${detail.inStock ? 'En stock' : 'En rupture de stock'}, rayon ${category?.name ?? 'catalogue'}.`
+  : 'Fiche produit de notre jardinerie tropicale.'
+const seo = detail
+  ? {
+      image: image
+        ? {
+            path: largestWebp(image),
+            width: image.width,
+            height: image.height,
+            alt: image.alt || detail.name,
+          }
+        : undefined,
+      jsonLd: [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: detail.name,
+          sku: detail.slug,
+          url: absoluteUrl(productHref(detail.slug)),
+          ...(category && { category: category.name }),
+          ...(image && { image: largestWebp(image) }),
+          offers: {
+            '@type': 'Offer',
+            url: absoluteUrl(productHref(detail.slug)),
+            priceCurrency: 'EUR',
+            price: (detail.price / 100).toFixed(2),
+            availability: `https://schema.org/${detail.inStock ? 'InStock' : 'OutOfStock'}`,
+          },
+        },
+      ],
+    }
+  : { noindex: true }
+---
+
+<PageLayout
+  title={detail?.name ?? 'Produit'}
+  {description}
+  parents={detail ? parents : [CATALOG]}
+  {seo}
+  headingTestId="product-title"
+>
+  {image && <ImagePreload slot="head" {image} sizes={IMAGE_SIZES} />}
+  {product.status === 'error' ? (
+    <Alert variant="error" data-testid="product-error">
+      {product.message}
+    </Alert>
+  ) : (
+    detail && (
+      <article class="product-page" data-testid="product-page">
+        {image && (
+          <ResponsiveImage
+            {image}
+            sizes={IMAGE_SIZES}
+            priority
+            class="aspect-square h-auto w-full rounded-md object-cover"
+          />
+        )}
+        <div>
+          <p class="text-lead font-semibold" data-testid="product-price">
+            {formatPrice(detail.price)}
+          </p>
+          <dl class="product-features">
+            <dt>Exposition</dt>
+            <dd>{EXPOSURE_LABELS[detail.exposure]}</dd>
+            <dt>Taille</dt>
+            <dd>{detail.size}</dd>
+            <dt>Disponibilité</dt>
+            <dd>{detail.inStock ? 'En stock' : <Badge variant="error">Rupture de stock</Badge>}</dd>
+          </dl>
+          {category && (
+            <p>
+              <a href={category.path} class="bui-link">
+                Voir les autres produits : {category.name}
+              </a>
+            </p>
+          )}
+        </div>
+      </article>
+    )
+  )}
+</PageLayout>
+
+<style>
+  .product-page {
+    display: grid;
+    gap: var(--bui-space-8);
+    align-items: start;
+  }
+
+  @media (min-width: 768px) {
+    .product-page {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .product-features {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: var(--bui-space-2) var(--bui-space-6);
+    margin-block: var(--bui-space-6);
+  }
+
+  .product-features dt {
+    font-weight: 600;
+  }
+</style>

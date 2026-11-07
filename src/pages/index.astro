@@ -1,10 +1,10 @@
 ---
 import { loadLatestArticles } from '@/modules/blog/index.server'
-import { loadFeaturedSlides } from '@/modules/content/index.server'
+import { loadFeaturedProducts } from '@/modules/catalog/index.server'
 
 import { HomeView } from '@/views/home'
 
-const [carousel, blog] = await Promise.all([loadFeaturedSlides(), loadLatestArticles()])
+const [{ featured }, blog] = await Promise.all([loadFeaturedProducts(), loadLatestArticles()])
 ---
 
-<HomeView {carousel} {blog} />
+<HomeView {featured} {blog} />

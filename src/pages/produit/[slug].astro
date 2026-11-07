@@ -1,0 +1,9 @@
+---
+import { ProductView } from '@/modules/catalog'
+import { loadProduct } from '@/modules/catalog/index.server'
+
+const product = await loadProduct(Astro.params.slug ?? '')
+if (product.status === 'not-found') return Astro.rewrite('/404')
+---
+
+<ProductView {product} />

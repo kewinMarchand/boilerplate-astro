@@ -1,4 +1,6 @@
 export type { Catalog } from './domain/catalog'
 export { eurosToCents } from './domain/price'
 export { default as CatalogPage } from './ui/CatalogPage.astro'
+export { default as FeaturedProducts } from './ui/FeaturedProducts.astro'
 export { default as ProductCard } from './ui/ProductCard.svelte'
+export { default as ProductView } from './ui/ProductView.astro'

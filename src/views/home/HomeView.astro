@@ -5,20 +5,20 @@ import { ImagePreload } from '@/shared/ui/kit'
 import BaseLayout from '@/shared/ui/layout/BaseLayout.astro'
 
 import { BlogSection } from '@/modules/blog'
-import { FeaturedCarousel } from '@/modules/content'
+import { FeaturedProducts } from '@/modules/catalog'
 
 import Hero from './Hero.astro'
 import { HERO_IMAGE } from './heroImage'
 
 import type { Article } from '@/modules/blog'
-import type { Slide } from '@/modules/content'
+import type { Catalog } from '@/modules/catalog'
 
 interface Props {
-  carousel: Slide.Carousel
+  featured: Catalog.Featured
   blog: Article.Blog
 }
 
-const { carousel, blog } = Astro.props
+const { featured, blog } = Astro.props
 
 const meta = buildPageMeta({ description: SITE.description, path: '/', jsonLd: buildHomeJsonLd() })
 ---
@@ -27,7 +27,7 @@ const meta = buildPageMeta({ description: SITE.description, path: '/', jsonLd: b
   <ImagePreload slot="head" image={HERO_IMAGE.image} sizes={HERO_IMAGE.sizes} />
   <Hero />
 
-  <FeaturedCarousel {carousel} />
+  <FeaturedProducts {featured} />
 
   <BlogSection {blog} />
 </BaseLayout>

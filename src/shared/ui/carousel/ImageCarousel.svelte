@@ -42,10 +42,22 @@
             <ResponsiveImage
               image={slide.image}
               sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-              class="aspect-video h-auto w-full rounded-md object-cover"
+              class="h-auto w-full rounded-md object-cover"
             />
           {/if}
-          <h3 class="mt-3 text-title font-semibold">{slide.title}</h3>
+          <h3 class="mt-3 text-title font-semibold">
+            {#if slide.href}
+              <!-- Après un glisser, Embla annule le clic : la diapositive ne s'ouvre pas en fin de geste -->
+              <a
+                href={slide.href}
+                draggable="false"
+                class="bui-link carousel-link"
+                data-testid="carousel-slide-link">{slide.title}</a
+              >
+            {:else}
+              {slide.title}
+            {/if}
+          </h3>
           <p class="text-text-muted">{slide.text}</p>
         </div>
       {/each}
@@ -91,3 +103,16 @@
     {/if}
   </div>
 </div>
+
+<style>
+  .carousel-slide {
+    position: relative;
+  }
+
+  /* Lien étiré sur toute la diapositive : un seul lien, nommé par le titre */
+  .carousel-link::after {
+    position: absolute;
+    inset: 0;
+    content: '';
+  }
+</style>
