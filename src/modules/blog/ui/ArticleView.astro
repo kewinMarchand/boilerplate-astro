@@ -1,0 +1,85 @@
+---
+import { absoluteUrl } from '@/shared/seo'
+import { Alert, ImagePreload, largestWebp, ResponsiveImage } from '@/shared/ui/kit'
+import PageLayout from '@/shared/ui/layout/PageLayout.astro'
+
+import { articleHref } from '../domain/article'
+import { formatPublishedAt } from '../domain/formatPublishedAt'
+
+import type { Article } from '../domain/article'
+
+interface Props {
+  article: Article.Page
+}
+
+// HTML venu de l'API, qui échappe le HTML saisi dans l'admin et retire les liens dangereux : injecté tel quel.
+const { article } = Astro.props
+const IMAGE_SIZES = '(min-width: 800px) 760px, calc(100vw - 32px)'
+const detail = article.status === 'success' ? article.article : null
+const image = detail?.image ?? null
+const seo = detail
+  ? {
+      publishedTime: detail.publishedAt,
+      image: image
+        ? {
+            path: largestWebp(image),
+            width: image.width,
+            height: image.height,
+            alt: image.alt || detail.title,
+          }
+        : undefined,
+      jsonLd: [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'BlogPosting',
+          headline: detail.title,
+          description: detail.excerpt,
+          datePublished: detail.publishedAt,
+          url: absoluteUrl(articleHref(detail.slug)),
+          ...(image && { image: largestWebp(image) }),
+          inLanguage: 'fr-FR',
+        },
+      ],
+    }
+  : { noindex: true }
+---
+
+<PageLayout
+  title={detail?.title ?? 'Article'}
+  description={detail ? detail.excerpt || detail.title : 'Article du blog.'}
+  {seo}
+  headingTestId="article-title"
+>
+  {image && <ImagePreload slot="head" {image} sizes={IMAGE_SIZES} />}
+  {article.status === 'error' ? (
+    <Alert variant="error" data-testid="article-error">
+      {article.message}
+    </Alert>
+  ) : (
+    <article class="max-w-prose" data-testid="article-page">
+      <p class="mb-6 text-body-sm text-text-muted">
+        Publié le{' '}
+        <time datetime={article.article.publishedAt}>
+          {formatPublishedAt(article.article.publishedAt)}
+        </time>
+      </p>
+      {image && (
+        <ResponsiveImage
+          {image}
+          sizes={IMAGE_SIZES}
+          priority
+          class="aspect-video h-auto w-full rounded-md object-cover"
+        />
+      )}
+      {article.article.excerpt && <p class="my-6 text-lead">{article.article.excerpt}</p>}
+      <div class="prose-legal" data-testid="article-body">
+        <Fragment set:html={article.article.html} />
+      </div>
+      <p class="mt-12">
+        <a href="/" class="bui-link">
+          Retour à l’accueil
+        </a>
+      </p>
+    </article>
+  )}
+</PageLayout>

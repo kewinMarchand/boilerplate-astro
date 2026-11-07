@@ -17,9 +17,18 @@ interface Props {
   parents?: Seo.BreadcrumbItem[]
   seo?: Omit<Seo.Input, 'title' | 'description' | 'path' | 'breadcrumb'>
   categoryMenu?: NavigationNode[] | undefined
+  headingTestId?: string | undefined
 }
 
-const { title, heading = title, description, parents = [], seo = {}, categoryMenu } = Astro.props
+const {
+  title,
+  heading = title,
+  description,
+  parents = [],
+  seo = {},
+  categoryMenu,
+  headingTestId,
+} = Astro.props
 const path = toAppPath(Astro.url.pathname)
 const breadcrumb = buildBreadcrumb({ label: title, path }, parents)
 const meta = buildPageMeta({ ...seo, title, description, path, breadcrumb })
@@ -28,7 +37,7 @@ const meta = buildPageMeta({ ...seo, title, description, path, breadcrumb })
 <BaseLayout {meta} {categoryMenu}>
   <slot name="head" slot="head" />
   <Breadcrumb items={breadcrumb} />
-  <h1 id="page-title" tabindex="-1" class="heading-1">
+  <h1 id="page-title" tabindex="-1" class="heading-1" data-testid={headingTestId}>
     {heading}
   </h1>
   <slot />

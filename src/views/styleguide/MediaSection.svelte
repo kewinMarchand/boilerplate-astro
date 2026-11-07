@@ -15,6 +15,7 @@
 
   const ARTICLE = {
     id: 'exemple',
+    slug: 'exemple',
     title: 'Carte de blog',
     excerpt: 'Illustration, titre, date de publication et extrait.',
     image: { ...PHOTO, alt: '' },

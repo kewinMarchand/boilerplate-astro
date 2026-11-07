@@ -56,5 +56,7 @@ export const buildPageMeta = (input: Seo.Input): Seo.Meta => {
     jsonLd: [...breadcrumbJsonLd, ...(input.jsonLd ?? [])],
     prev: input.prevPath && absoluteUrl(input.prevPath),
     next: input.nextPath && absoluteUrl(input.nextPath),
+    ogType: input.publishedTime ? 'article' : 'website',
+    publishedTime: input.publishedTime,
   }
 }

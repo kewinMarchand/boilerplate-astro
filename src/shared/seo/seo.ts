@@ -26,6 +26,8 @@ export declare namespace Seo {
     jsonLd?: JsonLd[] | undefined
     prevPath?: string | undefined
     nextPath?: string | undefined
+    /** Page d'article : `og:type` article et date de publication (AAAA-MM-JJ). */
+    publishedTime?: string | undefined
   }
 
   interface Meta {
@@ -40,5 +42,7 @@ export declare namespace Seo {
     jsonLd: JsonLd[]
     prev: string | undefined
     next: string | undefined
+    ogType: 'website' | 'article'
+    publishedTime: string | undefined
   }
 }

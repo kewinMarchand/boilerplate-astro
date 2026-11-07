@@ -1,0 +1,9 @@
+---
+import { ArticleView } from '@/modules/blog'
+import { loadArticle } from '@/modules/blog/index.server'
+
+const article = await loadArticle(Astro.params.slug ?? '')
+if (article.status === 'not-found') return Astro.rewrite('/404')
+---
+
+<ArticleView {article} />
