@@ -21,7 +21,7 @@ const LISTING: Catalog.Listing = {
   total: 0,
   page: 1,
   totalPages: 1,
-  facets: { exposure: [], size: [] },
+  facets: { exposure: [], size: [], attributes: [] },
 }
 
 describe('loadCatalogPage', () => {

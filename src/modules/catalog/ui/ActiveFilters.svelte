@@ -11,12 +11,13 @@
   interface Props {
     path: AppPath
     query: Catalog.Query
+    attributeFacets: Catalog.AttributeFacet[]
     clearAction: Snippet
   }
 
-  const { path, query, clearAction }: Props = $props()
+  const { path, query, attributeFacets, clearAction }: Props = $props()
 
-  const filters = $derived(listActiveFilters(query))
+  const filters = $derived(listActiveFilters(query, attributeFacets))
 </script>
 
 {#if filters.length > 0}

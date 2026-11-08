@@ -57,6 +57,12 @@ export const toProductDetail = (dto: ProductDetailDto): Catalog.ProductDetail =>
     .split(/\n\s*\n/)
     .map((paragraph) => paragraph.trim())
     .filter((paragraph) => paragraph !== ''),
+  attributes: dto.attributes.map((attribute) => ({
+    code: attribute.code,
+    label: attribute.label,
+    value: attribute.valueLabel,
+    unit: attribute.unit,
+  })),
 })
 
 const toFacetCounts = <T extends string>(values: readonly T[], dtos: FacetDto[]) =>
@@ -68,10 +74,12 @@ const toFacetCounts = <T extends string>(values: readonly T[], dtos: FacetDto[])
 /** Filtres communs à la liste et aux facettes : euros de l'URL en centimes, listes en clés répétées. */
 export const toFacetsQuery = (slugs: string[], query: Catalog.Query): ProductFacetsQuery => {
   const category = slugs.at(-1)
+  const attributes = Object.entries(query.attributes).filter(([, values]) => values.length > 0)
   return {
     ...(category && { category }),
     ...(query.exposures.length > 0 && { 'exposure[]': query.exposures }),
     ...(query.sizes.length > 0 && { 'size[]': query.sizes }),
+    ...(attributes.length > 0 && { attributes: Object.fromEntries(attributes) }),
     ...(query.priceMin !== undefined && { priceMin: eurosToCents(query.priceMin) }),
     ...(query.priceMax !== undefined && { priceMax: eurosToCents(query.priceMax) }),
     ...(query.inStock && { inStock: true }),
@@ -111,5 +119,10 @@ export const toListing = (
   facets: {
     exposure: toFacetCounts(EXPOSURES, facets.exposure),
     size: toFacetCounts(SIZES, facets.size),
+    attributes: facets.attributes.map((facet) => ({
+      code: facet.code,
+      label: facet.label,
+      values: facet.values.map(({ value, label, count }) => ({ value, label, count })),
+    })),
   },
 })

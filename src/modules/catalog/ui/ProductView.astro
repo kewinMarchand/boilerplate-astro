@@ -105,6 +105,18 @@ const seo = detail
             <dt>Disponibilité</dt>
             <dd>{detail.inStock ? 'En stock' : <Badge variant="error">Rupture de stock</Badge>}</dd>
           </dl>
+          {detail.attributes.length > 0 && (
+            <dl class="product-features" data-testid="product-attributes">
+              {detail.attributes.map((attribute) => (
+                <Fragment>
+                  <dt>{attribute.label}</dt>
+                  <dd>
+                    {attribute.unit ? `${attribute.value}\u00a0${attribute.unit}` : attribute.value}
+                  </dd>
+                </Fragment>
+              ))}
+            </dl>
+          )}
           <slot name="purchase" />
           {category && (
             <p>

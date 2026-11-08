@@ -14,6 +14,7 @@ const QUERY: Catalog.Query = {
   priceMin: undefined,
   priceMax: undefined,
   inStock: false,
+  attributes: {},
   sort: 'pertinence',
   view: 'grille',
   page: 1,
@@ -48,6 +49,15 @@ describe('toProductsQuery', () => {
       itemsPerPage: 12,
     })
     expect(toProductsQuery([], { ...QUERY, sort: 'nom' })).toMatchObject({ 'order[name]': 'asc' })
+  })
+
+  it('traduit les attributs cochés en attributes[<code>][], sans attribut vide', () => {
+    expect(
+      toProductsQuery([], {
+        ...QUERY,
+        attributes: { feuillage: ['persistant', 'caduc'], couleur: [] },
+      }),
+    ).toEqual({ attributes: { feuillage: ['persistant', 'caduc'] }, page: 1, itemsPerPage: 12 })
   })
 })
 
@@ -89,6 +99,7 @@ describe('toListing', () => {
           size: 'L',
           inStock: true,
           image: null,
+          attributes: [],
         },
       ],
       {
@@ -99,6 +110,16 @@ describe('toListing', () => {
         ],
         size: [{ value: 'L', count: 1 }],
         category: [{ slug: 'palmiers', name: 'Palmiers', count: 1 }],
+        attributes: [
+          {
+            code: 'feuillage',
+            label: 'Feuillage',
+            values: [
+              { value: 'persistant', label: 'Persistant', count: 1 },
+              { value: 'caduc', label: 'Caduc', count: 0 },
+            ],
+          },
+        ],
       },
       1,
       { chain: [], slugs: ['plantes-exterieur'] },
@@ -118,22 +139,42 @@ describe('toListing', () => {
       { value: 'mi-ombre', count: 1 },
       { value: 'ombre', count: 0 },
     ])
+    expect(listing.facets.attributes).toEqual([
+      {
+        code: 'feuillage',
+        label: 'Feuillage',
+        values: [
+          { value: 'persistant', label: 'Persistant', count: 1 },
+          { value: 'caduc', label: 'Caduc', count: 0 },
+        ],
+      },
+    ])
   })
 
   it('garde au moins une page quand il n’y a aucun résultat', () => {
-    const listing = toListing([], { totalItems: 0, exposure: [], size: [], category: [] }, 1, {
-      chain: [],
-      slugs: [],
-    })
+    const listing = toListing(
+      [],
+      { totalItems: 0, exposure: [], size: [], category: [], attributes: [] },
+      1,
+      {
+        chain: [],
+        slugs: [],
+      },
+    )
 
     expect(listing.totalPages).toBe(1)
   })
 
   it('calcule le nombre de pages à partir du total des facettes', () => {
-    const listing = toListing([], { totalItems: 25, exposure: [], size: [], category: [] }, 3, {
-      chain: [],
-      slugs: [],
-    })
+    const listing = toListing(
+      [],
+      { totalItems: 25, exposure: [], size: [], category: [], attributes: [] },
+      3,
+      {
+        chain: [],
+        slugs: [],
+      },
+    )
 
     expect(listing).toMatchObject({ total: 25, page: 3, totalPages: 3 })
   })
@@ -151,6 +192,7 @@ describe('toProductDetail', () => {
     inStock: true,
     image: null,
     categoryPath: [{ slug: 'palmiers', name: 'Palmiers' }],
+    attributes: [],
   }
 
   it('découpe la description en paragraphes aux lignes vides', () => {
@@ -160,6 +202,36 @@ describe('toProductDetail', () => {
     })
 
     expect(detail.description).toEqual(['Rustique.', 'Résiste au vent,\naux embruns.'])
+  })
+
+  it('garde le libellé de la valeur et l’unité de chaque attribut, dans l’ordre', () => {
+    const detail = toProductDetail({
+      ...DTO,
+      description: '',
+      attributes: [
+        {
+          code: 'feuillage',
+          label: 'Feuillage',
+          type: 'choice',
+          value: 'persistant',
+          valueLabel: 'Persistant',
+          unit: null,
+        },
+        {
+          code: 'hauteur-adulte',
+          label: 'Hauteur adulte',
+          type: 'number',
+          value: '180',
+          valueLabel: '180',
+          unit: 'cm',
+        },
+      ],
+    })
+
+    expect(detail.attributes).toEqual([
+      { code: 'feuillage', label: 'Feuillage', value: 'Persistant', unit: null },
+      { code: 'hauteur-adulte', label: 'Hauteur adulte', value: '180', unit: 'cm' },
+    ])
   })
 
   it('ne garde aucun paragraphe pour une description vide', () => {

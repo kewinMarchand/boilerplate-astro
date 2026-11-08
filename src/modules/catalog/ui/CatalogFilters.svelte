@@ -2,7 +2,7 @@
   import { resolveHref } from '@/shared/routing'
   import { Button, Checkbox, Icon, Switch } from '@/shared/ui/kit'
 
-  import { queryEntries } from '../domain/catalogQuery'
+  import { attributeParam, queryEntries } from '../domain/catalogQuery'
   import { EXPOSURE_LABELS, SIZE_LABELS } from './labels'
 
   import type { Catalog } from '../domain/catalog'
@@ -18,7 +18,13 @@
   const uid = $props.id()
 
   const keptFields = $derived(
-    queryEntries(query, ['exposition', 'taille', 'prix_min', 'prix_max', 'en_stock']),
+    queryEntries({ ...query, attributes: {} }, [
+      'exposition',
+      'taille',
+      'prix_min',
+      'prix_max',
+      'en_stock',
+    ]),
   )
 </script>
 
@@ -92,6 +98,29 @@
         {/each}
       </fieldset>
     </details>
+
+    {#each listing.facets.attributes as facet (facet.code)}
+      <details open class="bui-accordion__item">
+        <summary class="bui-accordion__summary">
+          {facet.label}<Icon name="chevron-down" class="bui-accordion__icon" />
+        </summary>
+        <fieldset class="bui-accordion__content flex flex-col gap-2">
+          <legend class="sr-only">{facet.label}</legend>
+          {#each facet.values as { value, label, count } (value)}
+            {@const checked = query.attributes[facet.code]?.includes(value) ?? false}
+            <Checkbox
+              id="{uid}-{attributeParam(facet.code)}-{value}"
+              label="{label} ({count})"
+              name={attributeParam(facet.code)}
+              {value}
+              {checked}
+              disabled={count === 0 && !checked}
+              data-testid={`catalog-filter-attribute-${facet.code}-${value}`}
+            />
+          {/each}
+        </fieldset>
+      </details>
+    {/each}
 
     <details open class="bui-accordion__item">
       <summary class="bui-accordion__summary">

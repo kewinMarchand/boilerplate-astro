@@ -8,7 +8,17 @@ export interface ActiveFilter {
   query: Catalog.Query
 }
 
-export const listActiveFilters = (query: Catalog.Query): ActiveFilter[] => {
+const attributeLabel = (facets: Catalog.AttributeFacet[], code: string, value: string) => {
+  const facet = facets.find((item) => item.code === code)
+  const valueLabel = facet?.values.find((item) => item.value === value)?.label ?? value
+  return `${facet?.label ?? code} : ${valueLabel}`
+}
+
+/** Les libellés des attributs viennent des facettes ; un code absent des facettes s'affiche tel quel. */
+export const listActiveFilters = (
+  query: Catalog.Query,
+  attributeFacets: Catalog.AttributeFacet[],
+): ActiveFilter[] => {
   const without = (patch: Partial<Catalog.Query>) => withFilter(query, patch)
   return [
     ...query.exposures.map((value) => ({
@@ -19,6 +29,14 @@ export const listActiveFilters = (query: Catalog.Query): ActiveFilter[] => {
       label: `Taille ${SIZE_LABELS[value].toLowerCase()}`,
       query: without({ sizes: query.sizes.filter((item) => item !== value) }),
     })),
+    ...Object.entries(query.attributes).flatMap(([code, values]) =>
+      values.map((value) => ({
+        label: attributeLabel(attributeFacets, code, value),
+        query: without({
+          attributes: { ...query.attributes, [code]: values.filter((item) => item !== value) },
+        }),
+      })),
+    ),
     ...(query.priceMin === undefined
       ? []
       : [{ label: `Prix min. ${query.priceMin} €`, query: without({ priceMin: undefined }) }]),

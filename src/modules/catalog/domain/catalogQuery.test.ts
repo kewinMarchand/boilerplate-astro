@@ -21,6 +21,7 @@ describe('parseCatalogQuery', () => {
       priceMin: 10,
       priceMax: 40,
       inStock: true,
+      attributes: {},
       sort: 'prix-asc',
       view: 'liste',
       page: 2,
@@ -32,12 +33,25 @@ describe('parseCatalogQuery', () => {
       parse('exposition=lune&taille=XL&prix_min=abc&tri=hasard&vue=mosaique&page=-3&en_stock=oui'),
     ).toEqual(DEFAULT_QUERY)
   })
+
+  it('lit les attributs attr-<code> répétés, sans doublon ni code ou valeur malformés', () => {
+    expect(
+      parse(
+        'attr-feuillage=persistant&attr-feuillage=caduc&attr-feuillage=caduc&attr-Mauvais=x&attr-couleur=Rouge&attr-=x',
+      ).attributes,
+    ).toEqual({ feuillage: ['persistant', 'caduc'] })
+  })
 })
 
 describe('serializeCatalogQuery', () => {
   it('fait l’aller-retour sans perte', () => {
     const search =
       '?exposition=soleil&taille=S&taille=L&prix_max=30&en_stock=1&tri=nom&vue=liste&page=3'
+    expect(serializeCatalogQuery(parse(search))).toBe(search)
+  })
+
+  it('fait l’aller-retour des attributs', () => {
+    const search = '?taille=M&attr-feuillage=persistant&attr-feuillage=caduc&attr-couleur=rouge'
     expect(serializeCatalogQuery(parse(search))).toBe(search)
   })
 
@@ -59,10 +73,12 @@ describe('withFilter', () => {
 
 describe('variantes de la liste', () => {
   it('tout effacer garde la vue et retire filtres et tri', () => {
-    expect(clearFilters(parse('exposition=soleil&tri=nom&vue=liste'))).toEqual({
-      ...DEFAULT_QUERY,
-      view: 'liste',
-    })
+    expect(clearFilters(parse('exposition=soleil&attr-feuillage=caduc&tri=nom&vue=liste'))).toEqual(
+      {
+        ...DEFAULT_QUERY,
+        view: 'liste',
+      },
+    )
   })
 
   it('considère comme filtrée toute liste avec filtre, tri ou vue liste', () => {
@@ -70,5 +86,6 @@ describe('variantes de la liste', () => {
     expect(isFiltered(parse('tri=nom'))).toBe(true)
     expect(isFiltered(parse('vue=liste'))).toBe(true)
     expect(isFiltered(parse('en_stock=1'))).toBe(true)
+    expect(isFiltered(parse('attr-feuillage=caduc'))).toBe(true)
   })
 })
