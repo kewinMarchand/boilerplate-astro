@@ -41,8 +41,8 @@
   </Alert>
 {:else}
   <div class="blog-grid">
-    {#each articles as article (article.id)}
-      <BlogCard {article} />
+    {#each articles as article, index (article.id)}
+      <BlogCard {article} featured={index === 0} />
     {/each}
   </div>
 {/if}

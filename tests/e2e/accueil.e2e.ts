@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test'
 
+import type { Page } from '@playwright/test'
+
 test.describe('Accueil', () => {
   test('affiche le hero, le carrousel et les articles', async ({ page }) => {
     await page.goto('/')
@@ -35,6 +37,79 @@ test.describe('Accueil', () => {
     await expect
       .poll(() => image.evaluate((element: HTMLImageElement) => element.naturalWidth))
       .toBeGreaterThan(0)
+  })
+})
+
+test.describe('Grille des articles', () => {
+  const cardBoxes = async (page: Page) => {
+    const cards = page.getByTestId('home-blog-card')
+    await expect(cards).toHaveCount(3)
+    const box = async (index: number) => {
+      const found = await cards.nth(index).boundingBox()
+      expect(found).not.toBeNull()
+      return found ?? { x: 0, y: 0, width: 0, height: 0 }
+    }
+    return [await box(0), await box(1), await box(2)] as const
+  }
+
+  test('l’image de l’article à la une annonce sa taille d’affichage aux points de rupture', async ({
+    page,
+  }) => {
+    await page.goto('/')
+    const cards = page.getByTestId('home-blog-card')
+
+    await expect(cards.first().locator('source').first()).toHaveAttribute(
+      'sizes',
+      '(min-width: 1024px) 66vw, 100vw',
+    )
+    await expect(cards.nth(1).locator('source').first()).toHaveAttribute(
+      'sizes',
+      '(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw',
+    )
+  })
+
+  test('desktop : l’article à la une sur 8 colonnes, les deux autres empilés à droite', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'Largeur desktop pilotée explicitement.')
+    await page.setViewportSize({ width: 1280, height: 900 })
+    await page.goto('/')
+    const [featured, second, third] = await cardBoxes(page)
+
+    expect(featured.width / second.width).toBeGreaterThan(1.8)
+    expect(featured.width / second.width).toBeLessThan(2.3)
+    expect(second.x).toBeGreaterThan(featured.x + featured.width)
+    expect(third.x).toBeCloseTo(second.x, 0)
+    expect(third.y).toBeGreaterThanOrEqual(second.y + second.height)
+  })
+
+  test('tablette : l’article à la une et les deux autres sur la même largeur, côte à côte', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'Largeur tablette pilotée explicitement.')
+    await page.setViewportSize({ width: 768, height: 1024 })
+    await page.goto('/')
+    const [featured, second, third] = await cardBoxes(page)
+
+    expect(featured.width).toBeCloseTo(second.width, 0)
+    expect(second.x).toBeGreaterThan(featured.x + featured.width)
+    expect(featured.y).toBeCloseTo(second.y, 0)
+    expect(third.x).toBeCloseTo(second.x, 0)
+    expect(third.y).toBeGreaterThanOrEqual(second.y + second.height)
+  })
+
+  test('mobile : les trois articles empilés sur la même largeur', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'Disposition mobile.')
+    await page.goto('/')
+    const [featured, second, third] = await cardBoxes(page)
+
+    expect(second.width).toBeCloseTo(featured.width, 0)
+    expect(third.width).toBeCloseTo(featured.width, 0)
+    expect(second.x).toBeCloseTo(featured.x, 0)
+    expect(second.y).toBeGreaterThanOrEqual(featured.y + featured.height)
+    expect(third.y).toBeGreaterThanOrEqual(second.y + second.height)
   })
 })
 
@@ -85,6 +160,18 @@ test.describe('Carrousel', () => {
 
     await expect(page).toHaveURL(/\/produit\/[a-z0-9-]+$/)
     await expect(page.getByTestId('product-title')).toHaveText(name)
+  })
+
+  test('les diapositives débordent du contenu sans faire défiler la page', async ({ page }) => {
+    const section = await page.getByTestId('home-carousel').boundingBox()
+    const slideRights = await page
+      .getByTestId('carousel-slide')
+      .evaluateAll((slides) => slides.map((slide) => slide.getBoundingClientRect().right))
+
+    expect(Math.max(...slideRights)).toBeGreaterThan((section?.x ?? 0) + (section?.width ?? 0))
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).toBe(true)
   })
 })
 
