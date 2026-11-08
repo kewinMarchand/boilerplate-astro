@@ -17,8 +17,11 @@ export interface NavigationNode {
 
 export const CATALOG_NAVIGATION: NavigationItem = { href: '/catalogue', label: 'Catalogue' }
 
+export const BLOG_NAVIGATION: NavigationItem = { href: '/blog', label: 'Blog' }
+
 export const MAIN_NAVIGATION: NavigationItem[] = [
   { href: '/', label: 'Accueil' },
+  BLOG_NAVIGATION,
   { href: '/taches', label: 'Tâches' },
   { href: '/contact', label: 'Contact' },
 ]

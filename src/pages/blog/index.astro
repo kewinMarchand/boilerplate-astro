@@ -1,0 +1,8 @@
+---
+import { BlogListView } from '@/modules/blog'
+import { loadLatestArticles } from '@/modules/blog/index.server'
+
+const blog = await loadLatestArticles()
+---
+
+<BlogListView {blog} />

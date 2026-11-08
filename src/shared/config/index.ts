@@ -3,6 +3,7 @@ export { computeComplianceStatus } from './accessibility'
 export type { NavigationItem, NavigationNode } from './navigation'
 export {
   ALL_NAVIGATION,
+  BLOG_NAVIGATION,
   CATALOG_NAVIGATION,
   isActivePath,
   LEGAL_NAVIGATION,

@@ -3,6 +3,7 @@ export const STATIC_ROUTES = [
   '/taches',
   '/contact',
   '/catalogue',
+  '/blog',
   '/mentions-legales',
   '/donnees-personnelles',
   '/accessibilite',

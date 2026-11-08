@@ -12,6 +12,16 @@ test.describe('Navigation', () => {
     await expect(nav.getByRole('link', { name: 'Accueil' })).not.toHaveAttribute('aria-current')
   })
 
+  test('le lien Blog suit le Catalogue (desktop)', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'Sur mobile, la navigation principale est dans le menu latéral.')
+    await page.goto('/blog')
+
+    const nav = page.getByRole('navigation', { name: 'Navigation principale' })
+    const catalog = nav.locator('li:visible').filter({ hasText: 'Catalogue' })
+    await expect(catalog.locator('xpath=following-sibling::li[1]')).toHaveText('Blog')
+    await expect(nav.getByRole('link', { name: 'Blog' })).toHaveAttribute('aria-current', 'page')
+  })
+
   test('le logo mène à l’accueil et porte aria-current sur l’accueil', async ({ page }) => {
     await page.goto('/')
     const logo = page.getByTestId('layout-logo')

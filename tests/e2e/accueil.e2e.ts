@@ -28,6 +28,21 @@ test.describe('Accueil', () => {
     expect(html).not.toMatch(/<img[^>]*src="\/images\/hero-1920\.webp"[^>]*loading="lazy"/)
   })
 
+  test('affiche au plus les trois articles les plus récents de l’API', async ({
+    page,
+    request,
+  }) => {
+    const apiUrl = process.env.API_URL || 'http://localhost:8090'
+    const articles = (await (await request.get(`${apiUrl}/api/articles`)).json()) as {
+      title: string
+    }[]
+    await page.goto('/')
+
+    await expect(page.getByTestId('home-blog-card').locator('h3')).toHaveText(
+      articles.slice(0, 3).map((article) => article.title),
+    )
+  })
+
   test('affiche les illustrations des articles servies par l’API', async ({ page }) => {
     await page.goto('/')
     const image = page.getByTestId('home-blog-card').first().locator('img')

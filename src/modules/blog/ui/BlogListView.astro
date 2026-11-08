@@ -1,0 +1,63 @@
+---
+import { BLOG_NAVIGATION } from '@/shared/config'
+import { absoluteUrl } from '@/shared/seo'
+import { Alert, Button, Icon } from '@/shared/ui/kit'
+import PageLayout from '@/shared/ui/layout/PageLayout.astro'
+
+import { articleHref } from '../domain/article'
+import BlogCard from './BlogCard.svelte'
+
+import type { Article } from '../domain/article'
+
+interface Props {
+  blog: Article.Blog
+}
+
+const { blog } = Astro.props
+const articles = blog.status === 'success' ? blog.articles : []
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: BLOG_NAVIGATION.label,
+    url: absoluteUrl(BLOG_NAVIGATION.href),
+    inLanguage: 'fr-FR',
+    blogPost: articles.map((article) => ({
+      '@type': 'BlogPosting',
+      headline: article.title,
+      datePublished: article.publishedAt,
+      url: absoluteUrl(articleHref(article.slug)),
+    })),
+  },
+]
+---
+
+<PageLayout
+  title={BLOG_NAVIGATION.label}
+  description="Tous les articles du blog, du plus récent au plus ancien : accessibilité, performance et composants d’interface."
+  seo={{ jsonLd }}
+>
+  <div aria-live="polite">
+    {blog.status === 'error' ? (
+      <div class="flex flex-col items-start gap-3">
+        <Alert variant="error" data-testid="blog-error">
+          {blog.message}
+        </Alert>
+        <Button variant="outline" href={BLOG_NAVIGATION.href} data-testid="blog-retry">
+          <Icon name="rotate-cw" />
+          Réessayer
+        </Button>
+      </div>
+    ) : articles.length === 0 ? (
+      <Alert variant="info" data-testid="blog-empty">
+        Aucun article publié pour l'instant. Revenez bientôt.
+      </Alert>
+    ) : (
+      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3" data-testid="blog-list">
+        {articles.map((article) => (
+          <BlogCard {article} testId="blog-card" headingLevel={2} />
+        ))}
+      </div>
+    )}
+  </div>
+</PageLayout>

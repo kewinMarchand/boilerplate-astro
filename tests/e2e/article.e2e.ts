@@ -35,9 +35,14 @@ test.describe('Fiche article', () => {
     await expect
       .poll(() => image.evaluate((element: HTMLImageElement) => element.naturalWidth))
       .toBeGreaterThan(0)
-    await expect(page.getByTestId('layout-breadcrumb')).toContainText(
+    await expect(page.getByTestId('layout-breadcrumb').getByRole('listitem')).toHaveText([
+      'Accueil',
+      'Blog',
       'Un carrousel accessible sans dépendance',
-    )
+    ])
+    await expect(
+      page.getByTestId('article-page').getByRole('link', { name: 'Tous les articles' }),
+    ).toHaveAttribute('href', '/blog')
   })
 
   test('expose ses données structurées d’article', async ({ page }) => {

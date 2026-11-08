@@ -1,4 +1,5 @@
 ---
+import { BLOG_NAVIGATION } from '@/shared/config'
 import { absoluteUrl } from '@/shared/seo'
 import { Alert, ImagePreload, largestWebp, ResponsiveImage } from '@/shared/ui/kit'
 import PageLayout from '@/shared/ui/layout/PageLayout.astro'
@@ -47,6 +48,7 @@ const seo = detail
 <PageLayout
   title={detail?.title ?? 'Article'}
   description={detail ? detail.excerpt || detail.title : 'Article du blog.'}
+  parents={[{ label: BLOG_NAVIGATION.label, path: BLOG_NAVIGATION.href }]}
   {seo}
   headingTestId="article-title"
 >
@@ -76,8 +78,8 @@ const seo = detail
         <Fragment set:html={article.article.html} />
       </div>
       <p class="mt-12">
-        <a href="/" class="bui-link">
-          Retour à l’accueil
+        <a href={BLOG_NAVIGATION.href} class="bui-link">
+          Tous les articles
         </a>
       </p>
     </article>

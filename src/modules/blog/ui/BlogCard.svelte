@@ -10,12 +10,14 @@
     article: Article.Entity
     /** Article à la une : plus large dès la tablette, son image remplit la hauteur des deux autres. */
     featured?: boolean
+    testId?: 'home-blog-card' | 'blog-card'
+    headingLevel?: 2 | 3
   }
 
-  const { article, featured = false }: Props = $props()
+  const { article, featured = false, testId = 'home-blog-card', headingLevel = 3 }: Props = $props()
 </script>
 
-<article class="bui-card relative" data-testid="home-blog-card">
+<article class="bui-card relative" data-testid={testId}>
   {#if article.image}
     <div class={['bui-card__media', featured && 'md:relative md:aspect-video md:grow']}>
       <ResponsiveImage
@@ -31,9 +33,9 @@
     </div>
   {/if}
   <div class={['bui-card__body', featured && 'md:grow-0']}>
-    <h3 class="bui-card__title">
+    <svelte:element this={`h${headingLevel}`} class="bui-card__title">
       <a href={articleHref(article.slug)} class="blog-card-link">{article.title}</a>
-    </h3>
+    </svelte:element>
     <time datetime={article.publishedAt} class="text-body-sm text-text-muted">
       {formatPublishedAt(article.publishedAt)}
     </time>

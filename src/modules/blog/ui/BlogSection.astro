@@ -1,4 +1,6 @@
 ---
+import { BLOG_NAVIGATION } from '@/shared/config'
+
 import BlogGrid from './BlogGrid.svelte'
 
 import type { Article } from '../domain/article'
@@ -8,6 +10,7 @@ interface Props {
 }
 
 const { blog } = Astro.props
+const HOME_ARTICLE_COUNT = 3
 ---
 
 <section aria-labelledby="home-blog-title" class="mt-12" data-testid="home-blog">
@@ -17,9 +20,14 @@ const { blog } = Astro.props
   <div aria-live="polite">
     <BlogGrid
       status={blog.status}
-      articles={blog.status === 'success' ? blog.articles : undefined}
+      articles={blog.status === 'success' ? blog.articles.slice(0, HOME_ARTICLE_COUNT) : undefined}
       errorMessage={blog.status === 'error' ? blog.message : undefined}
       retryHref="/"
     />
   </div>
+  <p class="mt-6">
+    <a href={BLOG_NAVIGATION.href} class="bui-link" data-testid="home-blog-all">
+      Tous les articles
+    </a>
+  </p>
 </section>
