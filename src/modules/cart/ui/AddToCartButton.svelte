@@ -6,6 +6,9 @@
 
   import type { Cart } from '../domain/cart'
 
+  // Vider puis remplir la région : un lecteur d'écran ne relit pas un texte identique
+  const ANNOUNCE_DELAY_MS = 100
+
   interface Props {
     item: Cart.Item
     isAvailable: boolean
@@ -18,7 +21,10 @@
 
   const add = () => {
     cart.add(item)
-    isAdded = true
+    isAdded = false
+    window.setTimeout(() => {
+      isAdded = true
+    }, ANNOUNCE_DELAY_MS)
   }
 </script>
 

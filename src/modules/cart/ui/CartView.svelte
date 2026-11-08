@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { tick } from 'svelte'
+
   import { Button } from '@/shared/ui/kit'
 
   import { MAX_QUANTITY, totalPrice } from '../domain/cart'
@@ -10,17 +12,32 @@
 
   const uid = $props.id()
   const cart = useCart()
+
+  let list: HTMLUListElement | null = null
+  let empty: HTMLParagraphElement | null = null
+
+  /**
+   * Après un retrait, le focus va au bouton « Retirer » de la ligne qui prend la place, sinon de la
+   * précédente, sinon au message de panier vide : sans cela, il retombe en haut de la page.
+   */
+  const removeLine = async (slug: string, index: number) => {
+    cart.remove(slug)
+    await tick()
+    const buttons = list?.querySelectorAll<HTMLButtonElement>(':scope > li button')
+    const target = buttons?.[Math.min(index, buttons.length - 1)] ?? empty
+    target?.focus()
+  }
 </script>
 
 <!-- Le panier n'existe que dans le navigateur : contenu rendu après le montage -->
 {#if cart.ready}
   {#if cart.lines.length === 0}
-    <p data-testid="cart-empty">
+    <p bind:this={empty} tabindex="-1" data-testid="cart-empty">
       Votre panier est vide. <a href={CATALOG_PATH} class="bui-link">Parcourir le catalogue</a>
     </p>
   {:else}
-    <ul class="grid gap-4">
-      {#each cart.lines as line (line.slug)}
+    <ul bind:this={list} class="grid gap-4">
+      {#each cart.lines as line, index (line.slug)}
         <li
           class="grid items-center gap-2 border-b border-border pb-4 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_10rem_minmax(0,1fr)_auto]"
           data-testid="cart-line"
@@ -47,7 +64,7 @@
           <Button
             variant="outline"
             aria-label="Retirer {line.name}"
-            onclick={() => cart.remove(line.slug)}
+            onclick={() => removeLine(line.slug, index)}
             data-testid="cart-remove"
           >
             Retirer
