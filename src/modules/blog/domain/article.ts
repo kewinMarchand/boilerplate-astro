@@ -4,6 +4,18 @@ import type { ImageView } from '@/shared/ui/kit'
 export declare namespace Article {
   type Id = string
 
+  /** Rubrique ou format, administrés dans l'API. */
+  interface Term {
+    slug: string
+    name: string
+  }
+
+  interface Audio {
+    src: string
+    type: string
+    durationSeconds: number
+  }
+
   interface Entity {
     id: Id
     slug: string
@@ -11,6 +23,11 @@ export declare namespace Article {
     excerpt: string
     image: ImageView | null
     publishedAt: string
+    section: Term | null
+    format: Term | null
+    audio: Audio | null
+    /** Intervenant de l'audio, vide si aucun. */
+    speaker: string
   }
 
   type Blog = { status: 'success'; articles: Entity[] } | { status: 'error'; message: string }
@@ -20,6 +37,9 @@ export declare namespace Article {
   /** Fiche : l'article et son texte en HTML, converti par l'API depuis le Markdown saisi dans l'admin. */
   interface Detail extends Entity {
     html: string
+    /** Saisis dans l'admin, chaînes vides sinon : la fiche garde alors son titre et son extrait. */
+    metaTitle: string
+    metaDescription: string
   }
 
   type Load =
@@ -32,3 +52,8 @@ export declare namespace Article {
 }
 
 export const articleHref = (slug: string): AppPath => `/blog/${slug}`
+
+export const SECTION_PARAM = 'rubrique'
+
+export const sectionHref = (slug: string): AppPath =>
+  `/blog?${SECTION_PARAM}=${encodeURIComponent(slug)}`

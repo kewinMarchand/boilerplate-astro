@@ -59,14 +59,86 @@ test.describe('Liste des articles', () => {
   })
 })
 
+interface ArticleDto {
+  title: string
+  section: { slug: string; name: string } | null
+}
+
+test.describe('Rubriques des articles', () => {
+  test('chaque carte porte sa rubrique en sur-titre, sauf sans rubrique', async ({
+    page,
+    request,
+  }) => {
+    const articles = (await (await request.get(`${API_URL}/api/articles`)).json()) as ArticleDto[]
+    await page.goto('/blog')
+
+    const cards = page.getByTestId('blog-card')
+    for (const [index, article] of articles.entries()) {
+      const overline = cards.nth(index).getByTestId('article-section')
+      if (article.section) await expect(overline).toHaveText(article.section.name)
+      else await expect(overline).toHaveCount(0)
+    }
+  })
+
+  test('la carte de l’accueil porte aussi la rubrique', async ({ page, request }) => {
+    const [first] = (await (await request.get(`${API_URL}/api/articles`)).json()) as ArticleDto[]
+    await page.goto('/')
+
+    await expect(
+      page.getByTestId('home-blog-card').first().getByTestId('article-section'),
+    ).toHaveText(first?.section?.name ?? '')
+  })
+
+  test('le filtre liste « Toutes » puis chaque rubrique, l’active marquée', async ({
+    page,
+    request,
+  }) => {
+    const sections = (await (await request.get(`${API_URL}/api/article-sections`)).json()) as {
+      name: string
+    }[]
+    await page.goto('/blog')
+
+    const filter = page.getByRole('navigation', { name: 'Rubriques' })
+    const links = filter.getByTestId('blog-section-link')
+    await expect(links).toHaveText(['Toutes', ...sections.map((section) => section.name)])
+    await expect(links.first()).toHaveAttribute('aria-current', 'page')
+    await expect(filter.locator('[aria-current]')).toHaveCount(1)
+  })
+
+  test('une rubrique filtre la liste par le paramètre rubrique', async ({ page, request }) => {
+    const expected = (await (
+      await request.get(`${API_URL}/api/articles?section=conseils`)
+    ).json()) as ArticleDto[]
+    await page.goto('/blog')
+    await page.getByTestId('blog-section-link').filter({ hasText: 'Conseils' }).click()
+
+    await expect(page).toHaveURL(/\/blog\?rubrique=conseils$/)
+    await expect(page.getByTestId('blog-card').getByRole('heading', { level: 2 })).toHaveText(
+      expected.map((article) => article.title),
+    )
+    await expect(page.getByTestId('article-section')).toHaveText(expected.map(() => 'Conseils'))
+    const active = page.getByTestId('blog-sections').locator('[aria-current="page"]')
+    await expect(active).toHaveText('Conseils')
+  })
+
+  test('une rubrique inconnue donne une liste vide, sans erreur', async ({ page }) => {
+    const response = await page.goto('/blog?rubrique=inconnue')
+
+    expect(response?.status()).toBe(200)
+    await expect(page.getByTestId('blog-empty')).toBeVisible()
+    await expect(page.getByTestId('blog-sections').locator('[aria-current]')).toHaveCount(0)
+  })
+})
+
 test.describe('Liste des articles, API sans article (X-Scenario: empty)', () => {
   test.use({ extraHTTPHeaders: { 'X-Scenario': 'empty' } })
 
-  test('affiche un message amical', async ({ page }) => {
+  test('affiche un message amical, sans filtre de rubriques', async ({ page }) => {
     await page.goto('/blog')
 
     await expect(page.getByTestId('blog-empty')).toBeVisible()
     await expect(page.getByTestId('blog-list')).toHaveCount(0)
+    await expect(page.getByTestId('blog-sections')).toHaveCount(0)
   })
 })
 
@@ -80,5 +152,11 @@ test.describe('Liste des articles, API en erreur (X-Scenario: error)', () => {
     await expect(page.getByTestId('blog-error')).toBeVisible()
     await expect(page.getByTestId('blog-retry')).toHaveAttribute('href', '/blog')
     await expect(page.getByTestId('blog-list')).toHaveCount(0)
+  })
+
+  test('la relance garde la rubrique filtrée', async ({ page }) => {
+    await page.goto('/blog?rubrique=conseils')
+
+    await expect(page.getByTestId('blog-retry')).toHaveAttribute('href', '/blog?rubrique=conseils')
   })
 })

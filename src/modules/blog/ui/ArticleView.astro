@@ -4,7 +4,8 @@ import { absoluteUrl } from '@/shared/seo'
 import { Alert, ImagePreload, largestWebp, ResponsiveImage } from '@/shared/ui/kit'
 import PageLayout from '@/shared/ui/layout/PageLayout.astro'
 
-import { articleHref } from '../domain/article'
+import { articleHref, sectionHref } from '../domain/article'
+import { formatDuration, isoDuration } from '../domain/formatDuration'
 import { formatPublishedAt } from '../domain/formatPublishedAt'
 
 import type { Article } from '../domain/article'
@@ -20,6 +21,8 @@ const detail = article.status === 'success' ? article.article : null
 const image = detail?.image ?? null
 const seo = detail
   ? {
+      metaTitle: detail.metaTitle,
+      metaDescription: detail.metaDescription,
       publishedTime: detail.publishedAt,
       image: image
         ? {
@@ -59,12 +62,55 @@ const seo = detail
     </Alert>
   ) : (
     <article class="max-w-prose" data-testid="article-page">
+      {(article.article.section || article.article.format) && (
+        <p class="mb-2 flex flex-wrap gap-x-3 text-body-sm font-semibold">
+          {article.article.section && (
+            <a
+              href={sectionHref(article.article.section.slug)}
+              class="bui-link"
+              data-testid="article-section"
+            >
+              {article.article.section.name}
+            </a>
+          )}
+          {article.article.format && (
+            <span data-testid="article-format">{article.article.format.name}</span>
+          )}
+        </p>
+      )}
       <p class="mb-6 text-body-sm text-text-muted">
         Publié le{' '}
         <time datetime={article.article.publishedAt}>
           {formatPublishedAt(article.article.publishedAt)}
         </time>
       </p>
+      {article.article.audio && (
+        <figure class="mb-6 flex flex-col gap-2">
+          <figcaption class="flex flex-wrap gap-x-3 text-body-sm text-text-muted">
+            <span>
+              Version audio,{' '}
+              <time datetime={isoDuration(article.article.audio.durationSeconds)}>
+                {formatDuration(article.article.audio.durationSeconds)}
+              </time>
+            </span>
+            {article.article.speaker && (
+              <span data-testid="article-speaker">{article.article.speaker}</span>
+            )}
+          </figcaption>
+          <audio
+            controls
+            preload="none"
+            class="w-full"
+            aria-label="Version audio de l’article"
+            data-testid="article-audio"
+          >
+            <source src={article.article.audio.src} type={article.article.audio.type} />
+            <a href={article.article.audio.src} class="bui-link">
+              Télécharger la version audio
+            </a>
+          </audio>
+        </figure>
+      )}
       {image && (
         <ResponsiveImage
           {image}

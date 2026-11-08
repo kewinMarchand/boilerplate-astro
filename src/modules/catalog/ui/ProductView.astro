@@ -8,6 +8,7 @@ import { productHref } from '../domain/catalog'
 import { CATALOG_ROOT_PATH } from '../domain/categoryPath'
 import { formatPrice } from '../domain/price'
 import { EXPOSURE_LABELS } from './labels'
+import ProductGallery from './ProductGallery.svelte'
 import SimilarProducts from './SimilarProducts.astro'
 
 import type { Catalog } from '../domain/catalog'
@@ -22,6 +23,7 @@ const IMAGE_SIZES = '(min-width: 1440px) 680px, (min-width: 768px) 50vw, calc(10
 const CATALOG: Seo.BreadcrumbItem = { label: CATALOG_NAVIGATION.label, path: CATALOG_ROOT_PATH }
 const detail = product.status === 'success' ? product.product : null
 const image = detail?.image ?? null
+const galleryImages = detail?.gallery.length ? [...(image ? [image] : []), ...detail.gallery] : []
 const category = detail?.categoryPath.at(-1)
 const parents: Seo.BreadcrumbItem[] = [
   CATALOG,
@@ -32,6 +34,8 @@ const description = detail
   : 'Fiche produit de notre jardinerie tropicale.'
 const seo = detail
   ? {
+      metaTitle: detail.metaTitle,
+      metaDescription: detail.metaDescription,
       image: image
         ? {
             path: largestWebp(image),
@@ -78,13 +82,17 @@ const seo = detail
   ) : (
     detail && (
       <article class="product-page" data-testid="product-page">
-        {image && (
-          <ResponsiveImage
-            {image}
-            sizes={IMAGE_SIZES}
-            priority
-            class="aspect-square h-auto w-full rounded-md object-cover"
-          />
+        {galleryImages.length > 0 ? (
+          <ProductGallery client:idle images={galleryImages} sizes={IMAGE_SIZES} />
+        ) : (
+          image && (
+            <ResponsiveImage
+              {image}
+              sizes={IMAGE_SIZES}
+              priority
+              class="aspect-square h-auto w-full rounded-md object-cover"
+            />
+          )
         )}
         <div>
           <p class="text-lead font-semibold" data-testid="product-price">

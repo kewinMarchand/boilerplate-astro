@@ -63,6 +63,9 @@ export const toProductDetail = (dto: ProductDetailDto): Catalog.ProductDetail =>
     value: attribute.valueLabel,
     unit: attribute.unit,
   })),
+  gallery: dto.gallery,
+  metaTitle: dto.metaTitle.trim(),
+  metaDescription: dto.metaDescription.trim(),
 })
 
 const toFacetCounts = <T extends string>(values: readonly T[], dtos: FacetDto[]) =>

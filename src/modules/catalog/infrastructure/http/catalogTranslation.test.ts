@@ -193,6 +193,9 @@ describe('toProductDetail', () => {
     image: null,
     categoryPath: [{ slug: 'palmiers', name: 'Palmiers' }],
     attributes: [],
+    gallery: [],
+    metaTitle: '',
+    metaDescription: '',
   }
 
   it('découpe la description en paragraphes aux lignes vides', () => {
@@ -236,5 +239,37 @@ describe('toProductDetail', () => {
 
   it('ne garde aucun paragraphe pour une description vide', () => {
     expect(toProductDetail({ ...DTO, description: '' }).description).toEqual([])
+  })
+
+  it('garde la galerie dans l’ordre, vide sans image supplémentaire', () => {
+    const image = (name: string) => ({
+      alt: 'Palmier nain',
+      width: 800,
+      height: 800,
+      sources: [{ type: 'image/webp' as const, srcset: `https://api/${name}-400.webp 400w` }],
+      src: `https://api/${name}-400.webp`,
+    })
+    const gallery = [image('profil'), image('feuille')]
+
+    expect(toProductDetail({ ...DTO, description: '', gallery }).gallery).toEqual(gallery)
+    expect(toProductDetail({ ...DTO, description: '' }).gallery).toEqual([])
+  })
+
+  it('reprend titre et description saisis, chaînes vides sinon', () => {
+    const detail = toProductDetail({
+      ...DTO,
+      description: '',
+      metaTitle: ' Palmier nain d’extérieur ',
+      metaDescription: 'Un palmier rustique.',
+    })
+
+    expect(detail).toMatchObject({
+      metaTitle: 'Palmier nain d’extérieur',
+      metaDescription: 'Un palmier rustique.',
+    })
+    expect(toProductDetail({ ...DTO, description: '' })).toMatchObject({
+      metaTitle: '',
+      metaDescription: '',
+    })
   })
 })

@@ -1,8 +1,12 @@
 ---
-import { BlogListView } from '@/modules/blog'
-import { loadLatestArticles } from '@/modules/blog/index.server'
+import { BlogListView, SECTION_PARAM } from '@/modules/blog'
+import { loadArticleSections, loadLatestArticles } from '@/modules/blog/index.server'
 
-const blog = await loadLatestArticles()
+const activeSection = Astro.url.searchParams.get(SECTION_PARAM) || undefined
+const [blog, sections] = await Promise.all([
+  loadLatestArticles(activeSection),
+  loadArticleSections(),
+])
 ---
 
-<BlogListView {blog} />
+<BlogListView {blog} {sections} {activeSection} />

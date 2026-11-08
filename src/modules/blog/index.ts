@@ -1,4 +1,5 @@
 export type { Article } from './domain/article'
+export { SECTION_PARAM } from './domain/article'
 export { default as ArticleView } from './ui/ArticleView.astro'
 export { default as BlogCard } from './ui/BlogCard.svelte'
 export { default as BlogListView } from './ui/BlogListView.astro'

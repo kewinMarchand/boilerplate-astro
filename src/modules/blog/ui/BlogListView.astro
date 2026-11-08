@@ -4,16 +4,27 @@ import { absoluteUrl } from '@/shared/seo'
 import { Alert, Button, Icon } from '@/shared/ui/kit'
 import PageLayout from '@/shared/ui/layout/PageLayout.astro'
 
-import { articleHref } from '../domain/article'
+import { articleHref, sectionHref } from '../domain/article'
 import BlogCard from './BlogCard.svelte'
 
 import type { Article } from '../domain/article'
 
 interface Props {
   blog: Article.Blog
+  sections: Article.Term[]
+  /** Slug du paramètre `rubrique`, absent pour toutes les rubriques. */
+  activeSection?: string | undefined
 }
 
-const { blog } = Astro.props
+const { blog, sections, activeSection } = Astro.props
+const filters = [
+  { label: 'Toutes', href: BLOG_NAVIGATION.href, active: !activeSection },
+  ...sections.map((section) => ({
+    label: section.name,
+    href: sectionHref(section.slug),
+    active: section.slug === activeSection,
+  })),
+]
 const articles = blog.status === 'success' ? blog.articles : []
 const jsonLd = [
   {
@@ -33,24 +44,49 @@ const jsonLd = [
 ---
 
 <PageLayout
+  page="blog"
   title={BLOG_NAVIGATION.label}
   description="Tous les articles du blog, du plus récent au plus ancien : accessibilité, performance et composants d’interface."
   seo={{ jsonLd }}
 >
+  {sections.length > 0 && (
+    <nav aria-label="Rubriques" class="mb-6" data-testid="blog-sections">
+      <ul class="flex flex-wrap gap-x-6 gap-y-2">
+        {filters.map((filter) => (
+          <li>
+            <a
+              href={filter.href}
+              class="bui-link aria-[current=page]:font-semibold aria-[current=page]:no-underline"
+              aria-current={filter.active ? 'page' : undefined}
+              data-testid="blog-section-link"
+            >
+              {filter.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )}
   <div aria-live="polite">
     {blog.status === 'error' ? (
       <div class="flex flex-col items-start gap-3">
         <Alert variant="error" data-testid="blog-error">
           {blog.message}
         </Alert>
-        <Button variant="outline" href={BLOG_NAVIGATION.href} data-testid="blog-retry">
+        <Button
+          variant="outline"
+          href={activeSection ? sectionHref(activeSection) : BLOG_NAVIGATION.href}
+          data-testid="blog-retry"
+        >
           <Icon name="rotate-cw" />
           Réessayer
         </Button>
       </div>
     ) : articles.length === 0 ? (
       <Alert variant="info" data-testid="blog-empty">
-        Aucun article publié pour l'instant. Revenez bientôt.
+        {activeSection
+          ? 'Aucun article dans cette rubrique pour l’instant.'
+          : "Aucun article publié pour l'instant. Revenez bientôt."}
       </Alert>
     ) : (
       <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3" data-testid="blog-list">

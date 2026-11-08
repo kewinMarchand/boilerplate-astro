@@ -33,6 +33,11 @@
     </div>
   {/if}
   <div class={['bui-card__body', featured && 'md:grow-0']}>
+    {#if article.section}
+      <p class="text-body-sm font-semibold text-primary" data-testid="article-section">
+        {article.section.name}
+      </p>
+    {/if}
     <svelte:element this={`h${headingLevel}`} class="bui-card__title">
       <a href={articleHref(article.slug)} class="blog-card-link">{article.title}</a>
     </svelte:element>

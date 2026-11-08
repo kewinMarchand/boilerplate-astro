@@ -14,6 +14,8 @@ interface Props {
   /** Texte du <h1> s'il diffère du titre (contenu administré dans l'API). */
   heading?: string | undefined
   description: string
+  /** Page fixe : titre et description saisis dans l'admin, s'il y en a, remplacent les valeurs calculées. */
+  page?: Seo.PageKey | undefined
   parents?: Seo.BreadcrumbItem[]
   seo?: Omit<Seo.Input, 'title' | 'description' | 'path' | 'breadcrumb'>
   categoryMenu?: NavigationNode[] | undefined
@@ -24,6 +26,7 @@ const {
   title,
   heading = title,
   description,
+  page,
   parents = [],
   seo = {},
   categoryMenu,
@@ -31,9 +34,17 @@ const {
 } = Astro.props
 const path = toAppPath(Astro.url.pathname)
 const breadcrumb = buildBreadcrumb({ label: title, path }, parents)
+const pageMeta = page && Astro.locals.pageMetas[page]
 const meta = buildPageMeta(
-  { ...seo, title, description, path, breadcrumb },
-  Astro.locals.siteIdentity.name,
+  {
+    ...seo,
+    ...(pageMeta && { metaTitle: pageMeta.title, metaDescription: pageMeta.description }),
+    title,
+    description,
+    path,
+    breadcrumb,
+  },
+  Astro.locals.siteIdentity,
 )
 ---
 

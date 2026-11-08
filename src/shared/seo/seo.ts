@@ -15,9 +15,32 @@ export declare namespace Seo {
     alt: string
   }
 
+  /** Pages fixes dont titre et description se saisissent dans l'admin (spec commune, section 26). */
+  type PageKey =
+    | 'home'
+    | 'catalog'
+    | 'blog'
+    | 'contact'
+    | 'sitemap'
+    | 'legal-notice'
+    | 'privacy'
+    | 'accessibility'
+
+  /** Chaînes vides quand rien n'est saisi. */
+  interface PageMeta {
+    title: string
+    description: string
+  }
+
+  type PageMetas = Partial<Record<PageKey, PageMeta>>
+
   interface Input {
     title?: string | undefined
     description: string
+    /** Titre saisi dans l'admin, servi tel quel (sans le nom du site) ; vide, le titre calculé. */
+    metaTitle?: string | undefined
+    /** Description saisie dans l'admin ; vide, `description`. */
+    metaDescription?: string | undefined
     path: string
     canonicalPath?: string | undefined
     noindex?: boolean | undefined

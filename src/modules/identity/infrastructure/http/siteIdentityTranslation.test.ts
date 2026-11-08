@@ -23,6 +23,8 @@ const DTO: SiteIdentityDto = {
   name: 'Oraki',
   tagline: 'Plantes rares et tropicales, livrées chez vous.',
   logo: null,
+  icon: null,
+  shareImage: null,
   defaultColorScheme: 'auto',
   theme: null,
 }
@@ -36,7 +38,7 @@ const LOGO = {
 }
 
 describe('toSiteIdentity', () => {
-  it('garde nom, accroche et thème par défaut, sans logo ni couleurs', () => {
+  it('garde nom, accroche et thème par défaut, sans logo, icône, image de partage ni couleurs', () => {
     expect(toSiteIdentity(DTO)).toEqual(DTO)
   })
 
@@ -49,6 +51,18 @@ describe('toSiteIdentity', () => {
       defaultColorScheme: 'dark',
       theme,
     })
+  })
+
+  it('reprend l’icône et l’image de partage', () => {
+    const icon = {
+      png32: 'https://api/icon-32.png',
+      png180: 'https://api/icon-180.png',
+      png192: 'https://api/icon-192.png',
+      png512: 'https://api/icon-512.png',
+    }
+    const shareImage = { ...LOGO, alt: 'Serre tropicale', width: 1200, height: 630 }
+
+    expect(toSiteIdentity({ ...DTO, icon, shareImage })).toEqual({ ...DTO, icon, shareImage })
   })
 
   it('écarte le thème si un jeton n’est pas une couleur #rrggbb', () => {

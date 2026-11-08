@@ -39,6 +39,11 @@ export declare namespace Catalog {
     /** Paragraphes de la description, vide si l'admin n'en a pas écrit. */
     description: string[]
     attributes: ProductAttribute[]
+    /** Images supplémentaires, dans l'ordre de l'admin ; vide sans galerie. */
+    gallery: ImageView[]
+    /** Saisis dans l'admin, chaînes vides sinon : la fiche garde alors son titre et sa description. */
+    metaTitle: string
+    metaDescription: string
   }
 
   /** Attribut configurable renseigné sur le produit, valeur prête à afficher (libellé pour une liste). */

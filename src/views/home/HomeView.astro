@@ -20,14 +20,16 @@ interface Props {
 
 const { featured, blog } = Astro.props
 
-const { siteIdentity } = Astro.locals
+const { siteIdentity, pageMetas } = Astro.locals
 const meta = buildPageMeta(
   {
     description: siteIdentity.tagline || SITE_IDENTITY_FALLBACK.tagline,
+    metaTitle: pageMetas.home?.title,
+    metaDescription: pageMetas.home?.description,
     path: '/',
-    jsonLd: buildHomeJsonLd(siteIdentity.name),
+    jsonLd: buildHomeJsonLd(siteIdentity),
   },
-  siteIdentity.name,
+  siteIdentity,
 )
 ---
 

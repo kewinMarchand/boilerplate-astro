@@ -21,7 +21,7 @@ interface Props {
 
 const { meta, categoryMenu = Astro.locals.categoryMenu } = Astro.props
 const { siteIdentity } = Astro.locals
-const { defaultColorScheme, theme } = siteIdentity
+const { defaultColorScheme, theme, icon } = siteIdentity
 
 // Amorçage avant le premier rendu : classe js (amélioration progressive), mode renforcé, thème mémorisé.
 // Rejoué après chaque navigation du routeur client (catalogue), qui remplace les attributs de <html>.
@@ -37,9 +37,18 @@ const BOOT_SCRIPT = `(()=>{const boot=()=>{${BOOT}};boot();if(!window.__boot){wi
     <meta name="theme-color" content={themeColor(siteIdentity)} />
     <meta name="color-scheme" content="light dark" />
     <meta name="format-detection" content="telephone=no, email=no, address=no" />
-    <link rel="icon" href="/favicon.ico" sizes="48x48" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    {icon ? (
+      <>
+        <link rel="icon" href={icon.png32} type="image/png" sizes="32x32" />
+        <link rel="apple-touch-icon" href={icon.png180} />
+      </>
+    ) : (
+      <>
+        <link rel="icon" href="/favicon.ico" sizes="48x48" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+      </>
+    )}
     <link rel="manifest" href="/manifest.webmanifest" />
     {theme && <style is:inline set:html={brandThemeCss(theme)} />}
     <script is:inline set:html={BOOT_SCRIPT} />

@@ -13,7 +13,7 @@ export const buildWebManifest = (identity: SiteIdentity) =>
     theme_color: themeColor(identity),
     background_color: '#ffffff',
     icons: [
-      { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
-      { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+      { src: identity.icon?.png192 ?? '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { src: identity.icon?.png512 ?? '/icon-512.png', sizes: '512x512', type: 'image/png' },
     ],
   })

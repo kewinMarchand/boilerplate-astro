@@ -9,6 +9,9 @@ import type { Page } from '@playwright/test'
 const EXTRA_ROUTES = [
   '/catalogue?exposition=mi-ombre&taille=M&vue=liste',
   '/catalogue?attr-feuillage=persistant',
+  '/produit/strelitzia-reginae',
+  '/blog?rubrique=conseils',
+  '/blog/un-carrousel-accessible-sans-dependance',
   '/route-inexistante',
   '/erreur-test',
   '/charte-graphique',

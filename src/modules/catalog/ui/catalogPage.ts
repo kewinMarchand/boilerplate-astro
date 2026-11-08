@@ -14,6 +14,8 @@ export interface CatalogPageDescription {
   path: AppPath
   title: string
   description: string
+  /** Racine du catalogue : page fixe, métadonnées saisies dans l'admin. */
+  page: Seo.PageKey | undefined
   parents: Seo.BreadcrumbItem[]
   seo: Omit<Seo.Input, 'title' | 'description' | 'path' | 'breadcrumb'>
 }
@@ -33,6 +35,7 @@ export const describeCatalogPage = (
     path,
     title: current?.name ?? CATALOG_NAVIGATION.label,
     description: listing?.description ?? 'Catalogue de notre jardinerie tropicale.',
+    page: current ? undefined : 'catalog',
     parents: current
       ? [{ label: CATALOG_NAVIGATION.label, path: CATALOG_ROOT_PATH }, ...categoryTrail(chain)]
       : [],
