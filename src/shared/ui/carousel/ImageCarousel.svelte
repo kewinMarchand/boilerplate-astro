@@ -42,6 +42,7 @@
             <ResponsiveImage
               image={slide.image}
               sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+              pictureClass="rounded-md"
               class="h-auto w-full rounded-md object-cover"
             />
           {/if}

@@ -47,6 +47,7 @@
     <ResponsiveImage
       image={PHOTO}
       sizes="(min-width: 768px) 720px, 100vw"
+      pictureClass="rounded-md"
       class="aspect-video h-auto w-full rounded-md object-cover"
     />
   </div>

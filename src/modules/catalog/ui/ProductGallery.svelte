@@ -51,6 +51,7 @@
         image={shown}
         {sizes}
         priority
+        pictureClass="rounded-md"
         class="aspect-square h-auto w-full rounded-md object-cover"
       />
     </div>

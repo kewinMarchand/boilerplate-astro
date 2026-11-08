@@ -34,6 +34,7 @@
         {eager}
         {priority}
         {fetchPriority}
+        pictureClass="@lg:self-start"
         class="product-card-image"
       />
     {:else}
