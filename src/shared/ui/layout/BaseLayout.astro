@@ -61,7 +61,9 @@ const BOOT_SCRIPT = `(()=>{const boot=()=>{${BOOT}};boot();if(!window.__boot){wi
     />
     <script>
       import { startObservability } from '@/shared/observability/client'
+      import { initImageFallback } from '@/shared/ui/kit/imageFallback'
 
+      initImageFallback()
       startObservability()
     </script>
   </head>

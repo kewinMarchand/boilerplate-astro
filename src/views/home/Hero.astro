@@ -12,7 +12,13 @@ const { name, tagline } = Astro.props
 ---
 
 <div class="hero full-bleed" data-testid="home-hero">
-  <ResponsiveImage image={HERO_IMAGE.image} sizes={HERO_IMAGE.sizes} priority class="hero-media" />
+  <ResponsiveImage
+    image={HERO_IMAGE.image}
+    sizes={HERO_IMAGE.sizes}
+    priority
+    fallback={false}
+    class="hero-media"
+  />
   <div class="hero-overlay"></div>
   <div class="container-page py-12">
     <div class="max-w-prose">

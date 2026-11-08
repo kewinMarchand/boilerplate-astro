@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ImageView } from './image'
+  import type { ClassValue } from 'svelte/elements'
 
   interface Props {
     image: ImageView
@@ -8,6 +9,9 @@
     eager?: boolean
     fetchPriority?: 'high' | 'low' | 'auto'
     class?: string
+    /** Fond de remplacement si l'image échoue (`bui-picture`) : images de l'API, pas le logo. */
+    fallback?: boolean
+    pictureClass?: ClassValue
   }
 
   const {
@@ -17,10 +21,12 @@
     eager = false,
     fetchPriority = priority ? 'high' : 'auto',
     class: className,
+    fallback = true,
+    pictureClass,
   }: Props = $props()
 </script>
 
-<picture>
+<picture class={[fallback && 'bui-picture', pictureClass]}>
   {#each image.sources as source (source.type)}
     <source type={source.type} srcset={source.srcset} {sizes} />
   {/each}

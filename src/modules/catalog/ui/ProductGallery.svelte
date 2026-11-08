@@ -36,7 +36,12 @@
 </script>
 
 {#snippet thumbImage(image: ImageView)}
-  <ResponsiveImage image={{ ...image, alt: '' }} sizes="64px" class="size-full object-cover" />
+  <ResponsiveImage
+    image={{ ...image, alt: '' }}
+    sizes="64px"
+    pictureClass="h-full"
+    class="size-full object-cover"
+  />
 {/snippet}
 
 <div class="flex flex-col gap-3" data-testid="product-gallery">
