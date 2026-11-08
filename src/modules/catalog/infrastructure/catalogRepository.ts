@@ -6,6 +6,7 @@ import { resolveCategoryPath } from '../domain/categoryPath'
 import { findCategoryChain } from '../domain/categoryTree'
 import {
   toCategory,
+  toFacetsQuery,
   toListing,
   toProduct,
   toProductDetail,
@@ -30,13 +31,20 @@ export const findCatalogListing = async (
   const categories = findCategoryChain(tree, slugs)
   if (!chain || !categories) return null
 
-  const { data, response } = await serverApiClient().GET('/api/products', {
-    params: { query: toProductsQuery(slugs, query) },
-  })
-  if (!data) throw new ApiError(response)
+  const client = serverApiClient()
+  const [products, facets] = await Promise.all([
+    client.GET('/api/products', { params: { query: toProductsQuery(slugs, query) } }),
+    client.GET('/api/product-facets', { params: { query: toFacetsQuery(slugs, query) } }),
+  ])
+  if (!products.data) throw new ApiError(products.response)
+  if (!facets.data) throw new ApiError(facets.response)
 
   const current = categories.at(-1)
-  return toListing(data, { chain, slugs, ...(current && { current }) })
+  return toListing(products.data, facets.data, query.page, {
+    chain,
+    slugs,
+    ...(current && { current }),
+  })
 }
 
 /** `null` si l'API ne connaît pas le produit (404). */
@@ -58,7 +66,7 @@ export const findSimilarProducts = async (
     params: { query: { category: categorySlug, itemsPerPage: SIMILAR_LIMIT + 1 } },
   })
   if (!data) throw new ApiError(response)
-  return data.items
+  return data
     .map(toProduct)
     .filter((product) => product.slug !== excludedSlug)
     .slice(0, SIMILAR_LIMIT)
@@ -71,7 +79,7 @@ export const findFeaturedProducts = async (): Promise<Catalog.Product[]> => {
   return data.map(toProduct)
 }
 
-/** Slugs de tous les produits, page après page (sitemap). */
+/** Slugs de tous les produits, page après page jusqu'à une page incomplète (sitemap). */
 export const findAllProductSlugs = async (): Promise<string[]> => {
   const slugs: string[] = []
   for (let page = 1; ; page += 1) {
@@ -79,7 +87,7 @@ export const findAllProductSlugs = async (): Promise<string[]> => {
       params: { query: { page, itemsPerPage: MAX_PAGE_SIZE } },
     })
     if (!data) throw new ApiError(response)
-    slugs.push(...data.items.map((item) => item.slug))
-    if (page >= data.totalPages) return slugs
+    slugs.push(...data.map((item) => item.slug))
+    if (data.length < MAX_PAGE_SIZE) return slugs
   }
 }
