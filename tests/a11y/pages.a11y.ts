@@ -16,6 +16,7 @@ const EXTRA_ROUTES = [
   '/erreur-test',
   '/charte-graphique',
   '/panier',
+  '/contact?produit=monstera-deliciosa',
 ]
 
 const expectNoViolations = async (page: Page) => {

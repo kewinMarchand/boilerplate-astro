@@ -5,6 +5,7 @@ import type { ImageView } from '@/shared/ui/kit'
 export const EXPOSURES = ['soleil', 'mi-ombre', 'ombre'] as const
 export const SIZES = ['S', 'M', 'L'] as const
 export const SORTS = ['pertinence', 'prix-asc', 'prix-desc', 'nom'] as const
+export const PRICE_SORTS: readonly Catalog.Sort[] = ['prix-asc', 'prix-desc']
 export const VIEWS = ['grille', 'liste'] as const
 export const PAGE_SIZE = 12
 /** Plus grande page acceptée par l'API. */
@@ -13,6 +14,9 @@ export const MAX_PAGE_SIZE = 48
 export const SIMILAR_LIMIT = 8
 
 export const productHref = (slug: string): AppPath => `/produit/${slug}`
+
+/** Demande de renseignement sur un produit : page de contact, produit en paramètre. */
+export const inquiryHref = (slug: string): AppPath => `/contact?produit=${slug}`
 
 export declare namespace Catalog {
   type Exposure = (typeof EXPOSURES)[number]
@@ -52,6 +56,13 @@ export declare namespace Catalog {
     label: string
     value: string
     unit: string | null
+  }
+
+  /** Produit nommé et lié à sa fiche (demande de renseignement). */
+  interface ProductLink {
+    slug: string
+    name: string
+    path: AppPath
   }
 
   type ProductLoad =

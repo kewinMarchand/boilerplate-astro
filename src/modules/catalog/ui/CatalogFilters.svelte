@@ -10,10 +10,11 @@
   interface Props {
     query: Catalog.Query
     listing: Catalog.Listing
+    salesEnabled: boolean
     onsubmit: (event: Event) => void
   }
 
-  const { query, listing, onsubmit }: Props = $props()
+  const { query, listing, salesEnabled, onsubmit }: Props = $props()
 
   const uid = $props.id()
 
@@ -122,29 +123,31 @@
       </details>
     {/each}
 
-    <details open class="bui-accordion__item">
-      <summary class="bui-accordion__summary">
-        Prix<Icon name="chevron-down" class="bui-accordion__icon" />
-      </summary>
-      <fieldset class="bui-accordion__content flex flex-wrap gap-3">
-        <legend class="sr-only">Prix en euros</legend>
-        {#each [{ name: 'prix_min', label: 'Minimum (€)', value: query.priceMin, testId: 'catalog-filter-price-min' }, { name: 'prix_max', label: 'Maximum (€)', value: query.priceMax, testId: 'catalog-filter-price-max' }] as field (field.name)}
-          <div class="bui-field w-28">
-            <label class="bui-field__label" for="{uid}-{field.name}">{field.label}</label>
-            <input
-              class="bui-field__input"
-              type="number"
-              id="{uid}-{field.name}"
-              name={field.name}
-              min="0"
-              inputmode="numeric"
-              value={field.value ?? ''}
-              data-testid={field.testId}
-            />
-          </div>
-        {/each}
-      </fieldset>
-    </details>
+    {#if salesEnabled}
+      <details open class="bui-accordion__item">
+        <summary class="bui-accordion__summary">
+          Prix<Icon name="chevron-down" class="bui-accordion__icon" />
+        </summary>
+        <fieldset class="bui-accordion__content flex flex-wrap gap-3">
+          <legend class="sr-only">Prix en euros</legend>
+          {#each [{ name: 'prix_min', label: 'Minimum (€)', value: query.priceMin, testId: 'catalog-filter-price-min' }, { name: 'prix_max', label: 'Maximum (€)', value: query.priceMax, testId: 'catalog-filter-price-max' }] as field (field.name)}
+            <div class="bui-field w-28">
+              <label class="bui-field__label" for="{uid}-{field.name}">{field.label}</label>
+              <input
+                class="bui-field__input"
+                type="number"
+                id="{uid}-{field.name}"
+                name={field.name}
+                min="0"
+                inputmode="numeric"
+                value={field.value ?? ''}
+                data-testid={field.testId}
+              />
+            </div>
+          {/each}
+        </fieldset>
+      </details>
+    {/if}
 
     <details open class="bui-accordion__item">
       <summary class="bui-accordion__summary">

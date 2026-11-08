@@ -8,14 +8,15 @@ import { formatPrice } from '../domain/price'
 interface Props {
   categorySlug: string
   productSlug: string
+  salesEnabled: boolean
 }
 
-const { categorySlug, productSlug } = Astro.props
+const { categorySlug, productSlug, salesEnabled } = Astro.props
 // Aucun autre produit, ou API en erreur : la section disparaît, la fiche reste servie.
 const slides = (await loadSimilarProducts(categorySlug, productSlug)).map((product) => ({
   id: product.id,
   title: product.name,
-  text: formatPrice(product.price),
+  ...(salesEnabled && { text: formatPrice(product.price) }),
   image: product.image,
   href: productHref(product.slug),
 }))

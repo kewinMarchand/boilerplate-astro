@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Button, Chip, Select } from '@/shared/ui/kit'
 
-  import { SORTS } from '../domain/catalog'
+  import { PRICE_SORTS, SORTS } from '../domain/catalog'
   import { queryEntries } from '../domain/catalogQuery'
   import { catalogHref } from './hooks/useCatalogNavigation.svelte'
   import { SORT_LABELS } from './labels'
@@ -14,15 +14,21 @@
     path: AppPath
     query: Catalog.Query
     total: number
+    salesEnabled: boolean
     onSortChange: (sort: Catalog.Sort) => void
     filterButton: Snippet
   }
 
-  const { path, query, total, onSortChange, filterButton }: Props = $props()
+  const { path, query, total, salesEnabled, onSortChange, filterButton }: Props = $props()
 
   const sortId = $props.id()
   const keptFields = $derived(queryEntries(query, ['tri']))
-  const sortOptions = SORTS.map((sort) => ({ value: sort, label: SORT_LABELS[sort] }))
+  const sortOptions = $derived(
+    SORTS.filter((sort) => salesEnabled || !PRICE_SORTS.includes(sort)).map((sort) => ({
+      value: sort,
+      label: SORT_LABELS[sort],
+    })),
+  )
 
   const handleSortChange = (event: Event) => {
     const select = event.currentTarget

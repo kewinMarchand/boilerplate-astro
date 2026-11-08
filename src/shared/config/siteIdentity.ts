@@ -42,6 +42,8 @@ export interface SiteIdentity {
   defaultColorScheme: 'auto' | 'light' | 'dark'
   /** `null` sans couleur de marque saisie : les jetons de boilerplates-ui restent tels quels. */
   theme: { light: BrandTokens; dark: BrandTokens } | null
+  /** Vente en ligne (section 27) : `false`, ni prix ni panier, une demande de renseignement par produit. */
+  salesEnabled: boolean
 }
 
 /** Repli quand l'API est en erreur ou injoignable : la page reste servie avec la configuration du site. */
@@ -53,4 +55,5 @@ export const SITE_IDENTITY_FALLBACK: SiteIdentity = {
   shareImage: null,
   defaultColorScheme: 'auto',
   theme: null,
+  salesEnabled: true,
 }

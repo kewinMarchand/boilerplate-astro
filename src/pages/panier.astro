@@ -1,5 +1,7 @@
 ---
 import { CartPage } from '@/modules/cart'
+
+if (!Astro.locals.siteIdentity.salesEnabled) return Astro.rewrite('/404')
 ---
 
 <CartPage />

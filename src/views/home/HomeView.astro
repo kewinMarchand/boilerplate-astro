@@ -37,7 +37,7 @@ const meta = buildPageMeta(
   <ImagePreload slot="head" image={HERO_IMAGE.image} sizes={HERO_IMAGE.sizes} />
   <Hero name={siteIdentity.name} tagline={siteIdentity.tagline} />
 
-  <FeaturedProducts {featured} />
+  <FeaturedProducts {featured} salesEnabled={siteIdentity.salesEnabled} />
 
   <BlogSection {blog} />
 </BaseLayout>

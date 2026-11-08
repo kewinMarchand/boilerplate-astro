@@ -16,6 +16,8 @@ describe('loadSiteIdentity', () => {
   it('se replie sur la configuration du site si l’API échoue', async () => {
     vi.mocked(findSiteIdentity).mockRejectedValueOnce(new Error('panne'))
 
-    expect(await loadSiteIdentity()).toEqual(SITE_IDENTITY_FALLBACK)
+    const identity = await loadSiteIdentity()
+    expect(identity).toEqual(SITE_IDENTITY_FALLBACK)
+    expect(identity.salesEnabled).toBe(true)
   })
 })

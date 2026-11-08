@@ -6,7 +6,8 @@ export declare namespace Carousel {
     id: string
     image: ImageView | null
     title: string
-    text: string
+    /** Ligne sous le titre (le prix) ; absente, aucune ligne. */
+    text?: string
     /** Destination de la diapositive : son titre devient un lien étiré sur toute la diapositive. */
     href?: AppPath
   }

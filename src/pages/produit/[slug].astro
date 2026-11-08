@@ -7,7 +7,7 @@ const product = await loadProduct(Astro.params.slug ?? '')
 if (product.status === 'not-found') return Astro.rewrite('/404')
 ---
 
-<ProductView {product}>
+<ProductView {product} salesEnabled={Astro.locals.siteIdentity.salesEnabled}>
   {product.status === 'success' && (
     <AddToCartButton
       slot="purchase"

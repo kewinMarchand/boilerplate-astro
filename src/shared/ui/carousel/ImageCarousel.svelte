@@ -58,7 +58,9 @@
               {slide.title}
             {/if}
           </h3>
-          <p class="text-text-muted">{slide.text}</p>
+          {#if slide.text}
+            <p class="text-text-muted">{slide.text}</p>
+          {/if}
         </div>
       {/each}
     </div>

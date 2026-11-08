@@ -8,7 +8,7 @@ export interface FieldError {
   message: string
 }
 
-const FIELDS: (keyof Contact.FormValues)[] = ['name', 'email', 'message']
+const FIELDS: (keyof Contact.FormValues)[] = ['name', 'email', 'message', 'product']
 
 const isField = (path: string): path is keyof Contact.FormValues =>
   FIELDS.some((field) => field === path)

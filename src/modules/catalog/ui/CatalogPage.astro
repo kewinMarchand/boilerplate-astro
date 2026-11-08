@@ -13,9 +13,10 @@ import type { Catalog } from '../domain/catalog'
 interface Props {
   query: Catalog.Query
   result: Catalog.Result
+  salesEnabled: boolean
 }
 
-const { query, result } = Astro.props
+const { query, result, salesEnabled } = Astro.props
 const { title, description, page, parents, seo } = describeCatalogPage(query, result)
 const firstImage = result.status === 'success' ? result.listing.products[0]?.image : undefined
 ---
@@ -23,5 +24,5 @@ const firstImage = result.status === 'success' ? result.listing.products[0]?.ima
 <PageLayout {title} {description} {page} {parents} {seo}>
   <ClientRouter slot="head" />
   {firstImage && <ImagePreload slot="head" image={firstImage} sizes={PRODUCT_IMAGE_SIZES} />}
-  <CatalogView client:load transition:persist="catalogue" {query} {result} />
+  <CatalogView client:load transition:persist="catalogue" {query} {result} {salesEnabled} />
 </PageLayout>

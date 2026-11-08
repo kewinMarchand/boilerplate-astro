@@ -13,6 +13,15 @@ describe('toFieldErrors', () => {
     ).toEqual([{ field: 'email', message: 'Indiquez une adresse e-mail valide.' }])
   })
 
+  it('garde la violation du produit d’une demande de renseignement', () => {
+    expect(
+      toFieldErrors({
+        status: 422,
+        violations: [{ propertyPath: 'product', message: 'Ce produit n’existe pas.' }],
+      }),
+    ).toEqual([{ field: 'product', message: 'Ce produit n’existe pas.' }])
+  })
+
   it('ne renvoie rien sans violations', () => {
     expect(toFieldErrors(undefined)).toEqual([])
   })

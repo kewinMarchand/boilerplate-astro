@@ -11,8 +11,8 @@ declare global {
       pageMetas: Seo.PageMetas
       /** Arbre des catégories du catalogue, chargé une fois par requête (menu du header, plan du site). */
       categoryMenu: NavigationNode[]
-      /** Lien du panier du header, posé par le middleware : le socle n'importe pas de module. */
-      cartLink: AstroComponentFactory
+      /** Lien du panier du header, posé par le middleware : le socle n'importe pas de module. Absent sans vente en ligne. */
+      cartLink?: AstroComponentFactory
     }
   }
 }

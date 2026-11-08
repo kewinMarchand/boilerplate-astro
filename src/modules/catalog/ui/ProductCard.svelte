@@ -10,6 +10,7 @@
 
   interface Props {
     product: Catalog.Product
+    showPrice?: boolean
     eager?: boolean
     priority?: boolean
     fetchPriority?: 'high' | 'low' | 'auto'
@@ -17,6 +18,7 @@
 
   const {
     product,
+    showPrice = true,
     eager = false,
     priority = false,
     fetchPriority = priority ? 'high' : 'auto',
@@ -45,7 +47,11 @@
           data-testid="catalog-product-link">{product.name}</a
         >
       </h2>
-      <p class="font-semibold" data-testid="catalog-product-price">{formatPrice(product.price)}</p>
+      {#if showPrice}
+        <p class="font-semibold" data-testid="catalog-product-price">
+          {formatPrice(product.price)}
+        </p>
+      {/if}
       <p class="text-body-sm text-text-muted">
         {EXPOSURE_LABELS[product.exposure]} · Taille {SIZE_LABELS[product.size].toLowerCase()}
       </p>

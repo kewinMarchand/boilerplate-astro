@@ -7,6 +7,16 @@ import ContactForm from './ContactForm.svelte'
 
 import type { Contact } from '../domain/contactSchema'
 
+interface Props {
+  /** Demande de renseignement : le produit, trouvé dans l'API, dont le slug part avec le message. */
+  product: Contact.Product | null
+}
+
+const { product } = Astro.props
+// L'envoi sans JavaScript revient sur la même page : le produit reste dans l'adresse.
+const formParams = new URLSearchParams(String(actions.contact))
+if (product) formParams.set('produit', product.slug)
+
 // Envoi sans JavaScript : l'action a traité le POST, la page affiche son résultat.
 const result = Astro.getActionResult(actions.contact)
 const submitted = Astro.request.method === 'POST' ? await Astro.request.formData() : undefined
@@ -42,5 +52,20 @@ const status = sent
     Formulaire validé par un schéma zod, envoyé par une action serveur Astro. Il fonctionne aussi
     sans JavaScript.
   </p>
-  <ContactForm client:load formAction={String(actions.contact)} {values} {errors} {status} />
+  {product && (
+    <p data-testid="contact-product">
+      Votre demande concerne :{' '}
+      <a href={product.path} class="bui-link">
+        {product.name}
+      </a>
+    </p>
+  )}
+  <ContactForm
+    client:load
+    formAction={`?${formParams}`}
+    product={product?.slug}
+    {values}
+    {errors}
+    {status}
+  />
 </PageLayout>

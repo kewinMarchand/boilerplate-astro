@@ -1,10 +1,10 @@
 ---
 import { CATALOG_NAVIGATION } from '@/shared/config'
 import { absoluteUrl } from '@/shared/seo'
-import { Alert, Badge, ImagePreload, largestWebp, ResponsiveImage } from '@/shared/ui/kit'
+import { Alert, Badge, Button, ImagePreload, largestWebp, ResponsiveImage } from '@/shared/ui/kit'
 import PageLayout from '@/shared/ui/layout/PageLayout.astro'
 
-import { productHref } from '../domain/catalog'
+import { inquiryHref, productHref } from '../domain/catalog'
 import { CATALOG_ROOT_PATH } from '../domain/categoryPath'
 import { formatPrice } from '../domain/price'
 import { EXPOSURE_LABELS } from './labels'
@@ -16,9 +16,11 @@ import type { Seo } from '@/shared/seo'
 
 interface Props {
   product: Catalog.ProductPage
+  /** Faux : ni prix ni panier, une demande de renseignement à la place (section 27). */
+  salesEnabled: boolean
 }
 
-const { product } = Astro.props
+const { product, salesEnabled } = Astro.props
 const IMAGE_SIZES = '(min-width: 1440px) 680px, (min-width: 768px) 50vw, calc(100vw - 32px)'
 const CATALOG: Seo.BreadcrumbItem = { label: CATALOG_NAVIGATION.label, path: CATALOG_ROOT_PATH }
 const detail = product.status === 'success' ? product.product : null
@@ -30,7 +32,7 @@ const parents: Seo.BreadcrumbItem[] = [
   ...(detail?.categoryPath ?? []).map((link) => ({ label: link.name, path: link.path })),
 ]
 const description = detail
-  ? `${detail.name} : exposition ${EXPOSURE_LABELS[detail.exposure].toLowerCase()}, taille ${detail.size}, ${formatPrice(detail.price)}. ${detail.inStock ? 'En stock' : 'En rupture de stock'}, rayon ${category?.name ?? 'catalogue'}.`
+  ? `${detail.name} : exposition ${EXPOSURE_LABELS[detail.exposure].toLowerCase()}, taille ${detail.size}${salesEnabled ? `, ${formatPrice(detail.price)}` : ''}. ${detail.inStock ? 'En stock' : 'En rupture de stock'}, rayon ${category?.name ?? 'catalogue'}.`
   : 'Fiche produit de notre jardinerie tropicale.'
 const seo = detail
   ? {
@@ -54,13 +56,15 @@ const seo = detail
           url: absoluteUrl(productHref(detail.slug)),
           ...(category && { category: category.name }),
           ...(image && { image: largestWebp(image) }),
-          offers: {
-            '@type': 'Offer',
-            url: absoluteUrl(productHref(detail.slug)),
-            priceCurrency: 'EUR',
-            price: (detail.price / 100).toFixed(2),
-            availability: `https://schema.org/${detail.inStock ? 'InStock' : 'OutOfStock'}`,
-          },
+          ...(salesEnabled && {
+            offers: {
+              '@type': 'Offer',
+              url: absoluteUrl(productHref(detail.slug)),
+              priceCurrency: 'EUR',
+              price: (detail.price / 100).toFixed(2),
+              availability: `https://schema.org/${detail.inStock ? 'InStock' : 'OutOfStock'}`,
+            },
+          }),
         },
       ],
     }
@@ -95,9 +99,11 @@ const seo = detail
           )
         )}
         <div>
-          <p class="text-lead font-semibold" data-testid="product-price">
-            {formatPrice(detail.price)}
-          </p>
+          {salesEnabled && (
+            <p class="text-lead font-semibold" data-testid="product-price">
+              {formatPrice(detail.price)}
+            </p>
+          )}
           {detail.description.length > 0 && (
             <div data-testid="product-description">
               {detail.description.map((paragraph) => (
@@ -125,7 +131,19 @@ const seo = detail
               ))}
             </dl>
           )}
-          <slot name="purchase" />
+          {salesEnabled ? (
+            <slot name="purchase" />
+          ) : (
+            <div class="mb-6">
+              <Button
+                href={inquiryHref(detail.slug)}
+                aria-label={`Demande de renseignement sur ${detail.name}`}
+                data-testid="product-inquiry"
+              >
+                Demande de renseignement
+              </Button>
+            </div>
+          )}
           {category && (
             <p>
               <a href={category.path} class="bui-link">
@@ -137,7 +155,9 @@ const seo = detail
       </article>
     )
   )}
-  {detail && <SimilarProducts categorySlug={detail.categorySlug} productSlug={detail.slug} />}
+  {detail && (
+    <SimilarProducts categorySlug={detail.categorySlug} productSlug={detail.slug} {salesEnabled} />
+  )}
 </PageLayout>
 
 <style>

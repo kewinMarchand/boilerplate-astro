@@ -5,6 +5,7 @@ import {
   parseCatalogQuery,
   serializeCatalogQuery,
   withFilter,
+  withoutPriceCriteria,
 } from './catalogQuery'
 
 const parse = (search: string) => parseCatalogQuery(new URLSearchParams(search))
@@ -68,6 +69,22 @@ describe('withFilter', () => {
       exposures: ['soleil'],
       page: 1,
     })
+  })
+})
+
+describe('withoutPriceCriteria', () => {
+  it('retire filtre et tris par prix, garde le reste', () => {
+    const query = parse('prix_min=10&prix_max=50&tri=prix-desc&exposition=soleil&page=2')
+    expect(withoutPriceCriteria(query)).toEqual({
+      ...query,
+      priceMin: undefined,
+      priceMax: undefined,
+      sort: 'pertinence',
+    })
+  })
+
+  it('garde un tri qui ne porte pas sur le prix', () => {
+    expect(withoutPriceCriteria(parse('tri=nom')).sort).toBe('nom')
   })
 })
 

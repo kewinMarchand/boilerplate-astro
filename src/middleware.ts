@@ -22,8 +22,9 @@ announceStartup()
 
 // MAINTENANCE=1 : toutes les pages répondent 503 avec la page autonome de maintenance. Sinon, la requête
 // porte son X-Scenario jusqu'à l'API, l'identité du site, les métadonnées des pages fixes et le menu des
-// catégories sont chargés une fois pour le layout (avec le lien du panier), et la réponse reçoit la CSP
-// Report-Only, bloc des couleurs de marque compris. Seules les erreurs inattendues remontent à GlitchTip.
+// catégories sont chargés une fois pour le layout (avec le lien du panier si la vente en ligne est active),
+// et la réponse reçoit la CSP Report-Only, bloc des couleurs de marque compris. Seules les erreurs
+// inattendues remontent à GlitchTip.
 export const onRequest = defineMiddleware((context, next) => {
   if (process.env['MAINTENANCE'] === '1') {
     return new Response(MAINTENANCE_HTML, {
@@ -38,13 +39,13 @@ export const onRequest = defineMiddleware((context, next) => {
   if (context.isPrerendered) return next()
 
   return withRequestScenario(context.request, async () => {
-    context.locals.cartLink = CartLink
     const [siteIdentity, pageMetas, categoryMenu] = await Promise.all([
       loadSiteIdentity(),
       loadPageMetas(),
       getCategoryMenu(),
     ])
     context.locals.siteIdentity = siteIdentity
+    if (siteIdentity.salesEnabled) context.locals.cartLink = CartLink
     context.locals.pageMetas = pageMetas
     context.locals.categoryMenu = categoryMenu
     let response: Response

@@ -20,6 +20,13 @@ export const loadProduct = async (slug: string): Promise<Catalog.ProductLoad> =>
   }
 }
 
+/** Produit d'une demande de renseignement ; aucun sans slug, slug inconnu ou API en erreur. */
+export const loadProductLink = async (slug: string | null): Promise<Catalog.ProductLink | null> => {
+  if (!slug) return null
+  const product = await findProduct(slug).catch(() => null)
+  return product && { slug: product.slug, name: product.name, path: productHref(product.slug) }
+}
+
 /** Produits similaires de la fiche (même catégorie) ; aucun si l'API ne répond pas : la fiche reste l'essentiel. */
 export const loadSimilarProducts = (categorySlug: string, excludedSlug: string) =>
   findSimilarProducts(categorySlug, excludedSlug).catch(() => [])

@@ -13,7 +13,7 @@ export const sendContactMessage = async (
   values: Contact.FormValues,
 ): Promise<ContactSendResult> => {
   const { error, response } = await serverApiClient().POST('/api/contact_messages', {
-    body: values,
+    body: { ...values, product: values.product ?? null },
   })
   if (response.status === 422) return { status: 'invalid', fieldErrors: toFieldErrors(error) }
   if (!response.ok) throw new ApiError(response)

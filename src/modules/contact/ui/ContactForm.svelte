@@ -10,6 +10,8 @@
   interface Props {
     /** Action du formulaire HTML (envoi sans JavaScript). */
     formAction: string
+    /** Slug du produit d'une demande de renseignement, envoyé dans un champ caché. */
+    product?: string | undefined
     values: Contact.FormValues
     errors: Contact.FieldErrors
     status?: 'sent' | 'error' | undefined
@@ -120,14 +122,21 @@
     data-testid="contact-message"
     bind:value={values.message}
   />
+  {#if props.product}
+    <input type="hidden" name="product" value={props.product} />
+  {/if}
   <Button type="submit" icon="mail" loading={submitting} data-testid="contact-submit">
     Envoyer
   </Button>
   <div aria-live="polite">
     {#if status === 'sent'}
       <Alert variant="success" data-testid="contact-success">
-        Merci, votre message a bien été envoyé.
+        {props.product
+          ? 'Votre demande de renseignement a bien été envoyée.'
+          : 'Merci, votre message a bien été envoyé.'}
       </Alert>
+    {:else if errors.product}
+      <Alert variant="error" data-testid="contact-error">{errors.product.join(' ')}</Alert>
     {:else if status === 'error'}
       <Alert variant="error" data-testid="contact-error">
         L'envoi a échoué. Réessayez dans quelques instants.

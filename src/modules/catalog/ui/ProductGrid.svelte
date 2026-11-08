@@ -10,12 +10,13 @@
     status: Catalog.Status
     products: Catalog.Product[]
     view: Catalog.View
+    showPrice: boolean
     errorMessage?: string | undefined
     onRetry: () => void
     clearAction: Snippet
   }
 
-  const { status, products, view, errorMessage, onRetry, clearAction }: Props = $props()
+  const { status, products, view, showPrice, errorMessage, onRetry, clearAction }: Props = $props()
 
   const EAGER_COUNT = 4
 </script>
@@ -44,6 +45,7 @@
       <li>
         <ProductCard
           {product}
+          {showPrice}
           eager={index < EAGER_COUNT}
           priority={index === 0}
           fetchPriority={index === 0 ? 'high' : index < EAGER_COUNT ? 'low' : 'auto'}

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { EXPOSURES, SIZES, SORTS, VIEWS } from './catalog'
+import { EXPOSURES, PRICE_SORTS, SIZES, SORTS, VIEWS } from './catalog'
 
 import type { Catalog } from './catalog'
 
@@ -76,6 +76,14 @@ export const parseCatalogQuery = (params: URLSearchParams): Catalog.Query => {
     attributes: parseAttributes(params),
   }
 }
+
+/** Vente en ligne coupée : filtre et tris par prix sont ignorés, comme une valeur invalide. */
+export const withoutPriceCriteria = (query: Catalog.Query): Catalog.Query => ({
+  ...query,
+  priceMin: undefined,
+  priceMax: undefined,
+  sort: PRICE_SORTS.includes(query.sort) ? 'pertinence' : query.sort,
+})
 
 export const serializeCatalogQuery = (query: Catalog.Query): string => {
   const params = new URLSearchParams()

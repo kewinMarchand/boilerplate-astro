@@ -9,15 +9,16 @@ import type { Catalog } from '../domain/catalog'
 
 interface Props {
   featured: Catalog.Featured
+  salesEnabled: boolean
 }
 
-const { featured } = Astro.props
+const { featured, salesEnabled } = Astro.props
 const slides =
   featured.status === 'success'
     ? featured.products.map((product) => ({
         id: product.id,
         title: product.name,
-        text: formatPrice(product.price),
+        ...(salesEnabled && { text: formatPrice(product.price) }),
         image: product.image,
         href: productHref(product.slug),
       }))

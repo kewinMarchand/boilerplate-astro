@@ -27,6 +27,7 @@ const DTO: SiteIdentityDto = {
   shareImage: null,
   defaultColorScheme: 'auto',
   theme: null,
+  salesEnabled: true,
 }
 
 const LOGO = {
@@ -63,6 +64,10 @@ describe('toSiteIdentity', () => {
     const shareImage = { ...LOGO, alt: 'Serre tropicale', width: 1200, height: 630 }
 
     expect(toSiteIdentity({ ...DTO, icon, shareImage })).toEqual({ ...DTO, icon, shareImage })
+  })
+
+  it('reprend la vente en ligne coupée', () => {
+    expect(toSiteIdentity({ ...DTO, salesEnabled: false }).salesEnabled).toBe(false)
   })
 
   it('écarte le thème si un jeton n’est pas une couleur #rrggbb', () => {

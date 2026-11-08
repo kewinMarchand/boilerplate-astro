@@ -1,5 +1,8 @@
 ---
+import { loadProductLink } from '@/modules/catalog/index.server'
 import { ContactView } from '@/modules/contact'
+
+const product = await loadProductLink(Astro.url.searchParams.get('produit'))
 ---
 
-<ContactView />
+<ContactView {product} />
