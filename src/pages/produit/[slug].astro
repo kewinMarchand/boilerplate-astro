@@ -1,4 +1,5 @@
 ---
+import { AddToCartButton } from '@/modules/cart'
 import { ProductView } from '@/modules/catalog'
 import { loadProduct } from '@/modules/catalog/index.server'
 
@@ -6,4 +7,17 @@ const product = await loadProduct(Astro.params.slug ?? '')
 if (product.status === 'not-found') return Astro.rewrite('/404')
 ---
 
-<ProductView {product} />
+<ProductView {product}>
+  {product.status === 'success' && (
+    <AddToCartButton
+      slot="purchase"
+      client:load
+      item={{
+        slug: product.product.slug,
+        name: product.product.name,
+        price: product.product.price,
+      }}
+      isAvailable={product.product.inStock}
+    />
+  )}
+</ProductView>

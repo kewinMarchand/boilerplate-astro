@@ -3,6 +3,7 @@ import {
   findAllProductSlugs,
   findFeaturedProducts,
   findProduct,
+  findSimilarProducts,
 } from '../infrastructure/catalogRepository'
 import { FeaturedProductsLoadError } from './FeaturedProductsLoadError'
 import { ProductLoadError } from './ProductLoadError'
@@ -18,6 +19,10 @@ export const loadProduct = async (slug: string): Promise<Catalog.ProductLoad> =>
     return { status: 'error', message: new ProductLoadError().message }
   }
 }
+
+/** Produits similaires de la fiche (même catégorie) ; aucun si l'API ne répond pas : la fiche reste l'essentiel. */
+export const loadSimilarProducts = (categorySlug: string, excludedSlug: string) =>
+  findSimilarProducts(categorySlug, excludedSlug).catch(() => [])
 
 export const loadFeaturedProducts = async () => {
   try {

@@ -1,0 +1,31 @@
+---
+import { ImageCarousel } from '@/shared/ui/carousel'
+
+import { loadSimilarProducts } from '../application/products.server'
+import { productHref } from '../domain/catalog'
+import { formatPrice } from '../domain/price'
+
+interface Props {
+  categorySlug: string
+  productSlug: string
+}
+
+const { categorySlug, productSlug } = Astro.props
+// Aucun autre produit, ou API en erreur : la section disparaît, la fiche reste servie.
+const slides = (await loadSimilarProducts(categorySlug, productSlug)).map((product) => ({
+  id: product.id,
+  title: product.name,
+  text: formatPrice(product.price),
+  image: product.image,
+  href: productHref(product.slug),
+}))
+---
+
+{slides.length > 0 && (
+  <section aria-labelledby="product-similar-title" class="mt-12" data-testid="product-similar">
+    <h2 id="product-similar-title" class="section-title">
+      Produits similaires
+    </h2>
+    <ImageCarousel client:visible {slides} label="Produits similaires" />
+  </section>
+)}

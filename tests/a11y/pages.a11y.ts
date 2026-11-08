@@ -11,6 +11,7 @@ const EXTRA_ROUTES = [
   '/route-inexistante',
   '/erreur-test',
   '/charte-graphique',
+  '/panier',
 ]
 
 const expectNoViolations = async (page: Page) => {
@@ -36,6 +37,19 @@ for (const mode of MODES) {
         await expectNoViolations(page)
       })
     }
+
+    test('le panier rempli ne présente aucune violation axe', async ({ page }) => {
+      await page.goto('/produit/monstera-deliciosa')
+      await page.getByTestId('add-to-cart').click()
+      await expect(page.getByTestId('cart-count')).toHaveText('1')
+      await page.goto('/panier')
+      await expect(page.getByTestId('cart-line')).toHaveCount(1)
+      if (mode === 'enhanced') {
+        await expect(page.locator('html')).toHaveAttribute('data-a11y-mode', 'enhanced')
+      }
+
+      await expectNoViolations(page)
+    })
 
     test('le menu ouvert ne présente aucune violation axe', async ({ page, isMobile }) => {
       await gotoHydrated(page, '/')

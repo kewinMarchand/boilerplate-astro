@@ -9,6 +9,8 @@ export const VIEWS = ['grille', 'liste'] as const
 export const PAGE_SIZE = 12
 /** Plus grande page acceptée par l'API. */
 export const MAX_PAGE_SIZE = 48
+/** Produits du carrousel « Produits similaires » de la fiche. */
+export const SIMILAR_LIMIT = 8
 
 export const productHref = (slug: string): AppPath => `/produit/${slug}`
 

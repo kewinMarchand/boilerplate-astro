@@ -6,6 +6,7 @@ import { SCENARIO_HEADER } from '@/shared/observability'
 import { reportServerError } from '@/shared/observability/index.server'
 import { announceStartup, CSP_HEADER, siteCspHeader } from '@/shared/security/index.server'
 
+import { CartLink } from '@/modules/cart'
 import { getCategoryMenu } from '@/modules/catalog/index.server'
 
 import { MAINTENANCE_HTML, MAINTENANCE_RETRY_AFTER_SECONDS } from '@/views/errors'
@@ -13,8 +14,8 @@ import { MAINTENANCE_HTML, MAINTENANCE_RETRY_AFTER_SECONDS } from '@/views/error
 announceStartup()
 
 // MAINTENANCE=1 : toutes les pages répondent 503 avec la page autonome de maintenance. Sinon, la requête
-// porte son X-Scenario jusqu'à l'API, le menu des catégories est chargé une fois pour le header, et la
-// réponse reçoit la CSP Report-Only. Seules les erreurs inattendues remontent à GlitchTip.
+// porte son X-Scenario jusqu'à l'API, le menu des catégories est chargé une fois pour le header (avec le
+// lien du panier), et la réponse reçoit la CSP Report-Only. Seules les erreurs inattendues remontent à GlitchTip.
 export const onRequest = defineMiddleware((context, next) => {
   if (process.env['MAINTENANCE'] === '1') {
     return new Response(MAINTENANCE_HTML, {
@@ -29,6 +30,7 @@ export const onRequest = defineMiddleware((context, next) => {
   if (context.isPrerendered) return next()
 
   return withRequestScenario(context.request, async () => {
+    context.locals.cartLink = CartLink
     context.locals.categoryMenu = await getCategoryMenu()
     let response: Response
     try {

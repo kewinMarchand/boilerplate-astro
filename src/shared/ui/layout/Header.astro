@@ -14,6 +14,7 @@ interface Props {
 }
 
 const { categoryMenu } = Astro.props
+const { cartLink: CartLink } = Astro.locals
 const { pathname } = Astro.url
 const [home, ...otherLinks] = MAIN_NAVIGATION
 ---
@@ -52,6 +53,7 @@ const [home, ...otherLinks] = MAIN_NAVIGATION
     <div class="hidden js:max-lg:block">
       <MobileMenu client:media="(max-width: 1023.98px)" nodes={categoryMenu} {pathname} />
     </div>
+    <CartLink />
     <ColorSchemeToggle client:load />
     <A11yModeToggle client:load />
   </div>
