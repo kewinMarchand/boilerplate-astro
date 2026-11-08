@@ -17,7 +17,7 @@ test.describe('Navigation', () => {
     const logo = page.getByTestId('layout-logo')
 
     await expect(logo).toHaveAttribute('href', '/')
-    await expect(logo).toHaveAccessibleName('Boilerplate Astro')
+    await expect(logo).toHaveAccessibleName('Boilerplate')
     await expect(logo).toHaveAttribute('aria-current', 'page')
 
     await page.goto('/contact')

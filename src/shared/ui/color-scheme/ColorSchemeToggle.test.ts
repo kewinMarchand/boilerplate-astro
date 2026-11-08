@@ -17,7 +17,7 @@ describe('ColorSchemeToggle', () => {
     expect(screen.getByTestId('color-scheme-option-auto')).toHaveAttribute('aria-checked', 'true')
   })
 
-  it('pose et mémorise le choix, puis « système » retire la clé', async () => {
+  it('pose et mémorise le choix, puis « système » écrit auto', async () => {
     render(ColorSchemeToggle)
     const toggle = screen.getByTestId('color-scheme-toggle')
 
@@ -30,7 +30,7 @@ describe('ColorSchemeToggle', () => {
     await userEvent.click(toggle)
     await userEvent.click(screen.getByTestId('color-scheme-option-auto'))
     expect(toggle).toHaveAccessibleName('Thème : système')
-    expect(localStorage.getItem('color-scheme')).toBeNull()
+    expect(localStorage.getItem('color-scheme')).toBe('auto')
   })
 
   it('annonce un choix sombre suspendu par le mode renforcé', () => {

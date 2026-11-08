@@ -13,6 +13,8 @@ export default defineConfig({
   integrations: [svelte(), precompress()],
   server: { port: 4321, host: true },
   devToolbar: { enabled: false },
+  // Feuilles en fichiers externes : seuls les blocs des îlots et des couleurs de marque restent inline (empreintes CSP).
+  build: { inlineStylesheets: 'never' },
   vite: {
     plugins: [tailwindcss()],
     // Dépendance Git : compilée dans le serveur, pour que l'image de production n'ait pas à l'installer.

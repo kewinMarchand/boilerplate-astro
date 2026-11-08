@@ -1,7 +1,8 @@
 ---
-import { CATALOG_NAVIGATION, MAIN_NAVIGATION, SITE } from '@/shared/config'
+import { CATALOG_NAVIGATION, MAIN_NAVIGATION } from '@/shared/config'
 import { A11yModeToggle } from '@/shared/ui/a11y-mode'
 import { ColorSchemeToggle } from '@/shared/ui/color-scheme'
+import { ResponsiveImage } from '@/shared/ui/kit'
 
 import CategoryMenu from './CategoryMenu.svelte'
 import MobileMenu from './MobileMenu.svelte'
@@ -14,7 +15,9 @@ interface Props {
 }
 
 const { categoryMenu } = Astro.props
-const { cartLink: CartLink } = Astro.locals
+const { cartLink: CartLink, siteIdentity } = Astro.locals
+const { name, logo } = siteIdentity
+const LOGO_HEIGHT = 40
 const { pathname } = Astro.url
 const [home, ...otherLinks] = MAIN_NAVIGATION
 ---
@@ -27,8 +30,19 @@ const [home, ...otherLinks] = MAIN_NAVIGATION
       aria-current={pathname === '/' ? 'page' : undefined}
       data-testid="layout-logo"
     >
-      <img src="/logo-mark.svg" alt="" width="40" height="40" />
-      {SITE.name}
+      {logo ? (
+        <ResponsiveImage
+          image={{ ...logo, alt: name }}
+          sizes={`${Math.round((LOGO_HEIGHT * logo.width) / logo.height)}px`}
+          priority
+          class="h-[40px] w-auto"
+        />
+      ) : (
+        <>
+          <img src="/logo-mark.svg" alt="" width="40" height="40" />
+          {name}
+        </>
+      )}
     </a>
     <nav aria-label="Navigation principale" class="js:max-lg:hidden">
       <ul class="flex flex-wrap gap-1">

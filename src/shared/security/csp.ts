@@ -9,12 +9,14 @@ export interface SiteOrigins {
   matomoUrl?: string | undefined
   /** DSN GlitchTip du navigateur, quand le suivi des erreurs est activé : envoi des erreurs. */
   glitchtipDsn?: string | undefined
+  /** Empreintes (`'sha256-…'`) des blocs `<style>` rendus par le serveur : couleurs de marque. */
+  styleHashes?: string[] | undefined
 }
 
 const originOf = (address: string) => new URL(address).origin
 
 /** En-tête Report-Only du site : seules les origines que le site charge réellement, selon ses variables. */
-export const siteCsp = ({ apiUrl, matomoUrl, glitchtipDsn }: SiteOrigins) => {
+export const siteCsp = ({ apiUrl, matomoUrl, glitchtipDsn, styleHashes = [] }: SiteOrigins) => {
   const extra: Directives = { 'img-src': [originOf(apiUrl)] }
   if (matomoUrl) {
     const matomo = originOf(matomoUrl)
@@ -27,5 +29,6 @@ export const siteCsp = ({ apiUrl, matomoUrl, glitchtipDsn }: SiteOrigins) => {
   if (glitchtipDsn) {
     extra['connect-src'] = [...(extra['connect-src'] ?? []), originOf(glitchtipDsn)]
   }
+  if (styleHashes.length > 0) extra['style-src'] = styleHashes
   return buildCsp(defaultDirectives({ apiOrigin: apiUrl, extra }), { reportUri: CSP_REPORT_PATH })
 }

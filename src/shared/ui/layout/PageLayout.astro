@@ -31,7 +31,10 @@ const {
 } = Astro.props
 const path = toAppPath(Astro.url.pathname)
 const breadcrumb = buildBreadcrumb({ label: title, path }, parents)
-const meta = buildPageMeta({ ...seo, title, description, path, breadcrumb })
+const meta = buildPageMeta(
+  { ...seo, title, description, path, breadcrumb },
+  Astro.locals.siteIdentity.name,
+)
 ---
 
 <BaseLayout {meta} {categoryMenu}>

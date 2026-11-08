@@ -22,11 +22,11 @@ export const buildBreadcrumbJsonLd = (items: Seo.BreadcrumbItem[]): Seo.JsonLd =
   })),
 })
 
-export const buildHomeJsonLd = (): Seo.JsonLd[] => [
+export const buildHomeJsonLd = (siteName: string): Seo.JsonLd[] => [
   {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: SITE.publisher.name,
+    name: siteName,
     url: absoluteUrl('/'),
     logo: absoluteUrl('/icon-512.png'),
     email: SITE.publisher.email,
@@ -34,24 +34,25 @@ export const buildHomeJsonLd = (): Seo.JsonLd[] => [
   {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: SITE.name,
+    name: siteName,
     url: absoluteUrl('/'),
     inLanguage: 'fr-FR',
   },
 ]
 
-export const buildPageMeta = (input: Seo.Input): Seo.Meta => {
+/** `siteName` : nom de l'identité du site (API, ou repli sur la configuration). */
+export const buildPageMeta = (input: Seo.Input, siteName: string): Seo.Meta => {
   const image = input.image ?? DEFAULT_SHARE_IMAGE
   const breadcrumbJsonLd = input.breadcrumb ? [buildBreadcrumbJsonLd(input.breadcrumb)] : []
 
   return {
-    title: input.title ? `${input.title} · ${SITE.name}` : SITE.name,
+    title: input.title ? `${input.title} · ${siteName}` : siteName,
     description: input.description,
     canonical: absoluteUrl(input.canonicalPath ?? input.path),
     robots: input.noindex ? 'noindex, follow' : 'index, follow',
-    siteName: SITE.name,
+    siteName,
     locale: SITE.locale,
-    ogTitle: input.title ?? SITE.name,
+    ogTitle: input.title ?? siteName,
     image: { ...image, url: absoluteUrl(image.path) },
     jsonLd: [...breadcrumbJsonLd, ...(input.jsonLd ?? [])],
     prev: input.prevPath && absoluteUrl(input.prevPath),

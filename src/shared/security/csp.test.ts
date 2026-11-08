@@ -24,6 +24,11 @@ describe('siteCsp', () => {
       "connect-src 'self' http://localhost:8091 https://matomo.exemple.com https://erreurs.exemple.com",
     )
   })
+
+  it('autorise les blocs de style par leur empreinte', () => {
+    const csp = siteCsp({ apiUrl: 'http://localhost:8091', styleHashes: ["'sha256-abc='"] })
+    expect(csp).toContain("style-src 'self' 'unsafe-inline' 'sha256-abc='")
+  })
 })
 
 describe('route de rapport', () => {

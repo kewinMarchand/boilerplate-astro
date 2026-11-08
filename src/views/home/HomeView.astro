@@ -1,5 +1,5 @@
 ---
-import { SITE } from '@/shared/config'
+import { SITE_IDENTITY_FALLBACK } from '@/shared/config'
 import { buildHomeJsonLd, buildPageMeta } from '@/shared/seo'
 import { ImagePreload } from '@/shared/ui/kit'
 import BaseLayout from '@/shared/ui/layout/BaseLayout.astro'
@@ -20,12 +20,20 @@ interface Props {
 
 const { featured, blog } = Astro.props
 
-const meta = buildPageMeta({ description: SITE.description, path: '/', jsonLd: buildHomeJsonLd() })
+const { siteIdentity } = Astro.locals
+const meta = buildPageMeta(
+  {
+    description: siteIdentity.tagline || SITE_IDENTITY_FALLBACK.tagline,
+    path: '/',
+    jsonLd: buildHomeJsonLd(siteIdentity.name),
+  },
+  siteIdentity.name,
+)
 ---
 
 <BaseLayout {meta}>
   <ImagePreload slot="head" image={HERO_IMAGE.image} sizes={HERO_IMAGE.sizes} />
-  <Hero />
+  <Hero name={siteIdentity.name} tagline={siteIdentity.tagline} />
 
   <FeaturedProducts {featured} />
 

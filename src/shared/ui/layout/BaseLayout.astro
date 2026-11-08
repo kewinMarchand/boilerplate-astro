@@ -1,7 +1,8 @@
 ---
 import { OBSERVABILITY_CONFIG_ID } from '@/shared/observability'
 import { observabilityConfig } from '@/shared/observability/index.server'
-import { SeoHead } from '@/shared/seo'
+import { SeoHead, themeColor } from '@/shared/seo'
+import { brandThemeCss } from '@/shared/theme/brandTheme'
 import { A11Y_MODE_SCRIPT } from '@/shared/ui/a11y-mode'
 import { COLOR_SCHEME_SCRIPT } from '@/shared/ui/color-scheme'
 
@@ -19,6 +20,8 @@ interface Props {
 }
 
 const { meta, categoryMenu = Astro.locals.categoryMenu } = Astro.props
+const { siteIdentity } = Astro.locals
+const { defaultColorScheme, theme } = siteIdentity
 
 // Amorçage avant le premier rendu : classe js (amélioration progressive), mode renforcé, thème mémorisé.
 // Rejoué après chaque navigation du routeur client (catalogue), qui remplace les attributs de <html>.
@@ -27,17 +30,18 @@ const BOOT_SCRIPT = `(()=>{const boot=()=>{${BOOT}};boot();if(!window.__boot){wi
 ---
 
 <!doctype html>
-<html lang="fr" data-color-scheme="auto">
+<html lang="fr" data-color-scheme={defaultColorScheme}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#1d4ed8" />
+    <meta name="theme-color" content={themeColor(siteIdentity)} />
     <meta name="color-scheme" content="light dark" />
     <meta name="format-detection" content="telephone=no, email=no, address=no" />
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
+    {theme && <style is:inline set:html={brandThemeCss(theme)} />}
     <script is:inline set:html={BOOT_SCRIPT} />
     <SeoHead {meta} />
     <slot name="head" />

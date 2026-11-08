@@ -1,6 +1,8 @@
 ---
-import { LEGAL_NAVIGATION, SITE } from '@/shared/config'
+import { LEGAL_NAVIGATION } from '@/shared/config'
 import { resolveHref } from '@/shared/routing'
+
+const { name } = Astro.locals.siteIdentity
 ---
 
 <footer class="mt-12 bg-surface-muted py-6" data-testid="app-footer">
@@ -18,7 +20,7 @@ import { resolveHref } from '@/shared/routing'
     </nav>
     <p class="flex items-center gap-2 text-body-sm text-text-muted">
       <img src="/logo-mark.svg" alt="" width="24" height="24" />
-      {SITE.name}
+      {name}
       {import.meta.env.DEV && (
         <a href="/charte-graphique" class="ml-auto underline">
           Charte graphique
