@@ -25,11 +25,14 @@ typecheck: ## Vérification des types TypeScript
 
 test: test-unit test-e2e test-a11y ## Tous les tests
 
-test-unit: ## Tests unitaires (Vitest)
-	$(RUN) yarn test:unit
+test-unit: ## Tests unitaires (Vitest) ; VITEST_CHANGED=1 : fichiers touchés par les modifications non commitées
+	$(RUN) yarn test:unit $(if $(VITEST_CHANGED),--changed)
 
 test-e2e: ## Tests end-to-end desktop et mobile (Playwright)
 	$(RUN) yarn test:e2e
+
+e2e-vite: ## e2e desktop des fichiers modifiés depuis origin/main (FICHIERS="…" ou GREP="…"), build réutilisé s'il est à jour
+	$(RUN) env FICHIERS='$(FICHIERS)' GREP='$(GREP)' sh tools/e2e-vite.sh
 
 test-a11y: ## Tests d'accessibilité WCAG 2.1 AA (axe-core + Playwright)
 	$(RUN) yarn test:a11y
@@ -37,4 +40,4 @@ test-a11y: ## Tests d'accessibilité WCAG 2.1 AA (axe-core + Playwright)
 metrics: build ## Métriques Lighthouse CI en clair puis en sombre (perf ≥ 90, a11y et SEO = 100)
 	$(RUN) sh -c 'export CHROME_PATH=$$(node -e "console.log(require(\"@playwright/test\").chromium.executablePath())") && yarn lhci && yarn lhci:sombre'
 
-.PHONY: qa qa-full lint arch-selftest icons-check lint-fix format format-check typecheck test test-unit test-e2e test-a11y metrics
+.PHONY: qa qa-full lint arch-selftest icons-check lint-fix format format-check typecheck test test-unit test-e2e e2e-vite test-a11y metrics

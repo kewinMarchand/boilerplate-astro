@@ -83,6 +83,8 @@ git cherry-pick <sha>
 | `make build`                          | Build de production dans `dist/`, fichiers statiques précompressés (brotli, gzip)                                        |
 | `make start`                          | Sert le build par `server.mjs`                                                                                           |
 | `make qa`                             | ESLint (dont les règles d'architecture), auto-test des règles, sprite d'icônes, Prettier, `astro check`, tests unitaires |
+| `make test-unit`                      | Vitest ; `VITEST_CHANGED=1` : seulement les tests touchés par les modifications non commitées (`--changed`)              |
+| `make e2e-vite`                       | Playwright desktop sur les e2e modifiés depuis `origin/main`, `FICHIERS="…"` ou `GREP="…"` ; build réutilisé             |
 | `make test-e2e`                       | Playwright, desktop et mobile, sur le build de production (port 3170)                                                    |
 | `make test-a11y`                      | axe-core, WCAG 2.1 AA, chaque page en standard, sombre et renforcé                                                       |
 | `make metrics`                        | Lighthouse CI (port 3270) en clair puis en sombre : échoue sous 90 en performance, sous 100 en accessibilité et SEO      |
@@ -122,6 +124,10 @@ server.mjs      serveur de production : statiques précompressés, puis Astro
 `make docker-build` construit l'image (Node 26 Alpine, dépendances d'exécution seulement). `server.mjs` sert `dist/client` dans la variante précompressée que le navigateur accepte, avec un cache d'un an sur les fichiers versionnés de `/_astro/`, puis confie le reste à Astro, dont les pages sont compressées à la volée. Au démarrage, `[boilerplate-astro] serveur démarré (production)` permet de retrouver le bon fichier de log. La CSP est en mode Report-Only : chaque écart est signalé à `POST /api/csp-report` et écrit sur la sortie standard.
 
 ## Tests
+
+En développement, on ne lance que ce que le changement touche : `make qa` (porte de chaque commit), puis `make e2e-vite`. La suite complète (e2e desktop et mobile, accessibilité, Lighthouse) tourne en CI à chaque push ; `make test-e2e`, `make test-a11y`, `make metrics` et `make qa-full` restent disponibles à la main.
+
+`make e2e-vite` (`tools/e2e-vite.sh`) lance Playwright sur le seul projet desktop : par défaut les fichiers e2e modifiés par rapport à `origin/main` (`--only-changed`, qui suit aussi les fichiers importés par les tests), sinon `FICHIERS="tests/e2e/panier.e2e.ts …"` ou `GREP="motif"` (titre des tests, sur toute la suite e2e) ; une sélection vide réussit (`--pass-with-no-tests`). Il ne reconstruit `dist/` que si les sources ont changé depuis son dernier build : empreinte SHA-256 des fichiers suivis ou non ignorés par git (hors `tests/`, `*.md`, `*.test.ts`, configurations Playwright et `.github/`), des fichiers `.env*` et des variables `PUBLIC_*`, écrite dans `dist/empreinte-e2e` après le build (`PUBLIC_SITE_URL` de la suite) ; Astro vidant `dist/` à chaque build, un `make build` lancé entre-temps force la reconstruction. Playwright sert ensuite `dist/` sans le reconstruire (`E2E_SANS_BUILD=1`). Temps mesurés (panier, 9 tests) : 6,4 s avec reconstruction, 2,9 s build réutilisé.
 
 - **Unitaires** : `src/**/*.test.ts` (domaine du catalogue, URL, prix, conformité, chargement du carrousel et des pages légales, SEO, Matomo, CSP, composants des bascules).
 - **End-to-end** : `tests/e2e/`, un fichier par page ou par brique (le site bilingue, `bilingue.e2e.ts`, est le build de la suite servi avec `API_SCENARIO=bilingual` sur les ports 4102 et 4103), ciblage par `data-testid`, rendus conditionnels testés présents et absents, scénarios sans JavaScript (carrousel, catalogue, contact, thème), états d'erreur et de liste vide par l'en-tête `X-Scenario`, envois vers un GlitchTip et un Matomo factices.
