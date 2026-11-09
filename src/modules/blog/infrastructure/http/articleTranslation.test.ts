@@ -43,7 +43,13 @@ describe('toArticle', () => {
 })
 
 describe('toArticleDetail', () => {
-  const DETAIL = { ...DTO, html: '<p>Texte</p>', metaTitle: '', metaDescription: '' }
+  const DETAIL = {
+    ...DTO,
+    html: '<p>Texte</p>',
+    metaTitle: '',
+    metaDescription: '',
+    alternates: [],
+  }
 
   it('garde des métadonnées vides quand rien n’est saisi', () => {
     expect(toArticleDetail(DETAIL)).toMatchObject({ metaTitle: '', metaDescription: '' })
@@ -53,5 +59,20 @@ describe('toArticleDetail', () => {
     expect(
       toArticleDetail({ ...DETAIL, metaTitle: ' Carrousel ', metaDescription: 'Sans dépendance.' }),
     ).toMatchObject({ metaTitle: 'Carrousel', metaDescription: 'Sans dépendance.' })
+  })
+
+  it('donne la fiche dans chaque langue où l’article existe', () => {
+    const detail = toArticleDetail({
+      ...DETAIL,
+      alternates: [
+        { locale: 'fr', slug: 'un-carrousel-accessible' },
+        { locale: 'en', slug: 'an-accessible-carousel' },
+      ],
+    })
+
+    expect(detail.alternates).toEqual([
+      { locale: 'fr', path: '/blog/un-carrousel-accessible' },
+      { locale: 'en', path: '/blog/an-accessible-carousel' },
+    ])
   })
 })

@@ -5,6 +5,7 @@ import { loadProduct } from '@/modules/catalog/index.server'
 
 const product = await loadProduct(Astro.params.slug ?? '')
 if (product.status === 'not-found') return Astro.rewrite('/404')
+const { add, added, view } = Astro.locals.dictionary.cart
 ---
 
 <ProductView {product} salesEnabled={Astro.locals.siteIdentity.salesEnabled}>
@@ -18,6 +19,7 @@ if (product.status === 'not-found') return Astro.rewrite('/404')
         price: product.product.price,
       }}
       isAvailable={product.product.inStock}
+      labels={{ add, added, view }}
     />
   )}
 </ProductView>

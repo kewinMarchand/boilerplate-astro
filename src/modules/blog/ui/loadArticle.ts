@@ -16,6 +16,11 @@ export const loadArticle = async (slug: string): Promise<Article.Load> => {
   return article ? { status: 'success', article } : { status: 'not-found' }
 }
 
-/** Chemins des fiches pour le sitemap ; aucun si l'API ne répond pas. */
-export const listArticlePaths = async (): Promise<AppPath[]> =>
-  (await findLatestArticles().catch(() => [])).map((article) => articleHref(article.slug))
+/** Fiches d'une langue pour le sitemap, associées d'une langue à l'autre par `key` ; aucune si l'API ne répond pas. */
+export const listArticleEntries = async (
+  locale: string,
+): Promise<{ key: string; path: AppPath }[]> =>
+  (await findLatestArticles(undefined, locale).catch(() => [])).map((article) => ({
+    key: article.id,
+    path: articleHref(article.slug),
+  }))

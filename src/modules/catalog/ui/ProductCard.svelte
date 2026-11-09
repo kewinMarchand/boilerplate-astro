@@ -1,15 +1,18 @@
 <script lang="ts">
+  import { format } from '@/shared/i18n'
+  import { resolveHref } from '@/shared/routing'
   import { Badge, ResponsiveImage } from '@/shared/ui/kit'
 
   import { productHref } from '../domain/catalog'
   import { formatPrice } from '../domain/price'
-  import { EXPOSURE_LABELS, SIZE_LABELS } from './labels'
   import { PRODUCT_IMAGE_SIZES } from './productImage'
 
   import type { Catalog } from '../domain/catalog'
+  import type { CatalogLabels } from './labels'
 
   interface Props {
     product: Catalog.Product
+    t: Pick<CatalogLabels, 'catalog' | 'language'>
     showPrice?: boolean
     eager?: boolean
     priority?: boolean
@@ -18,6 +21,7 @@
 
   const {
     product,
+    t,
     showPrice = true,
     eager = false,
     priority = false,
@@ -43,21 +47,24 @@
     <div class="flex flex-col gap-1 p-4">
       <h2 class="text-title font-semibold">
         <a
-          href={productHref(product.slug)}
+          href={resolveHref(productHref(product.slug))}
           class="bui-link product-card-link"
           data-testid="catalog-product-link">{product.name}</a
         >
       </h2>
       {#if showPrice}
         <p class="font-semibold" data-testid="catalog-product-price">
-          {formatPrice(product.price)}
+          {formatPrice(product.price, t.language.tag)}
         </p>
       {/if}
       <p class="text-body-sm text-text-muted">
-        {EXPOSURE_LABELS[product.exposure]} · Taille {SIZE_LABELS[product.size].toLowerCase()}
+        {format(t.catalog.cardFeatures, {
+          exposure: t.catalog.exposures[product.exposure],
+          size: t.catalog.sizes[product.size].toLowerCase(),
+        })}
       </p>
       {#if !product.inStock}
-        <p class="mt-1"><Badge variant="error">Rupture de stock</Badge></p>
+        <p class="mt-1"><Badge variant="error">{t.catalog.outOfStock}</Badge></p>
       {/if}
     </div>
   </div>

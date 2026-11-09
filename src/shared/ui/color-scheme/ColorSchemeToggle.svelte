@@ -1,10 +1,22 @@
 <script lang="ts">
+  import { format } from '@/shared/i18n'
   import { Menu } from '@/shared/ui/kit'
 
   import { COLOR_SCHEMES, type ColorScheme } from './colorScheme'
   import { useColorScheme } from './useColorScheme.svelte'
 
-  const LABELS: Record<ColorScheme, string> = { auto: 'système', light: 'clair', dark: 'sombre' }
+  interface Props {
+    /** Libellés dans la langue de la page (`colorScheme` du dictionnaire). */
+    labels: {
+      choices: Record<ColorScheme, string>
+      label: string
+      suspended: string
+    }
+  }
+
+  const { labels }: Props = $props()
+  // svelte-ignore state_referenced_locally
+  const LABELS = labels.choices
   const ICONS = { auto: 'monitor', light: 'sun', dark: 'moon' } as const
 
   const ITEMS = COLOR_SCHEMES.map((scheme) => ({
@@ -17,7 +29,8 @@
 
   // Le mode renforcé impose le clair : un autre choix reste mémorisé mais suspendu.
   const label = $derived(
-    `Thème : ${LABELS[theme.scheme]}${theme.enhanced && theme.scheme !== 'light' ? ", suspendu par l'accessibilité renforcée" : ''}`,
+    format(labels.label, { choice: LABELS[theme.scheme] }) +
+      (theme.enhanced && theme.scheme !== 'light' ? labels.suspended : ''),
   )
 </script>
 

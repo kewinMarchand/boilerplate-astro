@@ -28,6 +28,7 @@ const DTO: SiteIdentityDto = {
   defaultColorScheme: 'auto',
   theme: null,
   salesEnabled: true,
+  locales: ['fr'],
 }
 
 const LOGO = {

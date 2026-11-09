@@ -1,6 +1,7 @@
 ---
-import { BLOG_NAVIGATION } from '@/shared/config'
-import { absoluteUrl } from '@/shared/seo'
+import { BLOG_NAVIGATION, navigationLabel } from '@/shared/config'
+import { resolveHref } from '@/shared/routing'
+import { localizedUrl } from '@/shared/seo'
 import { Alert, ImagePreload, largestWebp, ResponsiveImage } from '@/shared/ui/kit'
 import PageLayout from '@/shared/ui/layout/PageLayout.astro'
 
@@ -16,6 +17,7 @@ interface Props {
 
 // HTML venu de l'API, qui échappe le HTML saisi dans l'admin et retire les liens dangereux : injecté tel quel.
 const { article } = Astro.props
+const { dictionary: t, locale } = Astro.locals
 const IMAGE_SIZES = '(min-width: 800px) 760px, calc(100vw - 32px)'
 const detail = article.status === 'success' ? article.article : null
 const image = detail?.image ?? null
@@ -39,9 +41,9 @@ const seo = detail
           headline: detail.title,
           description: detail.excerpt,
           datePublished: detail.publishedAt,
-          url: absoluteUrl(articleHref(detail.slug)),
+          url: localizedUrl(articleHref(detail.slug), locale),
           ...(image && { image: largestWebp(image) }),
-          inLanguage: 'fr-FR',
+          inLanguage: t.language.tag,
         },
       ],
     }
@@ -49,16 +51,17 @@ const seo = detail
 ---
 
 <PageLayout
-  title={detail?.title ?? 'Article'}
-  description={detail ? detail.excerpt || detail.title : 'Article du blog.'}
-  parents={[{ label: BLOG_NAVIGATION.label, path: BLOG_NAVIGATION.href }]}
+  title={detail?.title ?? t.blog.articleFallbackTitle}
+  description={detail ? detail.excerpt || detail.title : t.blog.articleFallbackDescription}
+  parents={[{ label: navigationLabel(BLOG_NAVIGATION, t), path: BLOG_NAVIGATION.href }]}
   {seo}
   headingTestId="article-title"
+  alternates={detail?.alternates}
 >
   {image && <ImagePreload slot="head" {image} sizes={IMAGE_SIZES} />}
   {article.status === 'error' ? (
     <Alert variant="error" data-testid="article-error">
-      {article.message}
+      {t.blog.articleError}
     </Alert>
   ) : (
     <article class="max-w-prose" data-testid="article-page">
@@ -66,7 +69,7 @@ const seo = detail
         <p class="mb-2 flex flex-wrap gap-x-3 text-body-sm font-semibold">
           {article.article.section && (
             <a
-              href={sectionHref(article.article.section.slug)}
+              href={resolveHref(sectionHref(article.article.section.slug))}
               class="bui-link"
               data-testid="article-section"
             >
@@ -79,16 +82,16 @@ const seo = detail
         </p>
       )}
       <p class="mb-6 text-body-sm text-text-muted">
-        Publié le{' '}
+        {t.blog.publishedOn}{' '}
         <time datetime={article.article.publishedAt}>
-          {formatPublishedAt(article.article.publishedAt)}
+          {formatPublishedAt(article.article.publishedAt, t.language.tag)}
         </time>
       </p>
       {article.article.audio && (
         <figure class="mb-6 flex flex-col gap-2">
           <figcaption class="flex flex-wrap gap-x-3 text-body-sm text-text-muted">
             <span>
-              Version audio,{' '}
+              {t.blog.audio}{' '}
               <time datetime={isoDuration(article.article.audio.durationSeconds)}>
                 {formatDuration(article.article.audio.durationSeconds)}
               </time>
@@ -101,12 +104,12 @@ const seo = detail
             controls
             preload="none"
             class="w-full"
-            aria-label="Version audio de l’article"
+            aria-label={t.blog.audioLabel}
             data-testid="article-audio"
           >
             <source src={article.article.audio.src} type={article.article.audio.type} />
             <a href={article.article.audio.src} class="bui-link">
-              Télécharger la version audio
+              {t.blog.audioDownload}
             </a>
           </audio>
         </figure>
@@ -125,8 +128,8 @@ const seo = detail
         <Fragment set:html={article.article.html} />
       </div>
       <p class="mt-12">
-        <a href={BLOG_NAVIGATION.href} class="bui-link">
-          Tous les articles
+        <a href={resolveHref(BLOG_NAVIGATION.href)} class="bui-link">
+          {t.blog.all}
         </a>
       </p>
     </article>

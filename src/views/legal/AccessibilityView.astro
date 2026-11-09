@@ -10,14 +10,15 @@ interface Props {
 }
 
 const { legalPage } = Astro.props
-const title = "Déclaration d'accessibilité"
+const t = Astro.locals.dictionary
+const title = t.legal.accessibilityTitle
 ---
 
 <PageLayout
   page="accessibility"
   {title}
   heading={legalPage.status === 'success' ? legalPage.page.title : title}
-  description="Déclaration d’accessibilité RGAA 4.1.2 du site : état de conformité, résultats des tests, environnement de test et voies de recours."
+  description={t.legal.accessibilityDescription}
 >
   <div class="prose-legal">
     <LegalPageContent page={legalPage} />

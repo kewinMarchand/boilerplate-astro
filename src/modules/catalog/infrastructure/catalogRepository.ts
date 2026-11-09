@@ -18,13 +18,18 @@ import type { Catalog } from '../domain/catalog'
 export const findCategoryTree = async (): Promise<Catalog.Category[]> => {
   const { data, response } = await serverApiClient().GET('/api/categories')
   if (!data) throw new ApiError(response)
-  return data.map(toCategory)
+  const language = responseLanguage(response)
+  return data.map((dto) => toCategory(dto, language))
 }
+
+/** Langue de la réponse (`Content-Language`, section 29), le français pour une API qui ne la donne pas. */
+const responseLanguage = (response: Response) => response.headers.get('content-language') ?? 'fr'
 
 /** Page du catalogue, ou null si le chemin de catégories n'existe pas dans l'arbre. */
 export const findCatalogListing = async (
   slugs: string[],
   query: Catalog.Query,
+  languages: Catalog.Languages,
 ): Promise<Catalog.Listing | null> => {
   const tree = await findCategoryTree()
   const chain = resolveCategoryPath(tree, slugs)
@@ -39,11 +44,12 @@ export const findCatalogListing = async (
   if (!products.data) throw new ApiError(products.response)
   if (!facets.data) throw new ApiError(facets.response)
 
-  const current = categories.at(-1)
   return toListing(products.data, facets.data, query.page, {
     chain,
     slugs,
-    ...(current && { current }),
+    categories,
+    languages,
+    language: responseLanguage(facets.response),
   })
 }
 
@@ -79,15 +85,17 @@ export const findFeaturedProducts = async (): Promise<Catalog.Product[]> => {
   return data.map(toProduct)
 }
 
-/** Slugs de tous les produits, page après page jusqu'à une page incomplète (sitemap). */
-export const findAllProductSlugs = async (): Promise<string[]> => {
-  const slugs: string[] = []
+/** Identifiant et slug de tous les produits dans une langue, page après page jusqu'à une page incomplète (sitemap). */
+export const findAllProductSlugs = async (
+  locale: string,
+): Promise<{ id: string; slug: string }[]> => {
+  const products: { id: string; slug: string }[] = []
   for (let page = 1; ; page += 1) {
-    const { data, response } = await serverApiClient().GET('/api/products', {
+    const { data, response } = await serverApiClient({ locale }).GET('/api/products', {
       params: { query: { page, itemsPerPage: MAX_PAGE_SIZE } },
     })
     if (!data) throw new ApiError(response)
-    slugs.push(...data.map((item) => item.slug))
-    if (data.length < MAX_PAGE_SIZE) return slugs
+    products.push(...data.map((item) => ({ id: String(item.id), slug: item.slug })))
+    if (data.length < MAX_PAGE_SIZE) return products
   }
 }

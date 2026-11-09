@@ -5,6 +5,7 @@
   import { catalogHref } from './hooks/useCatalogNavigation.svelte'
 
   import type { Catalog } from '../domain/catalog'
+  import type { CatalogLabels } from './labels'
   import type { AppPath } from '@/shared/routing'
   import type { Snippet } from 'svelte'
 
@@ -13,11 +14,12 @@
     query: Catalog.Query
     attributeFacets: Catalog.AttributeFacet[]
     clearAction: Snippet
+    t: CatalogLabels
   }
 
-  const { path, query, attributeFacets, clearAction }: Props = $props()
+  const { path, query, attributeFacets, clearAction, t }: Props = $props()
 
-  const filters = $derived(listActiveFilters(query, attributeFacets))
+  const filters = $derived(listActiveFilters(query, attributeFacets, t.catalog))
 </script>
 
 {#if filters.length > 0}

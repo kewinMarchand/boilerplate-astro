@@ -4,6 +4,7 @@
   import ProductCard from './ProductCard.svelte'
 
   import type { Catalog } from '../domain/catalog'
+  import type { CatalogLabels } from './labels'
   import type { Snippet } from 'svelte'
 
   interface Props {
@@ -11,32 +12,32 @@
     products: Catalog.Product[]
     view: Catalog.View
     showPrice: boolean
-    errorMessage?: string | undefined
+    t: CatalogLabels
     onRetry: () => void
     clearAction: Snippet
   }
 
-  const { status, products, view, showPrice, errorMessage, onRetry, clearAction }: Props = $props()
+  const { status, products, view, showPrice, t, onRetry, clearAction }: Props = $props()
 
   const EAGER_COUNT = 4
 </script>
 
 {#if status === 'pending'}
-  <div class="catalog-grid" role="status" aria-label="Chargement des produits">
+  <div class="catalog-grid" role="status" aria-label={t.catalog.loading}>
     {#each [1, 2, 3, 4] as key (key)}
       <Skeleton height="320px" />
     {/each}
   </div>
 {:else if status === 'error'}
   <div class="flex flex-col items-start gap-3">
-    <Alert variant="error" data-testid="catalog-error">{errorMessage}</Alert>
+    <Alert variant="error" data-testid="catalog-error">{t.catalog.loadError}</Alert>
     <Button variant="outline" onclick={onRetry} data-testid="catalog-retry"
-      ><Icon name="rotate-cw" />Réessayer
+      ><Icon name="rotate-cw" />{t.catalog.retry}
     </Button>
   </div>
 {:else if products.length === 0}
   <div class="flex flex-col items-start gap-4" data-testid="catalog-empty">
-    <Alert variant="info">Aucun produit ne correspond à ces filtres.</Alert>
+    <Alert variant="info">{t.catalog.empty}</Alert>
     {@render clearAction()}
   </div>
 {:else}
@@ -45,6 +46,7 @@
       <li>
         <ProductCard
           {product}
+          {t}
           {showPrice}
           eager={index < EAGER_COUNT}
           priority={index === 0}

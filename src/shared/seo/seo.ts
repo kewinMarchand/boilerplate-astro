@@ -1,3 +1,4 @@
+import type { LanguageAlternate, LocaleContext } from '@/shared/i18n'
 import type { AppPath } from '@/shared/routing'
 
 export declare namespace Seo {
@@ -53,6 +54,12 @@ export declare namespace Seo {
     publishedTime?: string | undefined
   }
 
+  /** Langue de la page et la page dans chaque langue (chemins sans préfixe). */
+  interface Languages {
+    locale: LocaleContext
+    alternates: LanguageAlternate[]
+  }
+
   interface Meta {
     title: string
     description: string
@@ -60,6 +67,10 @@ export declare namespace Seo {
     robots: string
     siteName: string
     locale: string
+    /** `og:locale:alternate`, vide sur un site monolingue. */
+    alternateLocales: string[]
+    /** `<link rel="alternate" hreflang>`, `x-default` compris ; vide sur un site monolingue. */
+    hreflang: { hreflang: string; href: string }[]
     ogTitle: string
     image: Image & { url: string }
     jsonLd: JsonLd[]

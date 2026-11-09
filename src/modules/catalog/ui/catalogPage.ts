@@ -1,12 +1,12 @@
-import { CATALOG_NAVIGATION } from '@/shared/config'
-import { absoluteUrl } from '@/shared/seo'
+import { CATALOG_NAVIGATION, navigationLabel } from '@/shared/config'
+import { localizedUrl } from '@/shared/seo'
 import { largestWebp } from '@/shared/ui/kit'
 
-import { isFiltered } from '../domain/catalogQuery'
+import { isFiltered, serializeCatalogQuery } from '../domain/catalogQuery'
 import { CATALOG_ROOT_PATH, categoryTrail } from '../domain/categoryPath'
-import { catalogHref } from './hooks/useCatalogNavigation.svelte'
 
 import type { Catalog } from '../domain/catalog'
+import type { Dictionary, LocaleContext } from '@/shared/i18n'
 import type { AppPath } from '@/shared/routing'
 import type { Seo } from '@/shared/seo'
 
@@ -20,11 +20,17 @@ export interface CatalogPageDescription {
   seo: Omit<Seo.Input, 'title' | 'description' | 'path' | 'breadcrumb'>
 }
 
-/** En-tête d'une page du catalogue (titre, fil d'Ariane, SEO), calculé côté serveur par la page Astro. */
+/**
+ * En-tête d'une page du catalogue (titre, fil d'Ariane, SEO), calculé côté serveur par la page Astro, dans la
+ * langue de la page. Chemins sans préfixe de langue : la canonique et prev/next le reçoivent de `buildPageMeta`.
+ */
 export const describeCatalogPage = (
   query: Catalog.Query,
   result: Catalog.Result,
+  t: Dictionary,
+  locale: LocaleContext,
 ): CatalogPageDescription => {
+  const catalogLabel = navigationLabel(CATALOG_NAVIGATION, t)
   const listing = result.status === 'success' ? result.listing : undefined
   const chain = listing?.chain ?? []
   const current = chain.at(-1)
@@ -33,19 +39,22 @@ export const describeCatalogPage = (
 
   return {
     path,
-    title: current?.name ?? CATALOG_NAVIGATION.label,
-    description: listing?.description ?? 'Catalogue de notre jardinerie tropicale.',
+    title: current?.name ?? catalogLabel,
+    description: listing?.description ?? t.catalog.description,
     page: current ? undefined : 'catalog',
     parents: current
-      ? [{ label: CATALOG_NAVIGATION.label, path: CATALOG_ROOT_PATH }, ...categoryTrail(chain)]
+      ? [{ label: catalogLabel, path: CATALOG_ROOT_PATH }, ...categoryTrail(chain)]
       : [],
     seo: {
       noindex: isFiltered(query),
       canonicalPath: query.page >= 2 ? `${path}?page=${query.page}` : path,
-      prevPath: query.page > 1 ? catalogHref(path, { ...query, page: query.page - 1 }) : undefined,
+      prevPath:
+        query.page > 1
+          ? `${path}${serializeCatalogQuery({ ...query, page: query.page - 1 })}`
+          : undefined,
       nextPath:
         listing && query.page < listing.totalPages
-          ? catalogHref(path, { ...query, page: query.page + 1 })
+          ? `${path}${serializeCatalogQuery({ ...query, page: query.page + 1 })}`
           : undefined,
       image: firstProduct?.image
         ? {
@@ -63,7 +72,7 @@ export const describeCatalogPage = (
             '@type': 'ListItem',
             position: (listing.page - 1) * listing.products.length + index + 1,
             name: product.name,
-            url: absoluteUrl(`${path}#${product.slug}`),
+            url: localizedUrl(`${path}#${product.slug}`, locale),
           })),
         },
       ],

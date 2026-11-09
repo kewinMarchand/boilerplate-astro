@@ -1,5 +1,6 @@
 ---
 import { BLOG_NAVIGATION } from '@/shared/config'
+import { resolveHref } from '@/shared/routing'
 
 import BlogGrid from './BlogGrid.svelte'
 
@@ -11,23 +12,24 @@ interface Props {
 
 const { blog } = Astro.props
 const HOME_ARTICLE_COUNT = 3
+const t = Astro.locals.dictionary
 ---
 
 <section aria-labelledby="home-blog-title" class="mt-12" data-testid="home-blog">
   <h2 id="home-blog-title" class="section-title">
-    Derniers articles
+    {t.blog.latest}
   </h2>
   <div aria-live="polite">
     <BlogGrid
       status={blog.status}
       articles={blog.status === 'success' ? blog.articles.slice(0, HOME_ARTICLE_COUNT) : undefined}
-      errorMessage={blog.status === 'error' ? blog.message : undefined}
-      retryHref="/"
+      retryHref={resolveHref('/')}
+      {t}
     />
   </div>
   <p class="mt-6">
-    <a href={BLOG_NAVIGATION.href} class="bui-link" data-testid="home-blog-all">
-      Tous les articles
+    <a href={resolveHref(BLOG_NAVIGATION.href)} class="bui-link" data-testid="home-blog-all">
+      {t.blog.all}
     </a>
   </p>
 </section>

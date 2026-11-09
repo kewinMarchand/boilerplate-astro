@@ -2,6 +2,9 @@
 import PageLayout from '@/shared/ui/layout/PageLayout.astro'
 
 import StyleguideSections from './StyleguideSections.svelte'
+
+// Page de développement, en français ; les cartes reçoivent les libellés de la page, comme ailleurs.
+const { catalog, language } = Astro.locals.dictionary
 ---
 
 <PageLayout
@@ -18,5 +21,5 @@ import StyleguideSections from './StyleguideSections.svelte'
     </a>
     .
   </p>
-  <StyleguideSections client:load />
+  <StyleguideSections client:load cardLabels={{ catalog, language }} />
 </PageLayout>

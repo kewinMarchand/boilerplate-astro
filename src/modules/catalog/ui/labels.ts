@@ -1,16 +1,4 @@
-import type { Catalog } from '../domain/catalog'
+import type { Dictionary } from '@/shared/i18n'
 
-export const EXPOSURE_LABELS: Record<Catalog.Exposure, string> = {
-  soleil: 'Soleil',
-  'mi-ombre': 'Mi-ombre',
-  ombre: 'Ombre',
-}
-
-export const SIZE_LABELS: Record<Catalog.Size, string> = { S: 'Petite', M: 'Moyenne', L: 'Grande' }
-
-export const SORT_LABELS: Record<Catalog.Sort, string> = {
-  pertinence: 'Pertinence',
-  'prix-asc': 'Prix croissant',
-  'prix-desc': 'Prix décroissant',
-  nom: 'Nom (A à Z)',
-}
+/** Libellés de l'îlot du catalogue, dans la langue de la page : sa partie du dictionnaire, pas davantage. */
+export type CatalogLabels = Pick<Dictionary, 'catalog' | 'language'> & { close: string }

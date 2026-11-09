@@ -13,7 +13,7 @@ const FIELDS: (keyof Contact.FormValues)[] = ['name', 'email', 'message', 'produ
 const isField = (path: string): path is keyof Contact.FormValues =>
   FIELDS.some((field) => field === path)
 
-/** Violations 422 vers les erreurs de champ. Les messages de l'API sont déjà en français. */
+/** Violations 422 vers les erreurs de champ. Les messages de l'API sont dans la langue demandée (`Accept-Language`). */
 export const toFieldErrors = (dto: ApiErrorDto | undefined): FieldError[] =>
   (dto && 'violations' in dto ? (dto.violations ?? []) : []).flatMap(({ propertyPath, message }) =>
     isField(propertyPath) ? [{ field: propertyPath, message }] : [],

@@ -1,4 +1,5 @@
 ---
+import { resolveHref } from '@/shared/routing'
 import { ImageCarousel } from '@/shared/ui/carousel'
 import { Alert } from '@/shared/ui/kit'
 
@@ -13,14 +14,15 @@ interface Props {
 }
 
 const { featured, salesEnabled } = Astro.props
+const t = Astro.locals.dictionary
 const slides =
   featured.status === 'success'
     ? featured.products.map((product) => ({
         id: product.id,
         title: product.name,
-        ...(salesEnabled && { text: formatPrice(product.price) }),
+        ...(salesEnabled && { text: formatPrice(product.price, t.language.tag) }),
         image: product.image,
-        href: productHref(product.slug),
+        href: resolveHref(productHref(product.slug)),
       }))
     : []
 // Sans produit à la une, le carrousel n'a rien à montrer : la section disparaît de l'accueil.
@@ -30,14 +32,14 @@ const visible = featured.status === 'error' || slides.length > 0
 {visible && (
   <section aria-labelledby="home-carousel-title" data-testid="home-carousel">
     <h2 id="home-carousel-title" class="section-title">
-      À la une
+      {t.catalog.featured}
     </h2>
     {featured.status === 'error' ? (
       <Alert variant="error" data-testid="home-carousel-error">
-        {featured.message}
+        {t.catalog.featuredError}
       </Alert>
     ) : (
-      <ImageCarousel client:visible {slides} label="À la une" />
+      <ImageCarousel client:visible {slides} label={t.catalog.featured} labels={t.carousel} />
     )}
   </section>
 )}

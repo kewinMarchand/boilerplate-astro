@@ -2,9 +2,10 @@
 import { CatalogPage } from '@/modules/catalog'
 import { loadCatalogPage } from '@/modules/catalog/index.server'
 
-const { salesEnabled } = Astro.locals.siteIdentity
-const page = await loadCatalogPage(Astro.params.slugs, Astro.url.searchParams, salesEnabled)
+const { siteIdentity, locale } = Astro.locals
+const { salesEnabled } = siteIdentity
+const page = await loadCatalogPage(Astro.params.slugs, Astro.url.searchParams, salesEnabled, locale)
 if (page.status === 'not-found') return Astro.rewrite('/404')
 ---
 
-<CatalogPage query={page.query} result={page.result} {salesEnabled} />
+<CatalogPage query={page.query} result={page.result} {salesEnabled} alternates={page.alternates} />

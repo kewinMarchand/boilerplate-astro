@@ -1,10 +1,8 @@
-import { MAIN_NAVIGATION } from '@/shared/config'
-
 import type { Seo } from './seo'
 
-const HOME = MAIN_NAVIGATION[0]
-
+/** Fil d'Ariane : l'accueil (`homeLabel`, dans la langue de la page), les parents, puis la page. */
 export const buildBreadcrumb = (
   current: Seo.BreadcrumbItem,
-  parents: Seo.BreadcrumbItem[] = [],
-): Seo.BreadcrumbItem[] => [{ label: HOME?.label ?? 'Accueil', path: '/' }, ...parents, current]
+  parents: Seo.BreadcrumbItem[],
+  homeLabel: string,
+): Seo.BreadcrumbItem[] => [{ label: homeLabel, path: '/' }, ...parents, current]

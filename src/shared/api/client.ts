@@ -1,6 +1,7 @@
 import createClient, { createQuerySerializer } from 'openapi-fetch'
 
 import type { paths } from './schema'
+import type { Middleware } from 'openapi-fetch'
 
 export type { components, operations } from './schema'
 
@@ -26,6 +27,9 @@ const serializeQuery = (query: Record<string, unknown>) =>
 
 export const serverApiUrl = () => process.env['API_URL'] ?? 'http://localhost:8090'
 
+/** Scénario fixé pour tout le site (`API_SCENARIO`, `bilingual` pour le site bilingue de test), lu sur le serveur. */
+export const serverApiScenario = () => process.env['API_SCENARIO'] || undefined
+
 /**
  * Client typé de l'API. `X-Scenario` (error, empty) n'a d'effet qu'en dev et en test côté API :
  * le relayer permet aux tests e2e de provoquer les états d'erreur et de liste vide.
@@ -35,13 +39,28 @@ export const createApiClient = (
   scenario?: string | null,
   // Lu dans l'environnement du serveur ; un îlot qui appelle l'API depuis le navigateur passe l'adresse.
   baseUrl: string = serverApiUrl(),
-) =>
-  createClient<paths, 'application/json'>({
+  // Langue de la page en paramètre de chaque lecture (clé de cache explicite, section 29 bis) ; aucune sur
+  // un site monolingue, dont les appels restent inchangés.
+  locale?: string,
+) => {
+  const client = createClient<paths, 'application/json'>({
     baseUrl,
     fetch,
     querySerializer: serializeQuery,
     headers: scenario ? { 'X-Scenario': scenario } : {},
   })
+  if (locale) client.use(localeParameter(locale))
+  return client
+}
+
+const localeParameter = (locale: string): Middleware => ({
+  onRequest: ({ request }) => {
+    if (request.method !== 'GET') return undefined
+    const url = new URL(request.url)
+    url.searchParams.set('locale', locale)
+    return new Request(url, request)
+  },
+})
 
 export class ApiError extends Error {
   constructor(response: Response) {

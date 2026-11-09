@@ -47,6 +47,11 @@ export const loadFeaturedProducts = async () => {
   }
 }
 
-/** Chemins des fiches pour le sitemap ; aucun si l'API ne répond pas. */
-export const listProductPaths = async (): Promise<AppPath[]> =>
-  (await findAllProductSlugs().catch(() => [])).map(productHref)
+/** Fiches d'une langue pour le sitemap, associées d'une langue à l'autre par `key` ; aucune si l'API ne répond pas. */
+export const listProductEntries = async (
+  locale: string,
+): Promise<{ key: string; path: AppPath }[]> =>
+  (await findAllProductSlugs(locale).catch(() => [])).map(({ id, slug }) => ({
+    key: id,
+    path: productHref(slug),
+  }))

@@ -1,6 +1,7 @@
 <script lang="ts">
   import emblaCarouselSvelte from 'embla-carousel-svelte'
 
+  import { format } from '@/shared/i18n'
   import { Button, Icon, ResponsiveImage } from '@/shared/ui/kit'
 
   import { CAROUSEL_OPTIONS, useCarousel } from './hooks/useCarousel.svelte'
@@ -10,15 +11,24 @@
   interface Props {
     slides: Carousel.Slide[]
     label: string
+    /** Libellés dans la langue de la page (`carousel` du dictionnaire). */
+    labels: {
+      roleDescription: string
+      slideRoleDescription: string
+      position: string
+      previous: string
+      next: string
+      goTo: string
+    }
   }
 
-  const { slides, label }: Props = $props()
+  const { slides, label, labels }: Props = $props()
 
   const viewportId = $props.id()
   const carousel = useCarousel()
 </script>
 
-<div role="region" aria-roledescription="carrousel" aria-label={label}>
+<div role="region" aria-roledescription={labels.roleDescription} aria-label={label}>
   <!-- Piste focusable : sans JavaScript, elle ne se défile pas au clavier autrement (axe scrollable-region-focusable). -->
   <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
   <div
@@ -34,8 +44,8 @@
         <div
           class="carousel-slide"
           role="group"
-          aria-roledescription="diapositive"
-          aria-label={`${position + 1} sur ${slides.length}`}
+          aria-roledescription={labels.slideRoleDescription}
+          aria-label={format(labels.position, { position: position + 1, total: slides.length })}
           data-testid="carousel-slide"
         >
           {#if slide.image}
@@ -76,7 +86,7 @@
       icon="chevron-left"
       data-testid="carousel-prev"
     >
-      Précédent
+      {labels.previous}
     </Button>
     <Button
       type="button"
@@ -86,7 +96,7 @@
       onclick={carousel.next}
       data-testid="carousel-next"
     >
-      Suivant
+      {labels.next}
       <Icon name="chevron-right" />
     </Button>
     {#if carousel.snapCount > 1}
@@ -95,7 +105,7 @@
           <button
             type="button"
             class="carousel-dot"
-            aria-label={`Aller à la diapositive ${index + 1}`}
+            aria-label={format(labels.goTo, { position: index + 1 })}
             aria-controls={viewportId}
             aria-current={index === carousel.selected ? 'true' : undefined}
             onclick={() => carousel.goTo(index)}

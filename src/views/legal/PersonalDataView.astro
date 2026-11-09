@@ -13,32 +13,32 @@ interface Props {
 }
 
 const { legalPage } = Astro.props
-const title = 'Données personnelles'
+const t = Astro.locals.dictionary
+const title = t.legal.privacyTitle
 ---
 
 <PageLayout
   page="privacy"
   {title}
   heading={legalPage.status === 'success' ? legalPage.page.title : title}
-  description="Traitement des données personnelles collectées par le formulaire de contact : finalité, base légale, durée de conservation et droits."
+  description={t.legal.privacyDescription}
 >
   <div class="prose-legal">
     <LegalPageContent page={legalPage} />
 
     {isAudienceMeasurementEnabled() && (
       <section aria-labelledby="mesure-audience" data-testid="legal-audience-measurement">
-        <h2 id="mesure-audience">Mesure d’audience</h2>
-        <p>
-          La fréquentation du site est mesurée avec Matomo, hébergé par l’éditeur, configuré sans
-          cookie et sans identifiant : aucun suivi d’un site à l’autre, aucune donnée transmise à un
-          tiers. Les statistiques produites sont anonymes et servent uniquement à améliorer le site.
-          Les données brutes sont conservées 25 mois au plus.
-        </p>
-        <p>
-          Vous pouvez vous opposer à cette mesure : votre choix est gardé dans ce navigateur, sans
-          cookie.
-        </p>
-        <OppositionMesure client:load />
+        <h2 id="mesure-audience">{t.legal.audienceTitle}</h2>
+        <p>{t.legal.audienceText}</p>
+        <p>{t.legal.oppositionText}</p>
+        <OppositionMesure
+          client:load
+          labels={{
+            opposition: t.legal.opposition,
+            refused: t.legal.oppositionRefused,
+            measured: t.legal.oppositionMeasured,
+          }}
+        />
       </section>
     )}
   </div>

@@ -1,6 +1,7 @@
 ---
-import { actions, isInputError } from 'astro:actions'
+import { actions } from 'astro:actions'
 
+import { resolveHref } from '@/shared/routing'
 import PageLayout from '@/shared/ui/layout/PageLayout.astro'
 
 import ContactForm from './ContactForm.svelte'
@@ -13,49 +14,32 @@ interface Props {
 }
 
 const { product } = Astro.props
+const { dictionary: t, locale } = Astro.locals
+const { title, description, intro, product: productLabel, ...labels } = t.contact
 // L'envoi sans JavaScript revient sur la même page : le produit reste dans l'adresse.
 const formParams = new URLSearchParams(String(actions.contact))
 if (product) formParams.set('produit', product.slug)
 
 // Envoi sans JavaScript : l'action a traité le POST, la page affiche son résultat.
 const result = Astro.getActionResult(actions.contact)
-const submitted = Astro.request.method === 'POST' ? await Astro.request.formData() : undefined
-const valueOf = (field: Contact.Field) => {
-  const value = submitted?.get(field)
-  return typeof value === 'string' ? value : ''
-}
-
 const outcome = result?.data
 const sent = outcome?.status === 'sent'
-const values: Contact.FormValues = sent
-  ? { name: '', email: '', message: '' }
-  : { name: valueOf('name'), email: valueOf('email'), message: valueOf('message') }
-const errors: Contact.FieldErrors =
-  result?.error && isInputError(result.error)
-    ? result.error.fields
-    : outcome?.status === 'invalid'
-      ? outcome.fieldErrors
-      : {}
-const status = sent
-  ? 'sent'
-  : outcome?.status === 'error' || (result?.error && !isInputError(result.error))
-    ? 'error'
-    : undefined
+const submitted = outcome && outcome.status !== 'sent' ? outcome.values : undefined
+const values: Contact.FormValues = {
+  name: submitted?.name ?? '',
+  email: submitted?.email ?? '',
+  message: submitted?.message ?? '',
+}
+const errors: Contact.FieldErrors = outcome?.status === 'invalid' ? outcome.fieldErrors : {}
+const status = sent ? 'sent' : outcome?.status === 'error' || result?.error ? 'error' : undefined
 ---
 
-<PageLayout
-  page="contact"
-  title="Contact"
-  description="Démo de formulaire : validation par schéma zod, erreurs liées aux champs, envoi par une action serveur Astro, avec ou sans JavaScript."
->
-  <p class="lead">
-    Formulaire validé par un schéma zod, envoyé par une action serveur Astro. Il fonctionne aussi
-    sans JavaScript.
-  </p>
+<PageLayout page="contact" {title} {description}>
+  <p class="lead">{intro}</p>
   {product && (
     <p data-testid="contact-product">
-      Votre demande concerne :{' '}
-      <a href={product.path} class="bui-link">
+      {productLabel}{' '}
+      <a href={resolveHref(product.path)} class="bui-link">
         {product.name}
       </a>
     </p>
@@ -67,5 +51,7 @@ const status = sent
     {values}
     {errors}
     {status}
+    {labels}
+    locale={locale.locales.length > 1 ? locale.locale : undefined}
   />
 </PageLayout>

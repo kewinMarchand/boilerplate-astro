@@ -6,7 +6,14 @@ import { CatalogLoadError } from './CatalogLoadError'
 import type { Catalog } from '../domain/catalog'
 
 export type CatalogPageLoad =
-  { status: 'not-found' } | { status: 'ok'; query: Catalog.Query; result: Catalog.Result }
+  | { status: 'not-found' }
+  | {
+      status: 'ok'
+      query: Catalog.Query
+      result: Catalog.Result
+      /** La page dans chaque langue ; inconnue si l'API est en erreur. */
+      alternates: Catalog.Alternate[] | undefined
+    }
 
 /**
  * Cas d'utilisation « afficher une page du catalogue » : lit l'état de recherche, interroge le
@@ -18,22 +25,29 @@ export const loadCatalogPage = async (
   rawSlugs: string | undefined,
   searchParams: URLSearchParams,
   salesEnabled: boolean,
+  languages: Catalog.Languages,
 ): Promise<CatalogPageLoad> => {
   const parsed = parseCatalogQuery(searchParams)
   const query = salesEnabled ? parsed : withoutPriceCriteria(parsed)
 
   let listing: Catalog.Listing | null
   try {
-    listing = await findCatalogListing(parseCategorySlugs(rawSlugs), query)
+    listing = await findCatalogListing(parseCategorySlugs(rawSlugs), query, languages)
   } catch {
     return {
       status: 'ok',
       query,
       result: { status: 'error', message: new CatalogLoadError().message },
+      alternates: undefined,
     }
   }
 
   if (!listing || query.page > listing.totalPages) return { status: 'not-found' }
 
-  return { status: 'ok', query, result: { status: 'success', listing } }
+  return {
+    status: 'ok',
+    query,
+    result: { status: 'success', listing },
+    alternates: listing.alternates,
+  }
 }

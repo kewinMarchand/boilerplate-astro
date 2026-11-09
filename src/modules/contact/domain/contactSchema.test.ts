@@ -1,8 +1,10 @@
-import { contactSchema } from './contactSchema'
+import { createContactSchema } from './contactSchema'
 
-describe('contactSchema', () => {
+const MESSAGES = { name: 'Nom trop court.', email: 'Adresse invalide.', message: 'Trop court.' }
+
+describe('createContactSchema', () => {
   it('accepte un message complet', () => {
-    const result = contactSchema.safeParse({
+    const result = createContactSchema(MESSAGES).safeParse({
       name: 'Ada',
       email: 'ada@exemple.fr',
       message: 'Bonjour, ceci est un message.',
@@ -10,9 +12,13 @@ describe('contactSchema', () => {
     expect(result.success).toBe(true)
   })
 
-  it('rejette un e-mail invalide avec un message explicite', () => {
-    const result = contactSchema.safeParse({ name: 'Ada', email: 'ada', message: 'Bonjour à tous' })
+  it('rejette un e-mail invalide avec le message reçu, celui de la langue de la page', () => {
+    const result = createContactSchema(MESSAGES).safeParse({
+      name: 'Ada',
+      email: 'ada',
+      message: 'Bonjour à tous',
+    })
     expect(result.success).toBe(false)
-    expect(result.error?.issues[0]?.message).toContain('adresse e-mail valide')
+    expect(result.error?.issues[0]?.message).toBe(MESSAGES.email)
   })
 })

@@ -71,19 +71,35 @@ describe('toFacetsQuery', () => {
 
 describe('toCategory', () => {
   it('ajoute la description éditoriale du site à chaque catégorie', () => {
-    const category = toCategory({
-      slug: 'plantes-aquatiques',
-      name: 'Plantes aquatiques',
-      parent: null,
-      children: [
-        { slug: 'nenuphars', name: 'Nénuphars', parent: 'plantes-aquatiques', children: [] },
-      ],
-    })
+    const category = toCategory(
+      {
+        slug: 'plantes-aquatiques',
+        name: 'Plantes aquatiques',
+        parent: null,
+        alternates: [],
+        children: [
+          {
+            slug: 'nenuphars',
+            name: 'Nénuphars',
+            parent: 'plantes-aquatiques',
+            alternates: [],
+            children: [],
+          },
+        ],
+      },
+      'fr',
+    )
 
     expect(category.description).toMatch(/^Plantes aquatiques pour bassins/)
     expect(category.children[0]?.description).toMatch(/^Nénuphars blancs/)
   })
 })
+
+const CONTEXT = {
+  categories: [],
+  languages: { locale: 'fr', locales: ['fr'] },
+  language: 'fr',
+}
 
 describe('toListing', () => {
   it('traduit identifiants, prix, sous-catégories et facettes dans l’ordre du domaine', () => {
@@ -122,7 +138,7 @@ describe('toListing', () => {
         ],
       },
       1,
-      { chain: [], slugs: ['plantes-exterieur'] },
+      { chain: [], slugs: ['plantes-exterieur'], ...CONTEXT },
     )
 
     expect(listing.products[0]).toMatchObject({ id: '7', price: 5990 })
@@ -156,10 +172,7 @@ describe('toListing', () => {
       [],
       { totalItems: 0, exposure: [], size: [], category: [], attributes: [] },
       1,
-      {
-        chain: [],
-        slugs: [],
-      },
+      { chain: [], slugs: [], ...CONTEXT },
     )
 
     expect(listing.totalPages).toBe(1)
@@ -170,10 +183,7 @@ describe('toListing', () => {
       [],
       { totalItems: 25, exposure: [], size: [], category: [], attributes: [] },
       3,
-      {
-        chain: [],
-        slugs: [],
-      },
+      { chain: [], slugs: [], ...CONTEXT },
     )
 
     expect(listing).toMatchObject({ total: 25, page: 3, totalPages: 3 })
@@ -196,6 +206,7 @@ describe('toProductDetail', () => {
     gallery: [],
     metaTitle: '',
     metaDescription: '',
+    alternates: [],
   }
 
   it('découpe la description en paragraphes aux lignes vides', () => {
@@ -271,5 +282,41 @@ describe('toProductDetail', () => {
       metaTitle: '',
       metaDescription: '',
     })
+  })
+
+  it('donne la fiche produit dans chaque langue où elle existe', () => {
+    const detail = toProductDetail({
+      ...DTO,
+      description: '',
+      alternates: [
+        { locale: 'fr', slug: 'palmier-nain' },
+        { locale: 'en', slug: 'dwarf-palm' },
+      ],
+    })
+
+    expect(detail.alternates).toEqual([
+      { locale: 'fr', path: '/produit/palmier-nain' },
+      { locale: 'en', path: '/produit/dwarf-palm' },
+    ])
+  })
+})
+
+describe('langues', () => {
+  it('choisit la description éditoriale dans la langue de la réponse, par le slug français', () => {
+    const category = toCategory(
+      {
+        slug: 'aquatic-plants',
+        name: 'Aquatic plants',
+        parent: null,
+        alternates: [
+          { locale: 'fr', slug: 'plantes-aquatiques' },
+          { locale: 'en', slug: 'aquatic-plants' },
+        ],
+        children: [],
+      },
+      'en',
+    )
+
+    expect(category.description).toMatch(/^Aquatic plants for ponds/)
   })
 })

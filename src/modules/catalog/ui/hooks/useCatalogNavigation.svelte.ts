@@ -32,7 +32,7 @@ export const useCatalogNavigation = (getPath: () => AppPath, getQuery: () => Cat
   onMount(() => {
     const start = (event: Event) => {
       const { to } = event as TransitionBeforePreparationEvent
-      pending = to.pathname.startsWith(CATALOG_ROOT_PATH)
+      pending = to.pathname.startsWith(resolveHref(CATALOG_ROOT_PATH))
       // Filtre ou tri : le focus reste sur le champ manipulé. Lien (pagination, Tout effacer) : retour au titre.
       keepFocus = document.activeElement?.closest('form') != null
     }

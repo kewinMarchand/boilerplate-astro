@@ -6,6 +6,14 @@
 
   import Section from './Section.svelte'
 
+  import type { Dictionary } from '@/shared/i18n'
+
+  interface Props {
+    cardLabels: Pick<Dictionary, 'catalog' | 'language'>
+  }
+
+  const { cardLabels }: Props = $props()
+
   /** Photo du site : la charte graphique est statique, elle ne lit pas l'API. */
   const PHOTO = staticImage('/images/hero', [640, 1280], {
     width: 1280,
@@ -37,11 +45,11 @@
 
 <Section id="medias" title="Médias et cartes">
   <div class="blog-grid mb-6">
-    <BlogCard article={ARTICLE} />
-    <ProductCard product={{ ...PRODUCT }} />
+    <BlogCard article={ARTICLE} tag={cardLabels.language.tag} />
+    <ProductCard product={{ ...PRODUCT }} t={cardLabels} />
   </div>
   <ul class="catalog-grid mb-6" data-view="liste">
-    <li><ProductCard product={{ ...PRODUCT, name: 'Carte produit en liste' }} /></li>
+    <li><ProductCard product={{ ...PRODUCT, name: 'Carte produit en liste' }} t={cardLabels} /></li>
   </ul>
   <div class="max-w-prose">
     <ResponsiveImage

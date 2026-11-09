@@ -1,8 +1,8 @@
-import { EXPOSURES, PAGE_SIZE, SIZES } from '@/modules/catalog/domain/catalog'
-import { categoryHref } from '@/modules/catalog/domain/categoryPath'
+import { EXPOSURES, PAGE_SIZE, productHref, SIZES } from '@/modules/catalog/domain/catalog'
+import { categoryAlternates, categoryHref } from '@/modules/catalog/domain/categoryPath'
 import { eurosToCents, Price } from '@/modules/catalog/domain/price'
 
-import { CATEGORY_DESCRIPTIONS, ROOT_DESCRIPTION } from './categoryDescriptions'
+import { categoryDescription } from './categoryDescriptions'
 
 import type { Catalog } from '@/modules/catalog/domain/catalog'
 import type { components, operations } from '@/shared/api/client'
@@ -26,11 +26,16 @@ const SORT_PARAMS: Record<Catalog.Sort, ProductsQuery> = {
   nom: { 'order[name]': 'asc' },
 }
 
-export const toCategory = (dto: CategoryDto): Catalog.Category => ({
+/** `language` : langue de la réponse (`Content-Language`), qui choisit la description éditoriale. */
+export const toCategory = (dto: CategoryDto, language: string): Catalog.Category => ({
   slug: dto.slug,
   name: dto.name,
-  description: CATEGORY_DESCRIPTIONS[dto.slug] ?? ROOT_DESCRIPTION,
-  children: dto.children.map(toCategory),
+  description: categoryDescription(
+    language,
+    dto.alternates.find((alternate) => alternate.locale === 'fr')?.slug ?? dto.slug,
+  ),
+  children: dto.children.map((child) => toCategory(child, language)),
+  alternates: dto.alternates,
 })
 
 export const toProduct = (dto: ProductDto): Catalog.Product => ({
@@ -66,6 +71,7 @@ export const toProductDetail = (dto: ProductDetailDto): Catalog.ProductDetail =>
   gallery: dto.gallery,
   metaTitle: dto.metaTitle.trim(),
   metaDescription: dto.metaDescription.trim(),
+  alternates: dto.alternates.map(({ locale, slug }) => ({ locale, path: productHref(slug) })),
 })
 
 const toFacetCounts = <T extends string>(values: readonly T[], dtos: FacetDto[]) =>
@@ -104,11 +110,20 @@ export const toListing = (
   {
     chain,
     slugs,
-    current,
-  }: { chain: Catalog.CategoryPath; slugs: string[]; current?: Catalog.Category },
+    categories,
+    languages,
+    language,
+  }: {
+    chain: Catalog.CategoryPath
+    slugs: string[]
+    categories: Catalog.Category[]
+    languages: Catalog.Languages
+    language: string
+  },
 ): Catalog.Listing => ({
   chain,
-  description: current?.description ?? ROOT_DESCRIPTION,
+  alternates: categoryAlternates(categories, languages),
+  description: categories.at(-1)?.description ?? categoryDescription(language),
   children: facets.category.map((child) => ({
     slug: child.slug,
     name: child.name,

@@ -1,13 +1,14 @@
 ---
-import { CATALOG_NAVIGATION } from '@/shared/config'
-import { absoluteUrl } from '@/shared/seo'
+import { CATALOG_NAVIGATION, navigationLabel } from '@/shared/config'
+import { format } from '@/shared/i18n'
+import { resolveHref } from '@/shared/routing'
+import { localizedUrl } from '@/shared/seo'
 import { Alert, Badge, Button, ImagePreload, largestWebp, ResponsiveImage } from '@/shared/ui/kit'
 import PageLayout from '@/shared/ui/layout/PageLayout.astro'
 
 import { inquiryHref, productHref } from '../domain/catalog'
 import { CATALOG_ROOT_PATH } from '../domain/categoryPath'
 import { formatPrice } from '../domain/price'
-import { EXPOSURE_LABELS } from './labels'
 import ProductGallery from './ProductGallery.svelte'
 import SimilarProducts from './SimilarProducts.astro'
 
@@ -21,8 +22,12 @@ interface Props {
 }
 
 const { product, salesEnabled } = Astro.props
+const { dictionary: t, locale } = Astro.locals
 const IMAGE_SIZES = '(min-width: 1440px) 680px, (min-width: 768px) 50vw, calc(100vw - 32px)'
-const CATALOG: Seo.BreadcrumbItem = { label: CATALOG_NAVIGATION.label, path: CATALOG_ROOT_PATH }
+const CATALOG: Seo.BreadcrumbItem = {
+  label: navigationLabel(CATALOG_NAVIGATION, t),
+  path: CATALOG_ROOT_PATH,
+}
 const detail = product.status === 'success' ? product.product : null
 const image = detail?.image ?? null
 const galleryImages = detail?.gallery.length ? [...(image ? [image] : []), ...detail.gallery] : []
@@ -32,8 +37,17 @@ const parents: Seo.BreadcrumbItem[] = [
   ...(detail?.categoryPath ?? []).map((link) => ({ label: link.name, path: link.path })),
 ]
 const description = detail
-  ? `${detail.name} : exposition ${EXPOSURE_LABELS[detail.exposure].toLowerCase()}, taille ${detail.size}${salesEnabled ? `, ${formatPrice(detail.price)}` : ''}. ${detail.inStock ? 'En stock' : 'En rupture de stock'}, rayon ${category?.name ?? 'catalogue'}.`
-  : 'Fiche produit de notre jardinerie tropicale.'
+  ? format(t.product.description, {
+      name: detail.name,
+      exposure: t.catalog.exposures[detail.exposure].toLowerCase(),
+      size: detail.size,
+      price: salesEnabled
+        ? format(t.product.descriptionPrice, { price: formatPrice(detail.price, t.language.tag) })
+        : '',
+      stock: detail.inStock ? t.product.descriptionInStock : t.product.descriptionOutOfStock,
+      category: category?.name ?? t.product.noCategory,
+    })
+  : t.product.fallbackDescription
 const seo = detail
   ? {
       metaTitle: detail.metaTitle,
@@ -53,13 +67,13 @@ const seo = detail
           name: detail.name,
           ...(detail.description.length > 0 && { description: detail.description.join(' ') }),
           sku: detail.slug,
-          url: absoluteUrl(productHref(detail.slug)),
+          url: localizedUrl(productHref(detail.slug), locale),
           ...(category && { category: category.name }),
           ...(image && { image: largestWebp(image) }),
           ...(salesEnabled && {
             offers: {
               '@type': 'Offer',
-              url: absoluteUrl(productHref(detail.slug)),
+              url: localizedUrl(productHref(detail.slug), locale),
               priceCurrency: 'EUR',
               price: (detail.price / 100).toFixed(2),
               availability: `https://schema.org/${detail.inStock ? 'InStock' : 'OutOfStock'}`,
@@ -72,22 +86,28 @@ const seo = detail
 ---
 
 <PageLayout
-  title={detail?.name ?? 'Produit'}
+  title={detail?.name ?? t.product.fallbackTitle}
   {description}
   parents={detail ? parents : [CATALOG]}
   {seo}
   headingTestId="product-title"
+  alternates={detail?.alternates}
 >
   {image && <ImagePreload slot="head" {image} sizes={IMAGE_SIZES} />}
   {product.status === 'error' ? (
     <Alert variant="error" data-testid="product-error">
-      {product.message}
+      {t.product.loadError}
     </Alert>
   ) : (
     detail && (
       <article class="product-page" data-testid="product-page">
         {galleryImages.length > 0 ? (
-          <ProductGallery client:idle images={galleryImages} sizes={IMAGE_SIZES} />
+          <ProductGallery
+            client:idle
+            images={galleryImages}
+            sizes={IMAGE_SIZES}
+            imageLabel={t.product.galleryImage}
+          />
         ) : (
           image && (
             <ResponsiveImage
@@ -102,7 +122,7 @@ const seo = detail
         <div>
           {salesEnabled && (
             <p class="text-lead font-semibold" data-testid="product-price">
-              {formatPrice(detail.price)}
+              {formatPrice(detail.price, t.language.tag)}
             </p>
           )}
           {detail.description.length > 0 && (
@@ -113,12 +133,18 @@ const seo = detail
             </div>
           )}
           <dl class="product-features">
-            <dt>Exposition</dt>
-            <dd>{EXPOSURE_LABELS[detail.exposure]}</dd>
-            <dt>Taille</dt>
+            <dt>{t.product.exposure}</dt>
+            <dd>{t.catalog.exposures[detail.exposure]}</dd>
+            <dt>{t.product.size}</dt>
             <dd>{detail.size}</dd>
-            <dt>Disponibilité</dt>
-            <dd>{detail.inStock ? 'En stock' : <Badge variant="error">Rupture de stock</Badge>}</dd>
+            <dt>{t.product.availability}</dt>
+            <dd>
+              {detail.inStock ? (
+                t.product.inStock
+              ) : (
+                <Badge variant="error">{t.product.outOfStock}</Badge>
+              )}
+            </dd>
           </dl>
           {detail.attributes.length > 0 && (
             <dl class="product-features" data-testid="product-attributes">
@@ -137,18 +163,18 @@ const seo = detail
           ) : (
             <div class="mb-6">
               <Button
-                href={inquiryHref(detail.slug)}
-                aria-label={`Demande de renseignement sur ${detail.name}`}
+                href={resolveHref(inquiryHref(detail.slug))}
+                aria-label={format(t.product.inquiryAbout, { name: detail.name })}
                 data-testid="product-inquiry"
               >
-                Demande de renseignement
+                {t.product.inquiry}
               </Button>
             </div>
           )}
           {category && (
             <p>
-              <a href={category.path} class="bui-link">
-                Voir les autres produits : {category.name}
+              <a href={resolveHref(category.path)} class="bui-link">
+                {format(t.product.otherProducts, { category: category.name })}
               </a>
             </p>
           )}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { format } from '@/shared/i18n'
   import { resolveHref } from '@/shared/routing'
   import { useIsDesktop } from '@/shared/ui/hooks'
   import { Button, Chip, Drawer, Icon } from '@/shared/ui/kit'
@@ -13,14 +14,17 @@
   import ProductGrid from './ProductGrid.svelte'
 
   import type { Catalog } from '../domain/catalog'
+  import type { CatalogLabels } from './labels'
 
   interface Props {
     query: Catalog.Query
     result: Catalog.Result
     salesEnabled: boolean
+    /** Libellés du catalogue dans la langue de la page. */
+    t: CatalogLabels
   }
 
-  const { query, result, salesEnabled }: Props = $props()
+  const { query, result, salesEnabled, t }: Props = $props()
 
   const listing = $derived(result.status === 'success' ? result.listing : undefined)
   const path = $derived(listing?.chain.at(-1)?.path ?? CATALOG_ROOT_PATH)
@@ -42,12 +46,12 @@
     variant="outline"
     data-testid="catalog-clear-filters"
   >
-    Tout effacer
+    {t.catalog.clearFilters}
   </Button>
 {/snippet}
 
 {#if listing && listing.children.length > 0}
-  <nav aria-label="Sous-catégories" class="mb-6">
+  <nav aria-label={t.catalog.subcategories} class="mb-6">
     <ul class="bui-chip-list">
       {#each listing.children as child (child.slug)}
         <li><Chip href={resolveHref(child.path)}>{child.name} ({child.count})</Chip></li>
@@ -59,8 +63,10 @@
 <div class="catalog-layout">
   {#if listing && isDesktop.current}
     <aside aria-labelledby="catalog-filters-title" class="catalog-aside">
-      <h2 id="catalog-filters-title" class="mb-4 text-title font-semibold">Filtres</h2>
-      <CatalogFilters {query} {listing} {salesEnabled} onsubmit={navigation.submitForm} />
+      <h2 id="catalog-filters-title" class="mb-4 text-title font-semibold">
+        {t.catalog.filters}
+      </h2>
+      <CatalogFilters {query} {listing} {salesEnabled} {t} onsubmit={navigation.submitForm} />
     </aside>
   {/if}
 
@@ -69,18 +75,19 @@
       {#if listing}
         <Drawer
           bind:open={filtersOpen}
-          title="Filtres"
+          title={t.catalog.filters}
+          closeLabel={t.close}
           side="start"
           triggerClass="bui-button bui-button--outline hidden js:max-lg:inline-flex"
           triggerTestId="catalog-filters-open"
         >
           {#snippet trigger()}
             <Icon name="sliders-horizontal" />
-            Filtrer{activeCount > 0 ? ` (${activeCount})` : ''}
+            {t.catalog.filterButton}{activeCount > 0 ? ` (${activeCount})` : ''}
           {/snippet}
-          <CatalogFilters {query} {listing} {salesEnabled} onsubmit={navigation.submitForm} />
+          <CatalogFilters {query} {listing} {salesEnabled} {t} onsubmit={navigation.submitForm} />
           <Button class="mt-6 w-full" onclick={() => (filtersOpen = false)}>
-            Voir les {listing.total} produits
+            {format(t.catalog.showProducts, { total: listing.total })}
           </Button>
         </Drawer>
       {/if}
@@ -91,6 +98,7 @@
       {query}
       total={listing?.total ?? 0}
       {salesEnabled}
+      {t}
       onSortChange={(sort) => navigation.update({ sort })}
       {filterButton}
     />
@@ -99,18 +107,19 @@
       {query}
       attributeFacets={listing?.facets.attributes ?? []}
       {clearAction}
+      {t}
     />
     <ProductGrid
       {status}
       products={listing?.products ?? []}
       view={query.view}
       showPrice={salesEnabled}
-      errorMessage={result.status === 'error' ? result.message : undefined}
+      {t}
       onRetry={navigation.retry}
       {clearAction}
     />
     {#if listing}
-      <Pagination {path} {query} totalPages={listing.totalPages} />
+      <Pagination {path} {query} totalPages={listing.totalPages} {t} />
     {/if}
   </div>
 </div>

@@ -1,4 +1,5 @@
 ---
+import { resolveHref } from '@/shared/routing'
 import { Button, ResponsiveImage } from '@/shared/ui/kit'
 
 import { HERO_IMAGE } from './heroImage'
@@ -9,6 +10,7 @@ interface Props {
 }
 
 const { name, tagline } = Astro.props
+const t = Astro.locals.dictionary
 ---
 
 <div class="hero full-bleed" data-testid="home-hero">
@@ -22,15 +24,19 @@ const { name, tagline } = Astro.props
   <div class="hero-overlay"></div>
   <div class="container-page py-12">
     <div class="max-w-prose">
-      <p class="hero-overline">Boilerplate Astro</p>
+      <p class="hero-overline">{t.home.overline}</p>
       <h1 class="heading-1">{name}</h1>
       <p class="mb-8 text-title">{tagline}</p>
       <div class="flex flex-col gap-4 sm:flex-row">
-        <Button href="/taches" variant="light" data-testid="home-tasks-link">
-          Voir la démo des tâches
+        <Button href={resolveHref('/taches')} variant="light" data-testid="home-tasks-link">
+          {t.home.tasksLink}
         </Button>
-        <Button href="/contact" variant="outline-light" data-testid="home-contact-link">
-          Voir le formulaire
+        <Button
+          href={resolveHref('/contact')}
+          variant="outline-light"
+          data-testid="home-contact-link"
+        >
+          {t.home.contactLink}
         </Button>
       </div>
     </div>

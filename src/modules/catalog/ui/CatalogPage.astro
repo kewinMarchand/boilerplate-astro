@@ -9,20 +9,34 @@ import CatalogView from './CatalogView.svelte'
 import { PRODUCT_IMAGE_SIZES } from './productImage'
 
 import type { Catalog } from '../domain/catalog'
+import type { CatalogLabels } from './labels'
 
 interface Props {
   query: Catalog.Query
   result: Catalog.Result
   salesEnabled: boolean
+  /** La page dans chaque langue ; inconnue si l'API est en erreur (même chemin partout). */
+  alternates: Catalog.Alternate[] | undefined
 }
 
-const { query, result, salesEnabled } = Astro.props
-const { title, description, page, parents, seo } = describeCatalogPage(query, result)
+const { query, result, salesEnabled, alternates } = Astro.props
+const { dictionary, locale } = Astro.locals
+const { title, description, page, parents, seo } = describeCatalogPage(
+  query,
+  result,
+  dictionary,
+  locale,
+)
+const t: CatalogLabels = {
+  catalog: dictionary.catalog,
+  language: dictionary.language,
+  close: dictionary.layout.close,
+}
 const firstImage = result.status === 'success' ? result.listing.products[0]?.image : undefined
 ---
 
-<PageLayout {title} {description} {page} {parents} {seo}>
+<PageLayout {title} {description} {page} {parents} {seo} {alternates}>
   <ClientRouter slot="head" />
   {firstImage && <ImagePreload slot="head" image={firstImage} sizes={PRODUCT_IMAGE_SIZES} />}
-  <CatalogView client:load transition:persist="catalogue" {query} {result} {salesEnabled} />
+  <CatalogView client:load transition:persist="catalogue" {query} {result} {salesEnabled} {t} />
 </PageLayout>

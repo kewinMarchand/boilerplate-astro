@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { format } from '@/shared/i18n'
+  import { resolveHref } from '@/shared/routing'
   import { Button } from '@/shared/ui/kit'
 
   import { CART_PATH } from './cartPath'
@@ -12,9 +14,11 @@
   interface Props {
     item: Cart.Item
     isAvailable: boolean
+    /** Libellés dans la langue de la page. */
+    labels: { add: string; added: string; view: string }
   }
 
-  const { item, isAvailable }: Props = $props()
+  const { item, isAvailable, labels }: Props = $props()
 
   const cart = useCart()
   let isAdded = $state(false)
@@ -32,11 +36,12 @@
 {#if cart.ready}
   <div class="mb-6">
     <Button disabled={!isAvailable} onclick={add} data-testid="add-to-cart">
-      Ajouter au panier
+      {labels.add}
     </Button>
     <p role="status" class="mt-2" data-testid="add-to-cart-status">
       {#if isAdded}
-        {item.name} ajouté au panier. <a href={CART_PATH} class="bui-link">Voir le panier</a>
+        {format(labels.added, { name: item.name })}
+        <a href={resolveHref(CART_PATH)} class="bui-link">{labels.view}</a>
       {/if}
     </p>
   </div>

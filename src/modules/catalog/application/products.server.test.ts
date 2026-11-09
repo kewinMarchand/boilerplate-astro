@@ -41,6 +41,7 @@ describe('loadProductLink', () => {
       gallery: [],
       metaTitle: '',
       metaDescription: '',
+      alternates: [],
     }
     vi.mocked(findProduct).mockResolvedValueOnce(product)
 

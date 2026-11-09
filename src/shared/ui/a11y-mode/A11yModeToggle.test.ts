@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/svelte'
 import userEvent from '@testing-library/user-event'
 
+import { fr } from '@/shared/i18n/dictionaries/fr'
+
 import A11yModeToggle from './A11yModeToggle.svelte'
 
 describe('A11yModeToggle', () => {
@@ -10,7 +12,7 @@ describe('A11yModeToggle', () => {
   })
 
   it('active puis désactive le mode renforcé', async () => {
-    render(A11yModeToggle)
+    render(A11yModeToggle, { label: fr.a11yMode.label })
     const toggle = screen.getByTestId('a11y-mode-toggle')
     expect(toggle).toHaveAttribute('aria-pressed', 'false')
 
@@ -27,7 +29,7 @@ describe('A11yModeToggle', () => {
 
   it('reprend l’état déjà posé sur la page', () => {
     document.documentElement.dataset.a11yMode = 'enhanced'
-    render(A11yModeToggle)
+    render(A11yModeToggle, { label: fr.a11yMode.label })
 
     expect(screen.getByTestId('a11y-mode-toggle')).toHaveAttribute('aria-pressed', 'true')
   })

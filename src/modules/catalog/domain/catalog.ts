@@ -25,6 +25,24 @@ export declare namespace Catalog {
   type View = (typeof VIEWS)[number]
   type Facet = 'exposure' | 'size'
 
+  /** Langue de la page et langues du site, pour retrouver un élément dans chaque langue. */
+  interface Languages {
+    locale: string
+    locales: string[]
+  }
+
+  /** Slug d'un élément dans une langue, tel que l'API le donne (`alternates`). */
+  interface SlugAlternate {
+    locale: string
+    slug: string
+  }
+
+  /** Chemin d'un élément dans une langue, sans préfixe de langue (sélecteur, hreflang, sitemap). */
+  interface Alternate {
+    locale: string
+    path: AppPath
+  }
+
   interface Product {
     id: string
     slug: string
@@ -48,6 +66,8 @@ export declare namespace Catalog {
     /** Saisis dans l'admin, chaînes vides sinon : la fiche garde alors son titre et sa description. */
     metaTitle: string
     metaDescription: string
+    /** La fiche dans chaque langue où le produit existe ; vide sur un site monolingue. */
+    alternates: Alternate[]
   }
 
   /** Attribut configurable renseigné sur le produit, valeur prête à afficher (libellé pour une liste). */
@@ -80,6 +100,7 @@ export declare namespace Catalog {
     name: string
     description: string
     children: Category[]
+    alternates: SlugAlternate[]
   }
 
   interface CategoryLink {
@@ -123,6 +144,8 @@ export declare namespace Catalog {
 
   interface Listing {
     chain: CategoryPath
+    /** La page de la catégorie dans chaque langue où toute sa chaîne existe. */
+    alternates: Alternate[]
     description: string
     children: (CategoryLink & { count: number })[]
     products: Product[]

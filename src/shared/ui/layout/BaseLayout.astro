@@ -10,6 +10,7 @@ import Footer from './Footer.astro'
 import Header from './Header.astro'
 
 import type { NavigationNode } from '@/shared/config'
+import type { LanguageAlternate } from '@/shared/i18n'
 import type { Seo } from '@/shared/seo'
 
 import '@/shared/theme/theme.css'
@@ -17,10 +18,12 @@ import '@/shared/theme/theme.css'
 interface Props {
   meta: Seo.Meta
   categoryMenu?: NavigationNode[] | undefined
+  /** La page dans chaque langue (sélecteur de langue) ; vide, l'accueil de chaque langue. */
+  alternates: LanguageAlternate[]
 }
 
-const { meta, categoryMenu = Astro.locals.categoryMenu } = Astro.props
-const { siteIdentity } = Astro.locals
+const { meta, categoryMenu = Astro.locals.categoryMenu, alternates } = Astro.props
+const { siteIdentity, locale, dictionary: t } = Astro.locals
 const { defaultColorScheme, theme, icon } = siteIdentity
 
 // Amorçage avant le premier rendu : classe js (amélioration progressive), mode renforcé, thème mémorisé.
@@ -30,7 +33,7 @@ const BOOT_SCRIPT = `(()=>{const boot=()=>{${BOOT}};boot();if(!window.__boot){wi
 ---
 
 <!doctype html>
-<html lang="fr" data-color-scheme={defaultColorScheme}>
+<html lang={locale.locale} data-color-scheme={defaultColorScheme}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -70,9 +73,9 @@ const BOOT_SCRIPT = `(()=>{const boot=()=>{${BOOT}};boot();if(!window.__boot){wi
   <body>
     <div class="flex min-h-screen flex-col">
       <a href="#main" class="skip-link">
-        Aller au contenu principal
+        {t.layout.skipLink}
       </a>
-      <Header {categoryMenu} />
+      <Header {categoryMenu} {alternates} />
       <main id="main" tabindex="-1" class="page-grid grow">
         <slot />
       </main>

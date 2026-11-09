@@ -11,9 +11,12 @@ export type ContactSendResult =
 
 export const sendContactMessage = async (
   values: Contact.FormValues,
+  locale: string,
 ): Promise<ContactSendResult> => {
+  // Langue de la page en `Accept-Language` : les violations 422 de l'API arrivent dans cette langue
   const { error, response } = await serverApiClient().POST('/api/contact_messages', {
     body: { ...values, product: values.product ?? null },
+    headers: { 'Accept-Language': locale },
   })
   if (response.status === 422) return { status: 'invalid', fieldErrors: toFieldErrors(error) }
   if (!response.ok) throw new ApiError(response)

@@ -1,5 +1,6 @@
 ---
 import { SITE_IDENTITY_FALLBACK } from '@/shared/config'
+import { samePathInEveryLocale } from '@/shared/i18n'
 import { buildHomeJsonLd, buildPageMeta } from '@/shared/seo'
 import { ImagePreload } from '@/shared/ui/kit'
 import BaseLayout from '@/shared/ui/layout/BaseLayout.astro'
@@ -20,20 +21,22 @@ interface Props {
 
 const { featured, blog } = Astro.props
 
-const { siteIdentity, pageMetas } = Astro.locals
+const { siteIdentity, pageMetas, locale, dictionary: t } = Astro.locals
+const alternates = samePathInEveryLocale(locale, '/')
 const meta = buildPageMeta(
   {
     description: siteIdentity.tagline || SITE_IDENTITY_FALLBACK.tagline,
     metaTitle: pageMetas.home?.title,
     metaDescription: pageMetas.home?.description,
     path: '/',
-    jsonLd: buildHomeJsonLd(siteIdentity),
+    jsonLd: buildHomeJsonLd(siteIdentity, locale, t.language.tag),
   },
   siteIdentity,
+  { locale, alternates },
 )
 ---
 
-<BaseLayout {meta}>
+<BaseLayout {meta} {alternates}>
   <ImagePreload slot="head" image={HERO_IMAGE.image} sizes={HERO_IMAGE.sizes} />
   <Hero name={siteIdentity.name} tagline={siteIdentity.tagline} />
 

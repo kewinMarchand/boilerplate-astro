@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { actions, isInputError } from 'astro:actions'
+  import { actions } from 'astro:actions'
 
   import { Alert, Button, TextField } from '@/shared/ui/kit'
 
-  import { contactSchema } from '../domain/contactSchema'
+  import { createContactSchema } from '../domain/contactSchema'
 
-  import type { Contact } from '../domain/contactSchema'
+  import type { Contact, ValidationMessages } from '../domain/contactSchema'
 
   interface Props {
     /** Action du formulaire HTML (envoi sans JavaScript). */
@@ -15,9 +15,24 @@
     values: Contact.FormValues
     errors: Contact.FieldErrors
     status?: 'sent' | 'error' | undefined
+    /** Libellés dans la langue de la page (`contact` du dictionnaire). */
+    labels: {
+      name: string
+      email: string
+      message: string
+      send: string
+      sent: string
+      inquirySent: string
+      sendError: string
+      validation: ValidationMessages
+    }
+    /** Langue de la page, envoyée avec le formulaire sur un site multilingue (l'action n'a pas de préfixe). */
+    locale?: string | undefined
   }
 
   const props: Props = $props()
+  // svelte-ignore state_referenced_locally
+  const contactSchema = createContactSchema(props.labels.validation)
 
   // svelte-ignore state_referenced_locally
   let values = $state<Contact.FormValues>({ ...props.values })
@@ -70,8 +85,7 @@
     submitting = false
 
     if (error) {
-      if (isInputError(error)) errors = error.fields
-      else status = 'error'
+      status = 'error'
       return
     }
     if (data.status === 'invalid') {
@@ -96,7 +110,7 @@
 >
   <TextField
     name="name"
-    label="Nom"
+    label={props.labels.name}
     autocomplete="name"
     required
     errors={errors.name}
@@ -105,7 +119,7 @@
   />
   <TextField
     name="email"
-    label="E-mail"
+    label={props.labels.email}
     type="email"
     autocomplete="email"
     required
@@ -115,7 +129,7 @@
   />
   <TextField
     name="message"
-    label="Message"
+    label={props.labels.message}
     multiline
     required
     errors={errors.message}
@@ -125,21 +139,22 @@
   {#if props.product}
     <input type="hidden" name="product" value={props.product} />
   {/if}
+  {#if props.locale}
+    <input type="hidden" name="locale" value={props.locale} />
+  {/if}
   <Button type="submit" icon="mail" loading={submitting} data-testid="contact-submit">
-    Envoyer
+    {props.labels.send}
   </Button>
   <div aria-live="polite">
     {#if status === 'sent'}
       <Alert variant="success" data-testid="contact-success">
-        {props.product
-          ? 'Votre demande de renseignement a bien été envoyée.'
-          : 'Merci, votre message a bien été envoyé.'}
+        {props.product ? props.labels.inquirySent : props.labels.sent}
       </Alert>
     {:else if errors.product}
       <Alert variant="error" data-testid="contact-error">{errors.product.join(' ')}</Alert>
     {:else if status === 'error'}
       <Alert variant="error" data-testid="contact-error">
-        L'envoi a échoué. Réessayez dans quelques instants.
+        {props.labels.sendError}
       </Alert>
     {/if}
   </div>

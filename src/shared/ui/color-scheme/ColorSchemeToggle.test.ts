@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/svelte'
 import userEvent from '@testing-library/user-event'
 
+import { fr } from '@/shared/i18n/dictionaries/fr'
+
 import ColorSchemeToggle from './ColorSchemeToggle.svelte'
 
 describe('ColorSchemeToggle', () => {
@@ -11,14 +13,14 @@ describe('ColorSchemeToggle', () => {
   })
 
   it('suit le système par défaut', () => {
-    render(ColorSchemeToggle)
+    render(ColorSchemeToggle, { labels: fr.colorScheme })
 
     expect(screen.getByTestId('color-scheme-toggle')).toHaveAccessibleName('Thème : système')
     expect(screen.getByTestId('color-scheme-option-auto')).toHaveAttribute('aria-checked', 'true')
   })
 
   it('pose et mémorise le choix, puis « système » écrit auto', async () => {
-    render(ColorSchemeToggle)
+    render(ColorSchemeToggle, { labels: fr.colorScheme })
     const toggle = screen.getByTestId('color-scheme-toggle')
 
     await userEvent.click(toggle)
@@ -36,7 +38,7 @@ describe('ColorSchemeToggle', () => {
   it('annonce un choix sombre suspendu par le mode renforcé', () => {
     document.documentElement.dataset.colorScheme = 'dark'
     document.documentElement.dataset.a11yMode = 'enhanced'
-    render(ColorSchemeToggle)
+    render(ColorSchemeToggle, { labels: fr.colorScheme })
 
     expect(screen.getByTestId('color-scheme-toggle')).toHaveAccessibleName(
       "Thème : sombre, suspendu par l'accessibilité renforcée",

@@ -1,5 +1,5 @@
 ---
-import { isActivePath } from '@/shared/config'
+import { isActivePath, navigationLabel } from '@/shared/config'
 import { resolveHref } from '@/shared/routing'
 import { Button } from '@/shared/ui/kit'
 
@@ -7,10 +7,10 @@ import type { NavigationItem } from '@/shared/config'
 
 type Props = NavigationItem
 
-const { href, label } = Astro.props
+const { href, labelKey } = Astro.props
 const isActive = isActivePath(Astro.url.pathname, href)
 ---
 
 <Button href={resolveHref(href)} variant="nav" aria-current={isActive ? 'page' : undefined}>
-  {label}
+  {navigationLabel({ href, labelKey }, Astro.locals.dictionary)}
 </Button>

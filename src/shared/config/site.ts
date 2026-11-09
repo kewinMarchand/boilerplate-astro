@@ -4,7 +4,6 @@ export interface SiteConfig {
   name: string
   description: string
   url: string
-  locale: string
   publisher: {
     name: string
     email: string
@@ -19,7 +18,6 @@ export const SITE: SiteConfig = {
   // Lue à l'exécution sur le serveur (image Docker), repli sur `site` d'Astro figé au build ; aussi importée
   // par des îlots, d'où globalThis.process (absent du navigateur, qui n'utilise pas d'URL absolue).
   url: globalThis.process?.env['PUBLIC_SITE_URL'] ?? import.meta.env.SITE,
-  locale: 'fr_FR',
   publisher: {
     name: 'Exemple SAS (société fictive)',
     email: 'contact@exemple.fr',

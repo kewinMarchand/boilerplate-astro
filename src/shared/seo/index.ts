@@ -5,6 +5,7 @@ export {
   buildHomeJsonLd,
   buildPageMeta,
   DEFAULT_SHARE_IMAGE,
+  localizedUrl,
 } from './buildPageMeta'
 export { buildWebManifest, themeColor } from './manifest'
 export { buildRobotsTxt } from './robots'

@@ -2,15 +2,16 @@
 import PageLayout from '@/shared/ui/layout/PageLayout.astro'
 
 import CartView from './CartView.svelte'
+
+const t = Astro.locals.dictionary
+const { title, description, noScript, empty, browseCatalog, unitPrice, quantityOf, remove } = t.cart
+const { removeItem, total, soon } = t.cart
+const labels = { empty, browseCatalog, unitPrice, quantityOf, remove, removeItem, total, soon }
 ---
 
-<PageLayout
-  title="Panier"
-  description="Votre panier : les produits choisis, leurs quantités et le total, gardés dans ce navigateur."
-  seo={{ noindex: true }}
->
+<PageLayout {title} {description} seo={{ noindex: true }}>
   <noscript>
-    <p>Le panier demande JavaScript.</p>
+    <p>{noScript}</p>
   </noscript>
-  <CartView client:load />
+  <CartView client:load labels={{ ...labels, tag: t.language.tag }} />
 </PageLayout>

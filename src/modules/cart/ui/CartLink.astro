@@ -1,5 +1,10 @@
 ---
 import CartLinkIsland from './CartLink.svelte'
+
+const t = Astro.locals.dictionary
 ---
 
-<CartLinkIsland client:idle />
+<CartLinkIsland
+  client:idle
+  labels={{ title: t.cart.title, itemCount: t.cart.itemCount, tag: t.language.tag }}
+/>

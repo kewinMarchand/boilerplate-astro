@@ -13,7 +13,7 @@ const { page } = Astro.props
 
 {page.status === 'error' ? (
   <Alert variant="error" data-testid="legal-error">
-    {page.message}
+    {Astro.locals.dictionary.legal.loadError}
   </Alert>
 ) : (
   <>

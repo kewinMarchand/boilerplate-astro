@@ -6,6 +6,7 @@ const node = (slug: string, children: Catalog.Category[] = []): Catalog.Category
   slug,
   name: slug,
   description: '',
+  alternates: [],
   children,
 })
 

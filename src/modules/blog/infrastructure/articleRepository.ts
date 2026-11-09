@@ -5,9 +5,15 @@ import { toArticle, toArticleDetail, toTerm } from './http/articleTranslation'
 
 import type { Article } from '../domain/article'
 
-/** `section` : slug de rubrique ; inconnu de l'API, liste vide. */
-export const findLatestArticles = async (section?: string): Promise<Article.Entity[]> => {
-  const { data, response } = await serverApiClient().GET('/api/articles', {
+/**
+ * `section` : slug de rubrique ; inconnu de l'API, liste vide. `locale` : une autre langue que celle de la
+ * page (sitemap).
+ */
+export const findLatestArticles = async (
+  section?: string,
+  locale?: string,
+): Promise<Article.Entity[]> => {
+  const { data, response } = await serverApiClient({ locale }).GET('/api/articles', {
     params: { query: section ? { section } : {} },
   })
   if (!data) throw new ApiError(response)

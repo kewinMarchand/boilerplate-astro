@@ -1,6 +1,7 @@
 ---
-import { BLOG_NAVIGATION } from '@/shared/config'
-import { absoluteUrl } from '@/shared/seo'
+import { BLOG_NAVIGATION, navigationLabel } from '@/shared/config'
+import { resolveHref } from '@/shared/routing'
+import { localizedUrl } from '@/shared/seo'
 import { Alert, Button, Icon } from '@/shared/ui/kit'
 import PageLayout from '@/shared/ui/layout/PageLayout.astro'
 
@@ -17,8 +18,10 @@ interface Props {
 }
 
 const { blog, sections, activeSection } = Astro.props
+const { dictionary: t, locale } = Astro.locals
+const blogLabel = navigationLabel(BLOG_NAVIGATION, t)
 const filters = [
-  { label: 'Toutes', href: BLOG_NAVIGATION.href, active: !activeSection },
+  { label: t.blog.allSections, href: BLOG_NAVIGATION.href, active: !activeSection },
   ...sections.map((section) => ({
     label: section.name,
     href: sectionHref(section.slug),
@@ -30,32 +33,27 @@ const jsonLd = [
   {
     '@context': 'https://schema.org',
     '@type': 'Blog',
-    name: BLOG_NAVIGATION.label,
-    url: absoluteUrl(BLOG_NAVIGATION.href),
-    inLanguage: 'fr-FR',
+    name: blogLabel,
+    url: localizedUrl(BLOG_NAVIGATION.href, locale),
+    inLanguage: t.language.tag,
     blogPost: articles.map((article) => ({
       '@type': 'BlogPosting',
       headline: article.title,
       datePublished: article.publishedAt,
-      url: absoluteUrl(articleHref(article.slug)),
+      url: localizedUrl(articleHref(article.slug), locale),
     })),
   },
 ]
 ---
 
-<PageLayout
-  page="blog"
-  title={BLOG_NAVIGATION.label}
-  description="Tous les articles du blog, du plus récent au plus ancien : accessibilité, performance et composants d’interface."
-  seo={{ jsonLd }}
->
+<PageLayout page="blog" title={blogLabel} description={t.blog.description} seo={{ jsonLd }}>
   {sections.length > 0 && (
-    <nav aria-label="Rubriques" class="mb-6" data-testid="blog-sections">
+    <nav aria-label={t.blog.sections} class="mb-6" data-testid="blog-sections">
       <ul class="flex flex-wrap gap-x-6 gap-y-2">
         {filters.map((filter) => (
           <li>
             <a
-              href={filter.href}
+              href={resolveHref(filter.href)}
               class="bui-link aria-[current=page]:font-semibold aria-[current=page]:no-underline"
               aria-current={filter.active ? 'page' : undefined}
               data-testid="blog-section-link"
@@ -71,27 +69,25 @@ const jsonLd = [
     {blog.status === 'error' ? (
       <div class="flex flex-col items-start gap-3">
         <Alert variant="error" data-testid="blog-error">
-          {blog.message}
+          {t.blog.loadError}
         </Alert>
         <Button
           variant="outline"
-          href={activeSection ? sectionHref(activeSection) : BLOG_NAVIGATION.href}
+          href={resolveHref(activeSection ? sectionHref(activeSection) : BLOG_NAVIGATION.href)}
           data-testid="blog-retry"
         >
           <Icon name="rotate-cw" />
-          Réessayer
+          {t.blog.retry}
         </Button>
       </div>
     ) : articles.length === 0 ? (
       <Alert variant="info" data-testid="blog-empty">
-        {activeSection
-          ? 'Aucun article dans cette rubrique pour l’instant.'
-          : "Aucun article publié pour l'instant. Revenez bientôt."}
+        {activeSection ? t.blog.emptySection : t.blog.empty}
       </Alert>
     ) : (
       <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3" data-testid="blog-list">
         {articles.map((article) => (
-          <BlogCard {article} testId="blog-card" headingLevel={2} />
+          <BlogCard {article} testId="blog-card" headingLevel={2} tag={t.language.tag} />
         ))}
       </div>
     )}

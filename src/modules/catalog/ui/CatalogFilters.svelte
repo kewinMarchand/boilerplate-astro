@@ -3,18 +3,19 @@
   import { Button, Checkbox, Icon, Switch } from '@/shared/ui/kit'
 
   import { attributeParam, queryEntries } from '../domain/catalogQuery'
-  import { EXPOSURE_LABELS, SIZE_LABELS } from './labels'
 
   import type { Catalog } from '../domain/catalog'
+  import type { CatalogLabels } from './labels'
 
   interface Props {
     query: Catalog.Query
     listing: Catalog.Listing
     salesEnabled: boolean
     onsubmit: (event: Event) => void
+    t: CatalogLabels
   }
 
-  const { query, listing, salesEnabled, onsubmit }: Props = $props()
+  const { query, listing, salesEnabled, onsubmit, t }: Props = $props()
 
   const uid = $props.id()
 
@@ -44,7 +45,7 @@
     {#if listing.children.length > 0}
       <details open class="bui-accordion__item">
         <summary class="bui-accordion__summary">
-          Catégorie<Icon name="chevron-down" class="bui-accordion__icon" />
+          {t.catalog.category}<Icon name="chevron-down" class="bui-accordion__icon" />
         </summary>
         <ul class="bui-accordion__content flex flex-col">
           {#each listing.children as child (child.slug)}
@@ -60,15 +61,15 @@
 
     <details open class="bui-accordion__item">
       <summary class="bui-accordion__summary">
-        Exposition<Icon name="chevron-down" class="bui-accordion__icon" />
+        {t.catalog.exposure}<Icon name="chevron-down" class="bui-accordion__icon" />
       </summary>
       <fieldset class="bui-accordion__content flex flex-col gap-2">
-        <legend class="sr-only">Exposition</legend>
+        <legend class="sr-only">{t.catalog.exposure}</legend>
         {#each listing.facets.exposure as { value, count } (value)}
           {@const checked = query.exposures.includes(value)}
           <Checkbox
             id="{uid}-exposition-{value}"
-            label="{EXPOSURE_LABELS[value]} ({count})"
+            label="{t.catalog.exposures[value]} ({count})"
             name="exposition"
             {value}
             {checked}
@@ -81,15 +82,15 @@
 
     <details open class="bui-accordion__item">
       <summary class="bui-accordion__summary">
-        Taille<Icon name="chevron-down" class="bui-accordion__icon" />
+        {t.catalog.size}<Icon name="chevron-down" class="bui-accordion__icon" />
       </summary>
       <fieldset class="bui-accordion__content flex flex-col gap-2">
-        <legend class="sr-only">Taille</legend>
+        <legend class="sr-only">{t.catalog.size}</legend>
         {#each listing.facets.size as { value, count } (value)}
           {@const checked = query.sizes.includes(value)}
           <Checkbox
             id="{uid}-taille-{value}"
-            label="{SIZE_LABELS[value]} ({count})"
+            label="{t.catalog.sizes[value]} ({count})"
             name="taille"
             {value}
             {checked}
@@ -126,11 +127,11 @@
     {#if salesEnabled}
       <details open class="bui-accordion__item">
         <summary class="bui-accordion__summary">
-          Prix<Icon name="chevron-down" class="bui-accordion__icon" />
+          {t.catalog.price}<Icon name="chevron-down" class="bui-accordion__icon" />
         </summary>
         <fieldset class="bui-accordion__content flex flex-wrap gap-3">
-          <legend class="sr-only">Prix en euros</legend>
-          {#each [{ name: 'prix_min', label: 'Minimum (€)', value: query.priceMin, testId: 'catalog-filter-price-min' }, { name: 'prix_max', label: 'Maximum (€)', value: query.priceMax, testId: 'catalog-filter-price-max' }] as field (field.name)}
+          <legend class="sr-only">{t.catalog.priceLegend}</legend>
+          {#each [{ name: 'prix_min', label: t.catalog.priceMin, value: query.priceMin, testId: 'catalog-filter-price-min' }, { name: 'prix_max', label: t.catalog.priceMax, value: query.priceMax, testId: 'catalog-filter-price-max' }] as field (field.name)}
             <div class="bui-field w-28">
               <label class="bui-field__label" for="{uid}-{field.name}">{field.label}</label>
               <input
@@ -151,13 +152,13 @@
 
     <details open class="bui-accordion__item">
       <summary class="bui-accordion__summary">
-        Disponibilité<Icon name="chevron-down" class="bui-accordion__icon" />
+        {t.catalog.availability}<Icon name="chevron-down" class="bui-accordion__icon" />
       </summary>
       <fieldset class="bui-accordion__content">
-        <legend class="sr-only">Disponibilité</legend>
+        <legend class="sr-only">{t.catalog.availability}</legend>
         <Switch
           id="{uid}-en-stock"
-          label="En stock uniquement"
+          label={t.catalog.inStockOnly}
           name="en_stock"
           value="1"
           checked={query.inStock}
@@ -167,5 +168,5 @@
     </details>
   </div>
 
-  <Button type="submit" class="js:hidden">Appliquer les filtres</Button>
+  <Button type="submit" class="js:hidden">{t.catalog.applyFilters}</Button>
 </form>

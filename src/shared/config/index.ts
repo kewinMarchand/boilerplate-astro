@@ -8,6 +8,7 @@ export {
   isActivePath,
   LEGAL_NAVIGATION,
   MAIN_NAVIGATION,
+  navigationLabel,
 } from './navigation'
 export type { SiteConfig } from './site'
 export { SITE } from './site'

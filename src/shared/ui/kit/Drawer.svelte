@@ -6,6 +6,8 @@
   interface Props {
     open: boolean
     title: string
+    /** Nom du bouton de fermeture, dans la langue de la page. */
+    closeLabel: string
     side?: 'start' | 'end'
     triggerClass?: string
     triggerLabel?: string
@@ -18,6 +20,7 @@
   let {
     open = $bindable(false),
     title,
+    closeLabel,
     side = 'end',
     triggerClass,
     triggerLabel,
@@ -44,7 +47,15 @@
 </button>
 <!-- Monté seulement ouvert : un `<dialog>` fermé laisserait son contenu (champs, data-testid) dans la page. -->
 {#if open}
-  <Drawer {id} {title} {side} open data-testid={panelTestId} onclose={() => (open = false)}>
+  <Drawer
+    {id}
+    {title}
+    {closeLabel}
+    {side}
+    open
+    data-testid={panelTestId}
+    onclose={() => (open = false)}
+  >
     {@render children()}
   </Drawer>
 {/if}

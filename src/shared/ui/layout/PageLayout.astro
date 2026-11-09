@@ -1,4 +1,5 @@
 ---
+import { samePathInEveryLocale } from '@/shared/i18n'
 import { toAppPath } from '@/shared/routing'
 import { buildBreadcrumb, buildPageMeta } from '@/shared/seo'
 
@@ -6,6 +7,7 @@ import BaseLayout from './BaseLayout.astro'
 import Breadcrumb from './Breadcrumb.astro'
 
 import type { NavigationNode } from '@/shared/config'
+import type { LanguageAlternate } from '@/shared/i18n'
 import type { Seo } from '@/shared/seo'
 
 // Page interne : fil d'Ariane et métadonnées calculés d'une seule source, puis le <h1>.
@@ -20,6 +22,8 @@ interface Props {
   seo?: Omit<Seo.Input, 'title' | 'description' | 'path' | 'breadcrumb'>
   categoryMenu?: NavigationNode[] | undefined
   headingTestId?: string | undefined
+  /** Page détaillée : l'élément dans chaque langue où il existe ; sans, le même chemin partout (page fixe). */
+  alternates?: LanguageAlternate[] | undefined
 }
 
 const {
@@ -31,9 +35,13 @@ const {
   seo = {},
   categoryMenu,
   headingTestId,
+  alternates: pageAlternates,
 } = Astro.props
+const { locale, dictionary: t } = Astro.locals
+// Adresse servie sans préfixe de langue : le middleware a réécrit `/en/...` vers la route.
 const path = toAppPath(Astro.url.pathname)
-const breadcrumb = buildBreadcrumb({ label: title, path }, parents)
+const alternates = pageAlternates ?? samePathInEveryLocale(locale, path)
+const breadcrumb = buildBreadcrumb({ label: title, path }, parents, t.nav.home)
 const pageMeta = page && Astro.locals.pageMetas[page]
 const meta = buildPageMeta(
   {
@@ -45,10 +53,11 @@ const meta = buildPageMeta(
     breadcrumb,
   },
   Astro.locals.siteIdentity,
+  { locale, alternates },
 )
 ---
 
-<BaseLayout {meta} {categoryMenu}>
+<BaseLayout {meta} {categoryMenu} {alternates}>
   <slot name="head" slot="head" />
   <Breadcrumb items={breadcrumb} />
   <h1 id="page-title" tabindex="-1" class="heading-1" data-testid={headingTestId}>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { resolveHref } from '@/shared/routing'
   import { ResponsiveImage } from '@/shared/ui/kit'
 
   import { articleHref } from '../domain/article'
@@ -12,9 +13,17 @@
     featured?: boolean
     testId?: 'home-blog-card' | 'blog-card'
     headingLevel?: 2 | 3
+    /** Langue de la page (BCP 47), pour la date. */
+    tag: string
   }
 
-  const { article, featured = false, testId = 'home-blog-card', headingLevel = 3 }: Props = $props()
+  const {
+    article,
+    featured = false,
+    testId = 'home-blog-card',
+    headingLevel = 3,
+    tag,
+  }: Props = $props()
 </script>
 
 <article class="bui-card relative" data-testid={testId}>
@@ -40,10 +49,10 @@
       </p>
     {/if}
     <svelte:element this={`h${headingLevel}`} class="bui-card__title">
-      <a href={articleHref(article.slug)} class="blog-card-link">{article.title}</a>
+      <a href={resolveHref(articleHref(article.slug))} class="blog-card-link">{article.title}</a>
     </svelte:element>
     <time datetime={article.publishedAt} class="text-body-sm text-text-muted">
-      {formatPublishedAt(article.publishedAt)}
+      {formatPublishedAt(article.publishedAt, tag)}
     </time>
     <p>{article.excerpt}</p>
   </div>

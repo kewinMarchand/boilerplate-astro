@@ -1,31 +1,52 @@
 ---
-import { CATALOG_NAVIGATION, MAIN_NAVIGATION } from '@/shared/config'
+import { CATALOG_NAVIGATION, MAIN_NAVIGATION, navigationLabel } from '@/shared/config'
+import { resolveHref } from '@/shared/routing'
 import { A11yModeToggle } from '@/shared/ui/a11y-mode'
 import { ColorSchemeToggle } from '@/shared/ui/color-scheme'
 import { ResponsiveImage } from '@/shared/ui/kit'
 
 import CategoryMenu from './CategoryMenu.svelte'
+import LanguageSwitcher from './LanguageSwitcher.astro'
 import MobileMenu from './MobileMenu.svelte'
 import NavLink from './NavLink.astro'
 
 import type { NavigationNode } from '@/shared/config'
+import type { LanguageAlternate } from '@/shared/i18n'
 
 interface Props {
   categoryMenu: NavigationNode[]
+  alternates: LanguageAlternate[]
 }
 
-const { categoryMenu } = Astro.props
-const { cartLink: CartLink, siteIdentity } = Astro.locals
+const { categoryMenu, alternates } = Astro.props
+const { cartLink: CartLink, siteIdentity, dictionary: t } = Astro.locals
 const { name, logo } = siteIdentity
 const LOGO_HEIGHT = 40
 const { pathname } = Astro.url
 const [home, ...otherLinks] = MAIN_NAVIGATION
+// Îlots : seuls les libellés qu'ils affichent, aucun dictionnaire dans leur JavaScript.
+const menuLabels = {
+  catalog: navigationLabel(CATALOG_NAVIGATION, t),
+  wholeCatalog: t.layout.wholeCatalog,
+}
+const { menu, close, mobileMenu, back, wholeCategory, navigation } = t.layout
+const mobileMenuLabels = {
+  menu,
+  close,
+  mobileMenu,
+  back,
+  wholeCategory,
+  navigation,
+  catalog: menuLabels.catalog,
+  items: MAIN_NAVIGATION.map((item) => ({ href: item.href, label: navigationLabel(item, t) })),
+}
 ---
 
 <header class="bg-primary text-on-primary">
+  <LanguageSwitcher {alternates} />
   <div class="container-page header-bar">
     <a
-      href="/"
+      href={resolveHref('/')}
       class="logo-link min-w-0 grow"
       aria-current={pathname === '/' ? 'page' : undefined}
       data-testid="layout-logo"
@@ -45,7 +66,7 @@ const [home, ...otherLinks] = MAIN_NAVIGATION
         </>
       )}
     </a>
-    <nav aria-label="Navigation principale" class="js:max-lg:hidden">
+    <nav aria-label={t.layout.mainNavigation} class="js:max-lg:hidden">
       <ul class="flex flex-wrap gap-1">
         {home && (
           <li>
@@ -56,7 +77,11 @@ const [home, ...otherLinks] = MAIN_NAVIGATION
           <NavLink {...CATALOG_NAVIGATION} />
         </li>
         <li class="hidden js:block">
-          <CategoryMenu client:media="(min-width: 1024px)" nodes={categoryMenu} />
+          <CategoryMenu
+            client:media="(min-width: 1024px)"
+            nodes={categoryMenu}
+            labels={menuLabels}
+          />
         </li>
         {otherLinks.map((item) => (
           <li>
@@ -66,10 +91,15 @@ const [home, ...otherLinks] = MAIN_NAVIGATION
       </ul>
     </nav>
     <div class="hidden js:max-lg:block">
-      <MobileMenu client:media="(max-width: 1023.98px)" nodes={categoryMenu} {pathname} />
+      <MobileMenu
+        client:media="(max-width: 1023.98px)"
+        nodes={categoryMenu}
+        {pathname}
+        labels={mobileMenuLabels}
+      />
     </div>
     {CartLink && <CartLink />}
-    <ColorSchemeToggle client:load />
-    <A11yModeToggle client:load />
+    <ColorSchemeToggle client:load labels={t.colorScheme} />
+    <A11yModeToggle client:load label={t.a11yMode.label} />
   </div>
 </header>

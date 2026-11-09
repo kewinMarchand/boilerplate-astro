@@ -1,17 +1,21 @@
 ---
 import PageLayout from '@/shared/ui/layout/PageLayout.astro'
 
-import { tasksApiUrl } from '../infrastructure/taskRepository'
+import { tasksApiScenario, tasksApiUrl } from '../infrastructure/taskRepository'
 import TasksPanel from './TasksPanel.svelte'
+
+const { dictionary: t, locale } = Astro.locals
+const { title, description, intro, ...labels } = t.tasks
+const scenario = tasksApiScenario()
 ---
 
-<PageLayout
-  title="Tâches"
-  description="Démo de chargement côté client : liste de tâches lue dans l’API par le navigateur, avec chargement, erreur et liste vide."
->
-  <p class="lead">
-    Données chargées dans le navigateur par un îlot Svelte : chargement, erreur et liste vide sont
-    gérés.
-  </p>
-  <TasksPanel client:load apiUrl={tasksApiUrl()} />
+<PageLayout {title} {description}>
+  <p class="lead">{intro}</p>
+  <TasksPanel
+    client:load
+    apiUrl={tasksApiUrl()}
+    {labels}
+    {...(locale.locales.length > 1 && { locale: locale.locale })}
+    {...(scenario && { scenario })}
+  />
 </PageLayout>

@@ -10,7 +10,11 @@ interface Props {
 const { items } = Astro.props
 ---
 
-<nav class="bui-breadcrumb mb-4" aria-label="Fil d’Ariane" data-testid="layout-breadcrumb">
+<nav
+  class="bui-breadcrumb mb-4"
+  aria-label={Astro.locals.dictionary.layout.breadcrumb}
+  data-testid="layout-breadcrumb"
+>
   <ol class="bui-breadcrumb__list">
     {items.map((item, index) => (
       <li class="bui-breadcrumb__item">

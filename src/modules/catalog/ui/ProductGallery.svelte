@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
+  import { format } from '@/shared/i18n'
   import { largestWebp, ResponsiveImage } from '@/shared/ui/kit'
 
   import type { ImageView } from '@/shared/ui/kit'
@@ -9,9 +10,11 @@
     /** Image principale puis galerie, dans l'ordre. */
     images: ImageView[]
     sizes: string
+    /** Nom des vignettes dans la langue de la page (`{position}` sur `{total}`). */
+    imageLabel: string
   }
 
-  const { images, sizes }: Props = $props()
+  const { images, sizes, imageLabel }: Props = $props()
   let current = $state(0)
   // Sans JavaScript, les vignettes restent des liens vers l'image en grand ; hydratées, des boutons.
   let enhanced = $state(false)
@@ -30,7 +33,8 @@
     thumbs[current]?.focus()
   }
 
-  const thumbLabel = (index: number) => `Voir l'image ${index + 1} sur ${images.length}`
+  const thumbLabel = (index: number) =>
+    format(imageLabel, { position: index + 1, total: images.length })
   const THUMB_CLASS =
     'block size-16 overflow-hidden rounded-md border-2 border-transparent aria-[current=true]:border-primary'
 </script>

@@ -44,6 +44,8 @@ export interface SiteIdentity {
   theme: { light: BrandTokens; dark: BrandTokens } | null
   /** Vente en ligne (section 27) : `false`, ni prix ni panier, une demande de renseignement par produit. */
   salesEnabled: boolean
+  /** Langues du site, la première est la langue par défaut (section 29). */
+  locales: string[]
 }
 
 /** Repli quand l'API est en erreur ou injoignable : la page reste servie avec la configuration du site. */
@@ -56,4 +58,5 @@ export const SITE_IDENTITY_FALLBACK: SiteIdentity = {
   defaultColorScheme: 'auto',
   theme: null,
   salesEnabled: true,
+  locales: ['fr'],
 }

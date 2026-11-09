@@ -1,18 +1,19 @@
 ---
-import { LEGAL_NAVIGATION } from '@/shared/config'
+import { LEGAL_NAVIGATION, navigationLabel } from '@/shared/config'
 import { resolveHref } from '@/shared/routing'
 
-const { name } = Astro.locals.siteIdentity
+const { siteIdentity, dictionary: t } = Astro.locals
+const { name } = siteIdentity
 ---
 
 <footer class="mt-12 bg-surface-muted py-6" data-testid="app-footer">
   <div class="container-page flex flex-col gap-4">
-    <nav aria-label="Liens légaux">
+    <nav aria-label={t.layout.legalLinks}>
       <ul class="flex flex-wrap gap-x-6 gap-y-2">
         {LEGAL_NAVIGATION.map((item) => (
           <li>
             <a href={resolveHref(item.href)} class="footer-link">
-              {item.label}
+              {navigationLabel(item, t)}
             </a>
           </li>
         ))}
@@ -22,8 +23,8 @@ const { name } = Astro.locals.siteIdentity
       <img src="/logo-mark.svg" alt="" width="24" height="24" />
       {name}
       {import.meta.env.DEV && (
-        <a href="/charte-graphique" class="ml-auto underline">
-          Charte graphique
+        <a href={resolveHref('/charte-graphique')} class="ml-auto underline">
+          {t.layout.styleguide}
         </a>
       )}
     </p>

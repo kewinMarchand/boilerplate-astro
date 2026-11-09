@@ -5,15 +5,17 @@
   import { paginationWindow } from './pagination'
 
   import type { Catalog } from '../domain/catalog'
+  import type { CatalogLabels } from './labels'
   import type { AppPath } from '@/shared/routing'
 
   interface Props {
     path: AppPath
     query: Catalog.Query
     totalPages: number
+    t: CatalogLabels
   }
 
-  const { path, query, totalPages }: Props = $props()
+  const { path, query, totalPages, t }: Props = $props()
 
   const items = $derived(paginationWindow(query.page, totalPages))
   const hrefFor = (page: number) => catalogHref(path, { ...query, page })
@@ -22,7 +24,7 @@
 {#if totalPages > 1}
   <nav
     class="bui-pagination mt-8"
-    aria-label="Pagination"
+    aria-label={t.catalog.pagination}
     data-ui-chrome
     data-testid="catalog-pagination"
   >
@@ -30,7 +32,9 @@
       {#if query.page > 1}
         <li>
           <a class="bui-pagination__link" href={hrefFor(query.page - 1)} rel="prev"
-            ><Icon name="chevron-left" /><span class="bui-pagination__label">Précédent</span></a
+            ><Icon name="chevron-left" /><span class="bui-pagination__label"
+              >{t.catalog.previous}</span
+            ></a
           >
         </li>
       {/if}
@@ -43,7 +47,7 @@
               class="bui-pagination__link"
               href={hrefFor(item)}
               aria-current={item === query.page ? 'page' : undefined}
-              ><span class="bui-visually-hidden">Page&nbsp;</span>{item}</a
+              ><span class="bui-visually-hidden">{t.catalog.page}&nbsp;</span>{item}</a
             >
           </li>
         {/if}
@@ -51,7 +55,9 @@
       {#if query.page < totalPages}
         <li>
           <a class="bui-pagination__link" href={hrefFor(query.page + 1)} rel="next"
-            ><span class="bui-pagination__label">Suivant</span><Icon name="chevron-right" /></a
+            ><span class="bui-pagination__label">{t.catalog.next}</span><Icon
+              name="chevron-right"
+            /></a
           >
         </li>
       {/if}

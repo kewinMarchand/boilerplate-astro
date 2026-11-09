@@ -11,7 +11,8 @@ describe('Price', () => {
     expect(() => Price.fromCents(10.5)).toThrow(InvalidPriceError)
   })
 
-  it('formate un prix en euros, à la française', () => {
-    expect(formatPrice(Price.fromCents(3490))).toBe('34,90\u00a0€')
+  it('formate un prix en euros dans la langue de la page', () => {
+    expect(formatPrice(Price.fromCents(3490), 'fr-FR')).toBe('34,90\u00a0€')
+    expect(formatPrice(Price.fromCents(3490), 'en-US')).toBe('€34.90')
   })
 })
