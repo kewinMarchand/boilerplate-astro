@@ -2,7 +2,7 @@ import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
 import { MODES } from './routes'
-import { useMode } from './support'
+import { gotoHydrated, useMode } from './support'
 
 import type { Page } from '@playwright/test'
 
@@ -60,6 +60,53 @@ test.describe('Image de l’API en échec', () => {
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
         .analyze()
       expect(results.violations).toEqual([])
+    })
+  }
+
+  test('une diapositive en 404 garde la taille de son image chargée', async ({ page }) => {
+    await gotoHydrated(page, '/')
+    const slide = page.getByTestId('carousel-slide').first()
+    const image = slide.locator('picture img')
+    // Image paresseuse sous la ligne de flottaison : chargée une fois la diapositive affichée
+    await slide.scrollIntoViewIfNeeded()
+    await expect(image).toHaveJSProperty('complete', true)
+    const loadedBox = await image.boundingBox()
+    expect(await slide.locator('picture').boundingBox()).toEqual(loadedBox)
+
+    const media = /\/media\/([^/-]+)-/.exec((await image.getAttribute('src')) ?? '')?.[1]
+    expect(media).toBeTruthy()
+    await page.route(`**/media/${media}-*`, (route) => route.fulfill({ status: 404 }))
+    await gotoHydrated(page, '/')
+    await slide.scrollIntoViewIfNeeded()
+
+    await expect(slide.locator('picture')).toHaveAttribute('data-image-error', '')
+    const failedBox = await slide.locator('picture').boundingBox()
+    expect(failedBox?.height).toBe(loadedBox?.height)
+    expect(failedBox?.width).toBe(loadedBox?.width)
+    expect(await image.boundingBox()).toEqual(failedBox)
+  })
+
+  for (const route of [
+    '/',
+    '/catalogue',
+    '/produit/monstera-deliciosa',
+    '/blog',
+    '/blog/le-mode-accessibilite-renforcee',
+  ]) {
+    test(`${route} : chaque image de l’API est en bloc, sans espace de ligne sous elle`, async ({
+      page,
+    }) => {
+      await gotoHydrated(page, route)
+      await expect(page.locator('picture.bui-picture').first()).toBeVisible()
+
+      const inline = await page
+        .locator('picture.bui-picture > img')
+        .evaluateAll((images) =>
+          images
+            .filter((image) => getComputedStyle(image).display !== 'block')
+            .map((image) => image.getAttribute('src')),
+        )
+      expect(inline).toEqual([])
     })
   }
 })
