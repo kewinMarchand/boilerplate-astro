@@ -7,10 +7,8 @@ import { en } from '@/shared/i18n/dictionaries/en'
 import { MODES } from './routes'
 import { gotoHydrated, useMode } from './support'
 
-import type { BrowserContext, Page } from '@playwright/test'
+import type { Page } from '@playwright/test'
 import type { ChildProcess } from 'node:child_process'
-
-const API_URL = process.env['API_URL'] || 'http://localhost:8090'
 
 /**
  * Fixtures de l'API (contrat, section 29) : `X-Scenario: bilingual` active `en` après `fr`, avec ces
@@ -79,10 +77,10 @@ test.describe('Site bilingue fr, en (API_SCENARIO=bilingual)', () => {
   let appUrl = ''
   let app: ChildProcess | undefined
 
-  // Variable lue à l'exécution : le build de la suite principale, servi sur ses propres ports (aucun autre
-  // boilerplate ne les prend), que l'API n'autorise pas en CORS : voir allowAppOrigin.
+  // Variable lue à l'exécution : le build de la suite principale, servi sur les ports du bloc du dépôt (section 7
+  // de la spec commune), que les deux API autorisent en CORS : le navigateur les appelle directement.
   test.beforeAll(async () => {
-    const port = test.info().project.name === 'mobile' ? 3161 : 3160
+    const port = test.info().project.name === 'mobile' ? 4103 : 4102
     appUrl = `http://localhost:${port}`
     app = spawn('node', ['server.mjs'], {
       env: {
@@ -101,29 +99,6 @@ test.describe('Site bilingue fr, en (API_SCENARIO=bilingual)', () => {
 
   test.afterAll(() => {
     app?.kill()
-  })
-
-  // Le navigateur du test ajoute l'en-tête CORS aux réponses de l'API appelée depuis la page (tâches).
-  const allowAppOrigin = (context: BrowserContext) =>
-    context.route(`${API_URL}/**`, async (route) => {
-      const response = await route.fetch()
-      await route.fulfill({
-        response,
-        headers: {
-          ...response.headers(),
-          'access-control-allow-origin': appUrl,
-          'access-control-allow-headers': 'content-type, accept, x-scenario',
-        },
-      })
-    })
-
-  test.beforeEach(async ({ context }) => {
-    await allowAppOrigin(context)
-  })
-
-  // Une requête encore en vol à la fin du test (tâches chargées dans le navigateur) ne fait pas échouer le suivant
-  test.afterEach(async ({ context }) => {
-    await context.unrouteAll({ behavior: 'ignoreErrors' })
   })
 
   const goto = (page: Page, path: string) => gotoHydrated(page, `${appUrl}${path}`)

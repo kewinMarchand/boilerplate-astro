@@ -124,7 +124,7 @@ server.mjs      serveur de production : statiques précompressés, puis Astro
 ## Tests
 
 - **Unitaires** : `src/**/*.test.ts` (domaine du catalogue, URL, prix, conformité, chargement du carrousel et des pages légales, SEO, Matomo, CSP, composants des bascules).
-- **End-to-end** : `tests/e2e/`, un fichier par page ou par brique (le site bilingue, `bilingue.e2e.ts`, est le build de la suite servi avec `API_SCENARIO=bilingual` sur les ports 3160 et 3161), ciblage par `data-testid`, rendus conditionnels testés présents et absents, scénarios sans JavaScript (carrousel, catalogue, contact, thème), états d'erreur et de liste vide par l'en-tête `X-Scenario`, envois vers un GlitchTip et un Matomo factices.
+- **End-to-end** : `tests/e2e/`, un fichier par page ou par brique (le site bilingue, `bilingue.e2e.ts`, est le build de la suite servi avec `API_SCENARIO=bilingual` sur les ports 4102 et 4103), ciblage par `data-testid`, rendus conditionnels testés présents et absents, scénarios sans JavaScript (carrousel, catalogue, contact, thème), états d'erreur et de liste vide par l'en-tête `X-Scenario`, envois vers un GlitchTip et un Matomo factices.
 - **Accessibilité** : `tests/a11y/`, axe-core sur chaque route, en standard, sombre et renforcé, desktop et mobile, menus ouverts compris. Axe ne couvre qu'une partie du RGAA : la déclaration reste « non conforme » sans audit.
 
 ## Intégration continue
