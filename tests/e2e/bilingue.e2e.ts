@@ -158,6 +158,20 @@ test.describe('Site bilingue fr, en (API_SCENARIO=bilingual)', () => {
     await expect(breadcrumb).toContainText('Indoor plants')
   })
 
+  test('une ligne du panier prend le nom et le lien de la langue de la page', async ({ page }) => {
+    await goto(page, PRODUCT.en)
+    await page.getByTestId('add-to-cart').click()
+    await expect(page.getByTestId('add-to-cart-status')).toContainText('Swiss cheese plant')
+
+    await goto(page, '/panier')
+    await expect(page.getByTestId('cart-line-link')).toHaveText('Monstera deliciosa')
+    await expect(page.getByTestId('cart-line-link')).toHaveAttribute('href', PRODUCT.fr)
+
+    await goto(page, '/en/panier')
+    await expect(page.getByTestId('cart-line-link')).toHaveText('Swiss cheese plant')
+    await expect(page.getByTestId('cart-line-link')).toHaveAttribute('href', PRODUCT.en)
+  })
+
   test('le sélecteur mène à l’équivalent de la fiche dans l’autre langue', async ({ page }) => {
     await goto(page, PRODUCT.en)
     const french = page.getByTestId('layout-language-fr')

@@ -1,7 +1,27 @@
-import { addItem, countItems, MAX_QUANTITY, removeItem, setQuantity, totalPrice } from './cart'
+import {
+  addItem,
+  countItems,
+  lineIn,
+  MAX_QUANTITY,
+  removeItem,
+  setQuantity,
+  totalPrice,
+} from './cart'
 
-const MONSTERA = { slug: 'monstera-deliciosa', name: 'Monstera deliciosa', price: 3490 }
-const FERN = { slug: 'fougere-de-boston', name: 'Fougère de Boston', price: 1590 }
+const MONSTERA = {
+  id: '1',
+  slug: 'monstera-deliciosa',
+  name: 'Monstera deliciosa',
+  price: 3490,
+  translations: [],
+}
+const FERN = {
+  id: '2',
+  slug: 'fougere-de-boston',
+  name: 'Fougère de Boston',
+  price: 1590,
+  translations: [],
+}
 
 describe('panier', () => {
   it('ajoute une ligne puis cumule les ajouts du même produit', () => {
@@ -15,17 +35,41 @@ describe('panier', () => {
     expect(totalPrice(lines)).toBe(2 * 3490 + 1590)
   })
 
+  it('cumule un produit ajouté depuis une autre langue (même identifiant, autre slug)', () => {
+    const english = { ...MONSTERA, slug: 'swiss-cheese-plant', name: 'Swiss cheese plant' }
+
+    expect(addItem(addItem([], MONSTERA), english)).toEqual([{ ...MONSTERA, quantity: 2 }])
+  })
+
   it('plafonne la quantité à 99 et la garde au moins à 1', () => {
-    const lines = setQuantity(addItem([], MONSTERA), MONSTERA.slug, 250)
+    const lines = setQuantity(addItem([], MONSTERA), MONSTERA.id, 250)
 
     expect(lines[0]?.quantity).toBe(MAX_QUANTITY)
     expect(addItem(lines, MONSTERA)[0]?.quantity).toBe(MAX_QUANTITY)
-    expect(setQuantity(lines, MONSTERA.slug, 0)[0]?.quantity).toBe(1)
+    expect(setQuantity(lines, MONSTERA.id, 0)[0]?.quantity).toBe(1)
   })
 
   it('retire une ligne', () => {
-    expect(removeItem(addItem(addItem([], MONSTERA), FERN), MONSTERA.slug)).toEqual([
+    expect(removeItem(addItem(addItem([], MONSTERA), FERN), MONSTERA.id)).toEqual([
       { ...FERN, quantity: 1 },
     ])
+  })
+
+  it('nomme et lie la ligne dans la langue de la page, sinon dans celle de l’ajout', () => {
+    const line = {
+      ...MONSTERA,
+      quantity: 1,
+      translations: [
+        { locale: 'fr', slug: 'monstera-deliciosa', name: 'Monstera deliciosa' },
+        { locale: 'en', slug: 'swiss-cheese-plant', name: 'Swiss cheese plant' },
+      ],
+    }
+
+    expect(lineIn(line, 'en')).toMatchObject({
+      slug: 'swiss-cheese-plant',
+      name: 'Swiss cheese plant',
+    })
+    expect(lineIn(line, 'de')).toMatchObject({ slug: 'monstera-deliciosa' })
+    expect(lineIn({ ...MONSTERA, quantity: 1 }, 'en')).toMatchObject({ name: 'Monstera deliciosa' })
   })
 })

@@ -13,5 +13,9 @@ const labels = { empty, browseCatalog, unitPrice, quantityOf, remove, removeItem
   <noscript>
     <p>{noScript}</p>
   </noscript>
-  <CartView client:load labels={{ ...labels, tag: t.language.tag }} />
+  <CartView
+    client:load
+    labels={{ ...labels, tag: t.language.tag }}
+    locale={Astro.locals.locale.locale}
+  />
 </PageLayout>

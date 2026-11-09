@@ -1,22 +1,30 @@
 ---
 import { AddToCartButton } from '@/modules/cart'
 import { ProductView } from '@/modules/catalog'
-import { loadProduct } from '@/modules/catalog/index.server'
+import { loadProduct, loadProductTranslations } from '@/modules/catalog/index.server'
 
 const product = await loadProduct(Astro.params.slug ?? '')
 if (product.status === 'not-found') return Astro.rewrite('/404')
-const { add, added, view } = Astro.locals.dictionary.cart
+const { siteIdentity, locale, dictionary } = Astro.locals
+const { add, added, view } = dictionary.cart
+// Nom et slug dans chaque langue, pour un panier affiché dans une autre langue que celle de l'ajout
+const translations =
+  product.status === 'success' && siteIdentity.salesEnabled
+    ? await loadProductTranslations(product.product, locale.locale)
+    : []
 ---
 
-<ProductView {product} salesEnabled={Astro.locals.siteIdentity.salesEnabled}>
+<ProductView {product} salesEnabled={siteIdentity.salesEnabled}>
   {product.status === 'success' && (
     <AddToCartButton
       slot="purchase"
       client:load
       item={{
+        id: product.product.id,
         slug: product.product.slug,
         name: product.product.name,
         price: product.product.price,
+        translations,
       }}
       isAvailable={product.product.inStock}
       labels={{ add, added, view }}

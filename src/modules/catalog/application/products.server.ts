@@ -20,6 +20,28 @@ export const loadProduct = async (slug: string): Promise<Catalog.ProductLoad> =>
   }
 }
 
+/**
+ * Slug et nom de la fiche dans chaque langue du site (panier affiché dans une autre langue que celle de
+ * l'ajout) ; aucun sur un site monolingue (`alternates` vide), sans appel. Une langue que l'API ne sert pas
+ * est omise.
+ */
+export const loadProductTranslations = async (
+  product: Catalog.ProductDetail,
+  locale: string,
+): Promise<Catalog.ProductTranslation[]> => {
+  const translations = await Promise.all(
+    product.alternates.map(async (alternate) => {
+      if (alternate.locale === locale) return { locale, slug: product.slug, name: product.name }
+      const slug = alternate.path.slice(productHref('').length)
+      const translated = await findProduct(slug, alternate.locale).catch(() => null)
+      return (
+        translated && { locale: alternate.locale, slug: translated.slug, name: translated.name }
+      )
+    }),
+  )
+  return translations.filter((translation) => translation !== null)
+}
+
 /** Produit d'une demande de renseignement ; aucun sans slug, slug inconnu ou API en erreur. */
 export const loadProductLink = async (slug: string | null): Promise<Catalog.ProductLink | null> => {
   if (!slug) return null

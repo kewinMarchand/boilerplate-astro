@@ -5,7 +5,7 @@
   import { resolveHref } from '@/shared/routing'
   import { Button } from '@/shared/ui/kit'
 
-  import { MAX_QUANTITY, totalPrice } from '../domain/cart'
+  import { lineIn, MAX_QUANTITY, totalPrice } from '../domain/cart'
   import { formatPrice } from '../domain/price'
   import { useCart } from './hooks/useCart.svelte'
 
@@ -24,9 +24,11 @@
       soon: string
       tag: string
     }
+    /** Langue de la page : nom et lien de chaque ligne dans cette langue. */
+    locale: string
   }
 
-  const { labels }: Props = $props()
+  const { labels, locale }: Props = $props()
 
   const CATALOG_PATH: AppPath = '/catalogue'
   const productHref = (slug: string): AppPath => `/produit/${slug}`
@@ -41,8 +43,8 @@
    * Après un retrait, le focus va au bouton « Retirer » de la ligne qui prend la place, sinon de la
    * précédente, sinon au message de panier vide : sans cela, il retombe en haut de la page.
    */
-  const removeLine = async (slug: string, index: number) => {
-    cart.remove(slug)
+  const removeLine = async (id: string, index: number) => {
+    cart.remove(id)
     await tick()
     const buttons = list?.querySelectorAll<HTMLButtonElement>(':scope > li button')
     const target = buttons?.[Math.min(index, buttons.length - 1)] ?? empty
@@ -59,28 +61,31 @@
     </p>
   {:else}
     <ul bind:this={list} class="grid gap-4">
-      {#each cart.lines as line, index (line.slug)}
+      {#each cart.lines as line, index (line.id)}
+        {@const { slug, name } = lineIn(line, locale)}
         <li
           class="grid items-center gap-2 border-b border-border pb-4 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_10rem_minmax(0,1fr)_auto]"
           data-testid="cart-line"
         >
-          <a href={resolveHref(productHref(line.slug))} class="bui-link font-semibold"
-            >{line.name}</a
+          <a
+            href={resolveHref(productHref(slug))}
+            class="bui-link font-semibold"
+            data-testid="cart-line-link">{name}</a
           >
           <span>{format(labels.unitPrice, { price: formatPrice(line.price, labels.tag) })}</span>
           <div class="bui-field">
-            <label class="bui-field__label" for="{uid}-{line.slug}"
-              >{format(labels.quantityOf, { name: line.name })}</label
+            <label class="bui-field__label" for="{uid}-{line.id}"
+              >{format(labels.quantityOf, { name })}</label
             >
             <input
-              id="{uid}-{line.slug}"
+              id="{uid}-{line.id}"
               type="number"
               min="1"
               max={MAX_QUANTITY}
               value={line.quantity}
               oninput={(event) => {
                 const quantity = event.currentTarget.valueAsNumber
-                if (!Number.isNaN(quantity)) cart.changeQuantity(line.slug, quantity)
+                if (!Number.isNaN(quantity)) cart.changeQuantity(line.id, quantity)
               }}
               class="bui-field__input"
               data-testid="cart-quantity"
@@ -89,8 +94,8 @@
           <span class="font-semibold">{formatPrice(line.price * line.quantity, labels.tag)}</span>
           <Button
             variant="outline"
-            aria-label={format(labels.removeItem, { name: line.name })}
-            onclick={() => removeLine(line.slug, index)}
+            aria-label={format(labels.removeItem, { name })}
+            onclick={() => removeLine(line.id, index)}
             data-testid="cart-remove"
           >
             {labels.remove}

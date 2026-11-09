@@ -1,6 +1,11 @@
 import { Price } from '../domain/price'
 import { findFeaturedProducts, findProduct } from '../infrastructure/catalogRepository'
-import { loadFeaturedProducts, loadProduct, loadProductLink } from './products.server'
+import {
+  loadFeaturedProducts,
+  loadProduct,
+  loadProductLink,
+  loadProductTranslations,
+} from './products.server'
 
 import type { Catalog } from '../domain/catalog'
 
@@ -23,27 +28,28 @@ describe('loadProduct', () => {
   })
 })
 
+const PRODUCT: Catalog.ProductDetail = {
+  id: '1',
+  slug: 'monstera-deliciosa',
+  name: 'Monstera deliciosa',
+  categorySlug: 'monstera',
+  price: Price.fromCents(3490),
+  exposure: 'mi-ombre',
+  size: 'M',
+  inStock: true,
+  image: null,
+  categoryPath: [],
+  description: [],
+  attributes: [],
+  gallery: [],
+  metaTitle: '',
+  metaDescription: '',
+  alternates: [],
+}
+
 describe('loadProductLink', () => {
   it('nomme le produit trouvé et le lie à sa fiche', async () => {
-    const product: Catalog.ProductDetail = {
-      id: '1',
-      slug: 'monstera-deliciosa',
-      name: 'Monstera deliciosa',
-      categorySlug: 'monstera',
-      price: Price.fromCents(3490),
-      exposure: 'mi-ombre',
-      size: 'M',
-      inStock: true,
-      image: null,
-      categoryPath: [],
-      description: [],
-      attributes: [],
-      gallery: [],
-      metaTitle: '',
-      metaDescription: '',
-      alternates: [],
-    }
-    vi.mocked(findProduct).mockResolvedValueOnce(product)
+    vi.mocked(findProduct).mockResolvedValueOnce(PRODUCT)
 
     expect(await loadProductLink('monstera-deliciosa')).toEqual({
       slug: 'monstera-deliciosa',
@@ -62,6 +68,36 @@ describe('loadProductLink', () => {
 
     vi.mocked(findProduct).mockRejectedValueOnce(new Error('panne'))
     expect(await loadProductLink('monstera')).toBeNull()
+  })
+})
+
+describe('loadProductTranslations', () => {
+  it('ne lit rien sur un site monolingue', async () => {
+    vi.mocked(findProduct).mockClear()
+
+    expect(await loadProductTranslations(PRODUCT, 'fr')).toEqual([])
+    expect(findProduct).not.toHaveBeenCalled()
+  })
+
+  it('lit la fiche dans chaque autre langue, et omet une langue que l’API ne sert pas', async () => {
+    const bilingual: Catalog.ProductDetail = {
+      ...PRODUCT,
+      alternates: [
+        { locale: 'fr', path: '/produit/monstera-deliciosa' },
+        { locale: 'en', path: '/produit/swiss-cheese-plant' },
+        { locale: 'de', path: '/produit/fensterblatt' },
+      ],
+    }
+    vi.mocked(findProduct).mockClear()
+    vi.mocked(findProduct)
+      .mockResolvedValueOnce({ ...PRODUCT, slug: 'swiss-cheese-plant', name: 'Swiss cheese plant' })
+      .mockRejectedValueOnce(new Error('panne'))
+
+    expect(await loadProductTranslations(bilingual, 'fr')).toEqual([
+      { locale: 'fr', slug: 'monstera-deliciosa', name: 'Monstera deliciosa' },
+      { locale: 'en', slug: 'swiss-cheese-plant', name: 'Swiss cheese plant' },
+    ])
+    expect(findProduct).toHaveBeenCalledWith('swiss-cheese-plant', 'en')
   })
 })
 

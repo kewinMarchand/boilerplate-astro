@@ -11,9 +11,26 @@ const isText = (value: unknown) => typeof value === 'string' && value.length > 0
 const isIntegerBetween = (value: unknown, min: number, max: number) =>
   Number.isSafeInteger(value) && typeof value === 'number' && value >= min && value <= max
 
-const isLine = (value: unknown): value is Cart.Line =>
+const isTranslation = (value: unknown): value is Cart.Translation =>
   typeof value === 'object' &&
   value !== null &&
+  'locale' in value &&
+  isText(value.locale) &&
+  'slug' in value &&
+  isText(value.slug) &&
+  'name' in value &&
+  isText(value.name)
+
+/** Ligne enregistrée ; `id` et `translations` absents d'un panier enregistré avant les langues. */
+type StoredLine = Omit<Cart.Line, 'id' | 'translations'> &
+  Partial<Pick<Cart.Line, 'id' | 'translations'>>
+
+const isLine = (value: unknown): value is StoredLine =>
+  typeof value === 'object' &&
+  value !== null &&
+  (!('id' in value) || isText(value.id)) &&
+  (!('translations' in value) ||
+    (Array.isArray(value.translations) && value.translations.every(isTranslation))) &&
   'slug' in value &&
   isText(value.slug) &&
   'name' in value &&
@@ -29,7 +46,19 @@ export const parseCart = (raw: string | null): Cart.Line[] => {
   try {
     const value: unknown = JSON.parse(raw)
     return Array.isArray(value) && value.every(isLine)
-      ? value.map(({ slug, name, price, quantity }) => ({ slug, name, price, quantity }))
+      ? value.map(({ id, slug, name, price, quantity, translations = [] }) => ({
+          // Panier enregistré avant les langues : le slug identifie la ligne.
+          id: id ?? slug,
+          slug,
+          name,
+          price,
+          quantity,
+          translations: translations.map((translation) => ({
+            locale: translation.locale,
+            slug: translation.slug,
+            name: translation.name,
+          })),
+        }))
       : []
   } catch {
     return []

@@ -54,8 +54,12 @@ export const findCatalogListing = async (
 }
 
 /** `null` si l'API ne connaît pas le produit (404). */
-export const findProduct = async (slug: string): Promise<Catalog.ProductDetail | null> => {
-  const { data, response } = await serverApiClient().GET('/api/products/{slug}', {
+/** `locale` : une autre langue que celle de la page (panier dans chaque langue). */
+export const findProduct = async (
+  slug: string,
+  locale?: string,
+): Promise<Catalog.ProductDetail | null> => {
+  const { data, response } = await serverApiClient({ locale }).GET('/api/products/{slug}', {
     params: { path: { slug } },
   })
   if (response.status === 404) return null

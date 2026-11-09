@@ -6,4 +6,5 @@ export {
   loadFeaturedProducts,
   loadProduct,
   loadProductLink,
+  loadProductTranslations,
 } from './application/products.server'
