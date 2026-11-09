@@ -71,6 +71,10 @@ export const en: Dictionary = {
     sitemap: 'Sitemap',
     catalog: 'Catalogue',
   },
+  maintenance: {
+    title: 'Site under maintenance',
+    text: '{name} is undergoing maintenance. The service will be back shortly, thank you for your patience.',
+  },
   home: {
     overline: 'Astro boilerplate',
     tasksLink: 'See the tasks demo',

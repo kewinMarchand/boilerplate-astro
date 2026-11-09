@@ -1,14 +1,23 @@
 import { SITE } from '@/shared/config'
+import { format, localeContext } from '@/shared/i18n'
+import { dictionaryFor } from '@/shared/i18n/index.server'
 
 export const MAINTENANCE_RETRY_AFTER_SECONDS = 3600
 
-export const MAINTENANCE_HTML = `<!doctype html>
-<html lang="fr">
+/**
+ * Page 503 autonome dans la langue de l'adresse (`path`) : son préfixe s'il désigne une autre langue activée,
+ * sinon la langue par défaut du site (`locales`).
+ */
+export const maintenancePage = (path: string, locales: string[]) => {
+  const context = localeContext(path, locales)
+  const t = dictionaryFor(context).maintenance
+  return `<!doctype html>
+<html lang="${context.locale}">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
-    <title>Site en maintenance · ${SITE.name}</title>
+    <title>${t.title} · ${SITE.name}</title>
     <style>
       body { margin: 0; min-height: 100vh; display: grid; place-items: center; font: 16px/1.6 system-ui, sans-serif; color: #111827; background: #ffffff; }
       main { max-width: 40rem; padding: 24px; }
@@ -17,9 +26,10 @@ export const MAINTENANCE_HTML = `<!doctype html>
   </head>
   <body>
     <main>
-      <h1>Site en maintenance</h1>
-      <p>${SITE.name} fait l’objet d’une opération de maintenance. Le service revient dans quelques instants, merci de votre patience.</p>
+      <h1>${t.title}</h1>
+      <p>${format(t.text, { name: SITE.name })}</p>
     </main>
   </body>
 </html>
 `
+}

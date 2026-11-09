@@ -75,6 +75,10 @@ export const fr = {
     sitemap: 'Plan du site',
     catalog: 'Catalogue',
   },
+  maintenance: {
+    title: 'Site en maintenance',
+    text: '{name} fait l’objet d’une opération de maintenance. Le service revient dans quelques instants, merci de votre patience.',
+  },
   home: {
     overline: 'Boilerplate Astro',
     tasksLink: 'Voir la démo des tâches',

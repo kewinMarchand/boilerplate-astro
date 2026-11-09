@@ -2,7 +2,7 @@ import { defineMiddleware } from 'astro:middleware'
 
 import { withRequestLanguage, withRequestScenario } from '@/shared/api/client.server'
 import { compressHtml } from '@/shared/http'
-import { localeContext, localePrefix, unlocalizePath } from '@/shared/i18n'
+import { FALLBACK_LOCALE, localeContext, localePrefix, unlocalizePath } from '@/shared/i18n'
 import { dictionaryFor, withRequestLocale } from '@/shared/i18n/index.server'
 import { SCENARIO_HEADER } from '@/shared/observability'
 import { reportServerError } from '@/shared/observability/index.server'
@@ -18,19 +18,31 @@ import { CartLink } from '@/modules/cart'
 import { getCategoryMenu } from '@/modules/catalog/index.server'
 import { loadPageMetas, loadSiteIdentity } from '@/modules/identity/index.server'
 
-import { MAINTENANCE_HTML, MAINTENANCE_RETRY_AFTER_SECONDS } from '@/views/errors'
+import { MAINTENANCE_RETRY_AFTER_SECONDS, maintenancePage } from '@/views/errors'
 
 announceStartup()
 
-// MAINTENANCE=1 : toutes les pages répondent 503 avec la page autonome de maintenance. Sinon, la requête
+const MAINTENANCE_LOCALES_TIMEOUT_MS = 2000
+
+/** Langues du site pour la page de maintenance, `fr` si l'API, parfois arrêtée elle aussi, ne répond pas à temps. */
+const maintenanceLocales = () =>
+  Promise.race([
+    loadSiteIdentity().then(({ locales }) => locales),
+    new Promise<string[]>((resolve) =>
+      setTimeout(resolve, MAINTENANCE_LOCALES_TIMEOUT_MS, [FALLBACK_LOCALE]),
+    ),
+  ])
+
+// MAINTENANCE=1 : toutes les pages répondent 503 avec la page autonome de maintenance, dans la langue de
+// l'adresse. Sinon, la requête
 // porte son X-Scenario jusqu'à l'API ; l'identité du site est lue dans la langue demandée par l'adresse
 // (`/en/...`), qui donne les langues du site et la langue de la page ; métadonnées des pages fixes et menu
 // des catégories sont chargés dans cette langue pour le layout (avec le lien du panier si la vente en ligne
 // est active), et la réponse reçoit la CSP Report-Only, bloc des couleurs de marque compris. Seules les
 // erreurs inattendues remontent à GlitchTip.
-export const onRequest = defineMiddleware((context, next) => {
+export const onRequest = defineMiddleware(async (context, next) => {
   if (process.env['MAINTENANCE'] === '1') {
-    return new Response(MAINTENANCE_HTML, {
+    return new Response(maintenancePage(context.url.pathname, await maintenanceLocales()), {
       status: 503,
       headers: {
         'content-type': 'text/html; charset=utf-8',
