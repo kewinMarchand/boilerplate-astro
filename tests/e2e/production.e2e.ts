@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 
 import type { ChildProcess } from 'node:child_process'
 
-const PORT = 3171
+const PORT = 4101
 const BASE_URL = `http://127.0.0.1:${PORT}`
 
 test.describe('Build de production sans routes de développement', () => {

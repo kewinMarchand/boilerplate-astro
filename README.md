@@ -85,12 +85,12 @@ git cherry-pick <sha>
 | `make qa`                             | ESLint (dont les règles d'architecture), auto-test des règles, sprite d'icônes, Prettier, `astro check`, tests unitaires |
 | `make test-unit`                      | Vitest ; `VITEST_CHANGED=1` : seulement les tests touchés par les modifications non commitées (`--changed`)              |
 | `make e2e-vite`                       | Playwright desktop sur les e2e modifiés depuis `origin/main`, `FICHIERS="…"` ou `GREP="…"` ; build réutilisé             |
-| `make test-e2e`                       | Playwright, desktop et mobile, sur le build de production (port 3170)                                                    |
+| `make test-e2e`                       | Playwright, desktop et mobile, sur le build de production (port 4100)                                                    |
 | `make test-a11y`                      | axe-core, WCAG 2.1 AA, chaque page en standard, sombre et renforcé                                                       |
-| `make metrics`                        | Lighthouse CI (port 3270) en clair puis en sombre : échoue sous 90 en performance, sous 100 en accessibilité et SEO      |
+| `make metrics`                        | Lighthouse CI (port 4119) en clair puis en sombre : échoue sous 90 en performance, sous 100 en accessibilité et SEO      |
 | `make icons`                          | Génère `public/icons.svg` et le type des noms depuis `icons.json`                                                        |
 | `make api-types`                      | Génère les types de l'API depuis son schéma OpenAPI                                                                      |
-| `make docker-build`, `make docker-up` | Image de production, servie sur le port 3000                                                                             |
+| `make docker-build`, `make docker-up` | Image de production, sur le port `PORT` (4118 par défaut)                                                                |
 
 ## Langues du site
 
@@ -124,6 +124,8 @@ server.mjs      serveur de production : statiques précompressés, puis Astro
 `make docker-build` construit l'image (Node 26 Alpine, dépendances d'exécution seulement). `server.mjs` sert `dist/client` dans la variante précompressée que le navigateur accepte, avec un cache d'un an sur les fichiers versionnés de `/_astro/`, puis confie le reste à Astro, dont les pages sont compressées à la volée. Au démarrage, `[boilerplate-astro] serveur démarré (production)` permet de retrouver le bon fichier de log. La CSP est en mode Report-Only : chaque écart est signalé à `POST /api/csp-report` et écrit sur la sortie standard.
 
 ## Tests
+
+Ports : registre unique de la section 7 de la spec commune (`~/Applications/boilerplates-commun/SPEC-COMMUNE.md`). Bloc 4100-4119 : 4100 e2e principal (build avec routes de développement, `DEV_ROUTES=1`), 4101 build de production stricte (`production.e2e.ts`), 4102 et 4103 site bilingue (desktop, mobile), 4104 et 4105 bilingue en maintenance, 4106 observabilité, 4107 faux GlitchTip, 4108 et 4109 site à l'identité saisie (`identite.e2e.ts`), 4110 et 4111 site à la vente coupée (`vente.e2e.ts`), 4112 et 4113 site aux métadonnées saisies (`metadonnees.e2e.ts`), leurs API factices sur un port libre choisi par le système (`listenOnFreePort`, `tests/e2e/support.ts` : six ports de plus que le bloc n'en laisse), 4118 image de production locale (`make docker-up`), 4119 Lighthouse. Le service `node` tourne en réseau `host` : ces ports sont pris sur la machine. Les tests attendent 4100 en dur (`tests/e2e/seo.e2e.ts`, `tests/e2e/breadcrumb.e2e.ts`, `tools/e2e-vite.sh`) : les changer avec `playwright.config.ts`.
 
 En développement, on ne lance que ce que le changement touche : `make qa` (porte de chaque commit), puis `make e2e-vite`. La suite complète (e2e desktop et mobile, accessibilité, Lighthouse) tourne en CI à chaque push ; `make test-e2e`, `make test-a11y`, `make metrics` et `make qa-full` restent disponibles à la main.
 

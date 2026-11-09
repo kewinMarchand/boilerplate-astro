@@ -7,8 +7,8 @@ import type { Page } from '@playwright/test'
 import type { ChildProcess } from 'node:child_process'
 import type { Server } from 'node:http'
 
-const APP_PORT = 3178
-const GLITCHTIP_PORT = 3179
+const APP_PORT = 4106
+const GLITCHTIP_PORT = 4107
 const APP_URL = `http://127.0.0.1:${APP_PORT}`
 const DSN = `http://clefactice@localhost:${GLITCHTIP_PORT}/1`
 

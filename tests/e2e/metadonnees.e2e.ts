@@ -3,6 +3,8 @@ import { readFileSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { expect, test } from '@playwright/test'
 
+import { listenOnFreePort } from './support'
+
 import type { APIRequestContext } from '@playwright/test'
 import type { ChildProcess } from 'node:child_process'
 import type { Server } from 'node:http'
@@ -86,8 +88,8 @@ test.describe('Métadonnées sans saisie dans l’admin', () => {
 test.describe('Métadonnées, icône et image de partage saisies dans l’admin', () => {
   test.describe.configure({ mode: 'serial' })
 
-  const ports = (project: string) =>
-    project === 'mobile' ? { site: 3175, api: 3185 } : { site: 3174, api: 3184 }
+  // Site sur le bloc du dépôt (section 7 de la spec commune), API factice sur un port libre
+  const sitePort = (project: string) => (project === 'mobile' ? 4113 : 4112)
   let siteUrl = ''
   let apiUrl = ''
   let fakeApi: Server
@@ -98,9 +100,8 @@ test.describe('Métadonnées, icône et image de partage saisies dans l’admin'
     `Description saisie dans l’admin pour la page ${page}, assez longue pour un moteur de recherche.`
 
   test.beforeAll(async () => {
-    const { site: sitePort, api: apiPort } = ports(test.info().project.name)
-    apiUrl = `http://127.0.0.1:${apiPort}`
-    siteUrl = `http://127.0.0.1:${sitePort}`
+    const port = sitePort(test.info().project.name)
+    siteUrl = `http://127.0.0.1:${port}`
     const png = readFileSync('public/icon-192.png')
     const jpeg = readFileSync('public/og-image.jpg')
     const upstream = async (path: string) =>
@@ -173,10 +174,11 @@ test.describe('Métadonnées, icône et image de partage saisies dans l’admin'
           'content-type': relayed.headers.get('content-type') ?? 'application/json',
         })
         .end(Buffer.from(await relayed.arrayBuffer()))
-    }).listen(apiPort, '127.0.0.1')
+    })
+    apiUrl = `http://127.0.0.1:${await listenOnFreePort(fakeApi)}`
 
     site = spawn('node', ['server.mjs'], {
-      env: { ...process.env, PORT: String(sitePort), HOST: '127.0.0.1', API_URL: apiUrl },
+      env: { ...process.env, PORT: String(port), HOST: '127.0.0.1', API_URL: apiUrl },
       stdio: 'ignore',
     })
     await expect

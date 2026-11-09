@@ -5,7 +5,7 @@
 #   sans l'un ni l'autre : fichiers modifiés par rapport à origin/main (--only-changed).
 set -eu
 
-PORT=3170
+PORT=4100
 # Astro vide `dist/` à chaque build : un `make build` lancé ensuite (autre URL publique) efface l'empreinte
 # et force la reconstruction.
 EMPREINTE=dist/empreinte-e2e

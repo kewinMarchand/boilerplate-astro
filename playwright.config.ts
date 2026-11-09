@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test'
 
-const PORT = 3170
+const PORT = 4100
 const BASE_URL = `http://localhost:${PORT}`
 // `make e2e-vite` construit lui-même `dist/`, seulement si les sources ont changé (tools/e2e-vite.sh)
 const BUILD =

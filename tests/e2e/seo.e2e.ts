@@ -46,7 +46,7 @@ test.describe('SEO', () => {
     ).text()
     expect(html).toContain('<meta name="robots" content="noindex, follow"')
     expect(html).toMatch(
-      /<link rel="canonical" href="http:\/\/localhost:3170\/catalogue\/plantes-interieur"/,
+      /<link rel="canonical" href="http:\/\/localhost:4100\/catalogue\/plantes-interieur"/,
     )
     expect(html).toContain('"@type":"ItemList"')
   })
@@ -57,6 +57,6 @@ test.describe('SEO', () => {
     expect(sitemap).not.toContain('charte-graphique')
 
     const robots = await (await request.get('/robots.txt')).text()
-    expect(robots).toContain('Sitemap: http://localhost:3170/sitemap.xml')
+    expect(robots).toContain('Sitemap: http://localhost:4100/sitemap.xml')
   })
 })

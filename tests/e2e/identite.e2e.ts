@@ -5,7 +5,7 @@ import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
 import { MODES } from './routes'
-import { useMode } from './support'
+import { listenOnFreePort, useMode } from './support'
 
 import type { Page } from '@playwright/test'
 import type { ChildProcess } from 'node:child_process'
@@ -104,16 +104,16 @@ test.describe('Identité du site lue dans l’API', () => {
 test.describe('Identité administrée avec logo et couleurs', () => {
   test.describe.configure({ mode: 'serial' })
 
-  const ports = (project: string) =>
-    project === 'mobile' ? { site: 3173, api: 3183 } : { site: 3172, api: 3182 }
+  // Site sur le bloc du dépôt (section 7 de la spec commune), API factice sur un port libre
+  const sitePort = (project: string) => (project === 'mobile' ? 4109 : 4108)
   let siteUrl = ''
   let fakeApi: Server
   let site: ChildProcess
 
   test.beforeAll(async () => {
-    const { site: sitePort, api: apiPort } = ports(test.info().project.name)
-    const apiUrl = `http://127.0.0.1:${apiPort}`
-    siteUrl = `http://127.0.0.1:${sitePort}`
+    const port = sitePort(test.info().project.name)
+    let apiUrl = ''
+    siteUrl = `http://127.0.0.1:${port}`
     const logo = readFileSync('public/icon-192.png')
 
     fakeApi = createServer(async (request, response) => {
@@ -140,10 +140,11 @@ test.describe('Identité administrée avec logo et couleurs', () => {
           'content-type': upstream.headers.get('content-type') ?? 'application/json',
         })
         .end(Buffer.from(await upstream.arrayBuffer()))
-    }).listen(apiPort, '127.0.0.1')
+    })
+    apiUrl = `http://127.0.0.1:${await listenOnFreePort(fakeApi)}`
 
     site = spawn('node', ['server.mjs'], {
-      env: { ...process.env, PORT: String(sitePort), HOST: '127.0.0.1', API_URL: apiUrl },
+      env: { ...process.env, PORT: String(port), HOST: '127.0.0.1', API_URL: apiUrl },
       stdio: 'ignore',
     })
     await expect

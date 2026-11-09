@@ -1,22 +1,22 @@
 {
   "ci": {
     "collect": {
-      "startServerCommand": "PORT=3270 HOST=127.0.0.1 yarn start",
+      "startServerCommand": "PORT=4119 HOST=127.0.0.1 yarn start",
       "startServerReadyPattern": "listening",
       "url": [
-        "http://localhost:3270/",
-        "http://localhost:3270/taches",
-        "http://localhost:3270/contact",
-        "http://localhost:3270/catalogue",
-        "http://localhost:3270/catalogue/plantes-interieur",
-        "http://localhost:3270/catalogue/plantes-interieur/feuillages",
-        "http://localhost:3270/mentions-legales",
-        "http://localhost:3270/donnees-personnelles",
-        "http://localhost:3270/accessibilite",
-        "http://localhost:3270/plan-du-site",
-        "http://localhost:3270/blog",
-        "http://localhost:3270/blog/le-mode-accessibilite-renforcee",
-        "http://localhost:3270/produit/monstera-deliciosa"
+        "http://localhost:4119/",
+        "http://localhost:4119/taches",
+        "http://localhost:4119/contact",
+        "http://localhost:4119/catalogue",
+        "http://localhost:4119/catalogue/plantes-interieur",
+        "http://localhost:4119/catalogue/plantes-interieur/feuillages",
+        "http://localhost:4119/mentions-legales",
+        "http://localhost:4119/donnees-personnelles",
+        "http://localhost:4119/accessibilite",
+        "http://localhost:4119/plan-du-site",
+        "http://localhost:4119/blog",
+        "http://localhost:4119/blog/le-mode-accessibilite-renforcee",
+        "http://localhost:4119/produit/monstera-deliciosa"
       ],
       "numberOfRuns": 3,
       "settings": {

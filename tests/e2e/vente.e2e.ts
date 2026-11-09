@@ -4,7 +4,7 @@ import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
 import { MODES } from './routes'
-import { gotoHydrated, useMode } from './support'
+import { gotoHydrated, listenOnFreePort, useMode } from './support'
 
 import type { Page } from '@playwright/test'
 import type { ChildProcess } from 'node:child_process'
@@ -86,16 +86,16 @@ test.describe('Vente en ligne active', () => {
 test.describe('Vente en ligne coupée', () => {
   test.describe.configure({ mode: 'serial' })
 
-  const ports = (project: string) =>
-    project === 'mobile' ? { site: 3177, api: 3187 } : { site: 3176, api: 3186 }
+  // Site sur le bloc du dépôt (section 7 de la spec commune), API factice sur un port libre
+  const sitePort = (project: string) => (project === 'mobile' ? 4111 : 4110)
   let siteUrl = ''
   let fakeApi: Server
   let site: ChildProcess
   const contactBodies: Record<string, unknown>[] = []
 
   test.beforeAll(async () => {
-    const { site: sitePort, api: apiPort } = ports(test.info().project.name)
-    siteUrl = `http://127.0.0.1:${sitePort}`
+    const port = sitePort(test.info().project.name)
+    siteUrl = `http://127.0.0.1:${port}`
 
     fakeApi = createServer(async (request, response) => {
       const chunks: Buffer[] = []
@@ -118,12 +118,13 @@ test.describe('Vente en ligne coupée', () => {
           'content-type': upstream.headers.get('content-type') ?? 'application/json',
         })
         .end(Buffer.from(await upstream.arrayBuffer()))
-    }).listen(apiPort, '127.0.0.1')
+    })
+    const apiPort = await listenOnFreePort(fakeApi)
 
     site = spawn('node', ['server.mjs'], {
       env: {
         ...process.env,
-        PORT: String(sitePort),
+        PORT: String(port),
         HOST: '127.0.0.1',
         API_URL: `http://127.0.0.1:${apiPort}`,
       },

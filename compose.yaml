@@ -2,9 +2,9 @@ services:
   web:
     build: .
     ports:
-      - '${PORT:-3000}:3000'
+      - '${PORT:-4118}:3000'
     environment:
-      PUBLIC_SITE_URL: ${PUBLIC_SITE_URL:-http://localhost:3000}
+      PUBLIC_SITE_URL: ${PUBLIC_SITE_URL:-http://localhost:4118}
       API_URL: ${API_URL:-http://localhost:8090}
       API_SCENARIO: ${API_SCENARIO:-}
       MAINTENANCE: ${MAINTENANCE:-0}
