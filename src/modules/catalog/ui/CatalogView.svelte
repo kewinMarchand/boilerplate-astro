@@ -14,11 +14,11 @@
   import ProductGrid from './ProductGrid.svelte'
 
   import type { Catalog } from '../domain/catalog'
-  import type { CatalogLabels } from './labels'
+  import type { CatalogIslandResult, CatalogLabels } from './labels'
 
   interface Props {
     query: Catalog.Query
-    result: Catalog.Result
+    result: CatalogIslandResult
     salesEnabled: boolean
     /** Libellés du catalogue dans la langue de la page. */
     t: CatalogLabels

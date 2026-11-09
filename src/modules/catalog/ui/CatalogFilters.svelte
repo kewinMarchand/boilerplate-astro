@@ -5,11 +5,11 @@
   import { attributeParam, queryEntries } from '../domain/catalogQuery'
 
   import type { Catalog } from '../domain/catalog'
-  import type { CatalogLabels } from './labels'
+  import type { CatalogIslandListing, CatalogLabels } from './labels'
 
   interface Props {
     query: Catalog.Query
-    listing: Catalog.Listing
+    listing: CatalogIslandListing
     salesEnabled: boolean
     onsubmit: (event: Event) => void
     t: CatalogLabels

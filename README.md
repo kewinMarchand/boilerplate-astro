@@ -99,7 +99,7 @@ Un site n'a qu'une langue, le français, tant que l'identité du site (`GET /api
 - chaque lecture de l'API passe `locale=<langue de la page>`, le contact envoie sa langue en `Accept-Language` ;
 - `<html lang>`, canonique, `og:locale`, `hreflang` (et `x-default`), `inLanguage` et sitemap suivent la langue de la page.
 
-Libellés : une clé par texte dans `src/shared/i18n/dictionaries/fr.ts` et `en.ts` (mêmes clés, vérifiées par le type et un test ; `{nom}` remplacé par `format`, pluriels par `plural`), lus sur le serveur dans `Astro.locals.dictionary` ; un îlot reçoit en propriété les seuls libellés qu'il affiche. Un lien interne passe par `resolveHref`, qui ajoute le préfixe de la page. Une langue activée sans dictionnaire prend les libellés de la langue par défaut. Pour voir le site bilingue des fixtures : `API_SCENARIO=bilingual` dans `.env`, puis `make build start`.
+Libellés : une clé par texte dans `src/shared/i18n/dictionaries/fr.ts` et `en.ts` (mêmes clés, vérifiées par le type et un test ; `{nom}` remplacé par `format`, pluriels par `plural`), lus sur le serveur dans `Astro.locals.dictionary` ; un îlot reçoit en propriété les seuls libellés qu'il affiche, jamais un texte que seul le serveur lit. Un lien interne passe par `resolveHref`, qui ajoute le préfixe de la page. Une langue activée sans dictionnaire prend les libellés de la langue par défaut. Pour voir le site bilingue des fixtures : `API_SCENARIO=bilingual` dans `.env`, puis `make build start`.
 
 ## Architecture
 

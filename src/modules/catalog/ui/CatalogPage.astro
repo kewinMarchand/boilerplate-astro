@@ -6,10 +6,10 @@ import PageLayout from '@/shared/ui/layout/PageLayout.astro'
 
 import { describeCatalogPage } from './catalogPage'
 import CatalogView from './CatalogView.svelte'
+import { catalogIslandResult, catalogLabels } from './labels'
 import { PRODUCT_IMAGE_SIZES } from './productImage'
 
 import type { Catalog } from '../domain/catalog'
-import type { CatalogLabels } from './labels'
 
 interface Props {
   query: Catalog.Query
@@ -27,20 +27,19 @@ const { title, description, page, parents, seo } = describeCatalogPage(
   dictionary,
   locale,
 )
-const t: CatalogLabels = {
-  catalog: dictionary.catalog,
-  language: dictionary.language,
-  close: dictionary.layout.close,
-  ui: {
-    removeFilter: dictionary.ui.removeFilter,
-    alert: { info: dictionary.ui.alert.info, error: dictionary.ui.alert.error },
-  },
-}
+const t = catalogLabels(dictionary)
 const firstImage = result.status === 'success' ? result.listing.products[0]?.image : undefined
 ---
 
 <PageLayout {title} {description} {page} {parents} {seo} {alternates}>
   <ClientRouter slot="head" />
   {firstImage && <ImagePreload slot="head" image={firstImage} sizes={PRODUCT_IMAGE_SIZES} />}
-  <CatalogView client:load transition:persist="catalogue" {query} {result} {salesEnabled} {t} />
+  <CatalogView
+    client:load
+    transition:persist="catalogue"
+    {query}
+    result={catalogIslandResult(result)}
+    {salesEnabled}
+    {t}
+  />
 </PageLayout>
