@@ -51,6 +51,7 @@ make up                # http://localhost:4321
 | `DEV_ROUTES`                                           | `1` : expose `/charte-graphique` et `/erreur-test` hors du serveur de développement                                                                                             |
 | `PUBLIC_GLITCHTIP_DSN`, `PUBLIC_GLITCHTIP_ENVIRONMENT` | Suivi des erreurs GlitchTip, serveur et navigateur. Vide : aucun SDK chargé, aucune requête                                                                                     |
 | `PUBLIC_MATOMO_URL`, `PUBLIC_MATOMO_SITE_ID`           | Mesure d'audience Matomo sans cookie. Vides : aucun script, aucune requête, pas de paragraphe sur la page Données personnelles                                                  |
+| `API_SCENARIO`                                         | Scénario de l'API (`X-Scenario`) pour tous les appels, serveur et navigateur : `bilingual` sert le site bilingue de test. Vide en production                                    |
 | `API_SCHEMA_URL`                                       | Schéma OpenAPI lu par `make api-types`                                                                                                                                          |
 
 Toutes sont lues à l'exécution : les changer ne demande pas de reconstruire le site.
@@ -71,7 +72,7 @@ git fetch boilerplate
 git cherry-pick <sha>
 ```
 
-À personnaliser : `src/shared/config/` (nom, description, éditeur pour le SEO, navigation, audit d'accessibilité), `public/` (logo, favicons, manifeste, image de partage), `src/views/home/` (hero), puis les modules. Le carrousel de l'accueil et le texte des pages légales se modifient dans l'admin de l'API Platform (`/admin`).
+À personnaliser : `src/shared/config/` (nom, description, éditeur pour le SEO, navigation, audit d'accessibilité), `src/shared/i18n/dictionaries/` (libellés de l'interface, `fr.ts` et `en.ts`), `public/` (logo, favicons, manifeste, image de partage), `src/views/home/` (hero), puis les modules. Le carrousel de l'accueil et le texte des pages légales se modifient dans l'admin de l'API Platform (`/admin`).
 
 ## Commandes
 
@@ -89,6 +90,17 @@ git cherry-pick <sha>
 | `make api-types`                      | Génère les types de l'API depuis son schéma OpenAPI                                                                      |
 | `make docker-build`, `make docker-up` | Image de production, servie sur le port 3000                                                                             |
 
+## Langues du site
+
+Un site n'a qu'une langue, le français, tant que l'identité du site (`GET /api/site-identity`, administrée dans l'API) n'en active pas d'autre : routes, HTML et appels à l'API restent alors ceux d'un site monolingue. À plus d'une langue (la première est la langue par défaut) :
+
+- la langue par défaut n'a pas de préfixe, les autres en ont un (`/en/produit/swiss-cheese-plant`) ; un préfixe qui n'est pas une langue activée répond 404, sans redirection selon le navigateur ;
+- l'en-tête montre un sélecteur de langue, qui mène à la même page dans l'autre langue, ou à son accueil si la page n'y existe pas ;
+- chaque lecture de l'API passe `locale=<langue de la page>`, le contact envoie sa langue en `Accept-Language` ;
+- `<html lang>`, canonique, `og:locale`, `hreflang` (et `x-default`), `inLanguage` et sitemap suivent la langue de la page.
+
+Libellés : une clé par texte dans `src/shared/i18n/dictionaries/fr.ts` et `en.ts` (mêmes clés, vérifiées par le type et un test ; `{nom}` remplacé par `format`, pluriels par `plural`), lus sur le serveur dans `Astro.locals.dictionary` ; un îlot reçoit en propriété les seuls libellés qu'il affiche. Un lien interne passe par `resolveHref`, qui ajoute le préfixe de la page. Une langue activée sans dictionnaire prend les libellés de la langue par défaut. Pour voir le site bilingue des fixtures : `API_SCENARIO=bilingual` dans `.env`, puis `make build start`.
+
 ## Architecture
 
 Découpage commun aux boilerplates (`boilerplates-commun/ARCHITECTURE-DDD.md`), vérifié par ESLint :
@@ -99,9 +111,9 @@ src/
   views/        pages qui composent des modules ou sans métier (accueil, légal, erreurs, charte)
   modules/      un dossier par sous-domaine : catalog, blog, task, contact, content
     <module>/domain, application, infrastructure, ui, index.ts (seul export public)
-  shared/       socle sans métier : config, SEO, API, observabilité, sécurité, thème, kit d'interface
+  shared/       socle sans métier : config, langues, SEO, API, observabilité, sécurité, thème, kit d'interface
   actions/      actions serveur Astro (formulaire de contact)
-  middleware.ts maintenance, menu des catégories, CSP, compression, erreurs
+  middleware.ts maintenance, langue de la page, menu des catégories, CSP, compression, erreurs
 server.mjs      serveur de production : statiques précompressés, puis Astro
 ```
 
@@ -112,7 +124,7 @@ server.mjs      serveur de production : statiques précompressés, puis Astro
 ## Tests
 
 - **Unitaires** : `src/**/*.test.ts` (domaine du catalogue, URL, prix, conformité, chargement du carrousel et des pages légales, SEO, Matomo, CSP, composants des bascules).
-- **End-to-end** : `tests/e2e/`, un fichier par page ou par brique, ciblage par `data-testid`, rendus conditionnels testés présents et absents, scénarios sans JavaScript (carrousel, catalogue, contact, thème), états d'erreur et de liste vide par l'en-tête `X-Scenario`, envois vers un GlitchTip et un Matomo factices.
+- **End-to-end** : `tests/e2e/`, un fichier par page ou par brique (le site bilingue, `bilingue.e2e.ts`, est le build de la suite servi avec `API_SCENARIO=bilingual` sur les ports 3160 et 3161), ciblage par `data-testid`, rendus conditionnels testés présents et absents, scénarios sans JavaScript (carrousel, catalogue, contact, thème), états d'erreur et de liste vide par l'en-tête `X-Scenario`, envois vers un GlitchTip et un Matomo factices.
 - **Accessibilité** : `tests/a11y/`, axe-core sur chaque route, en standard, sombre et renforcé, desktop et mobile, menus ouverts compris. Axe ne couvre qu'une partie du RGAA : la déclaration reste « non conforme » sans audit.
 
 ## Intégration continue
