@@ -35,7 +35,7 @@ const visible = featured.status === 'error' || slides.length > 0
       {t.catalog.featured}
     </h2>
     {featured.status === 'error' ? (
-      <Alert variant="error" data-testid="home-carousel-error">
+      <Alert variant="error" prefix={t.ui.alert.error} data-testid="home-carousel-error">
         {t.catalog.featuredError}
       </Alert>
     ) : (

@@ -14,7 +14,7 @@ const scenario = tasksApiScenario()
   <TasksPanel
     client:load
     apiUrl={tasksApiUrl()}
-    {labels}
+    labels={{ ...labels, alert: { info: t.ui.alert.info, error: t.ui.alert.error } }}
     {...(locale.locales.length > 1 && { locale: locale.locale })}
     {...(scenario && { scenario })}
   />

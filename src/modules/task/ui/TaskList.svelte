@@ -1,5 +1,8 @@
 <script lang="ts" module>
-  /** Libellés dans la langue de la page (`tasks` du dictionnaire, sans titre ni texte d'introduction). */
+  /**
+   * Libellés dans la langue de la page (`tasks` du dictionnaire, sans titre ni texte d'introduction), et
+   * préfixes des alertes de boilerplates-ui (`ui.alert`).
+   */
   export interface TaskLabels {
     loading: string
     loadError: string
@@ -7,6 +10,7 @@
     empty: string
     done: string
     todo: string
+    alert: { info: string; error: string }
   }
 </script>
 
@@ -39,13 +43,15 @@
   </div>
 {:else if status === 'error'}
   <div class="flex flex-col items-start gap-3">
-    <Alert variant="error" data-testid="tasks-error">{labels.loadError}</Alert>
+    <Alert variant="error" prefix={labels.alert.error} data-testid="tasks-error"
+      >{labels.loadError}</Alert
+    >
     <Button variant="outline" onclick={onRetry} data-testid="tasks-retry"
       ><Icon name="rotate-cw" />{labels.retry}
     </Button>
   </div>
 {:else if !tasks?.length}
-  <Alert variant="info" data-testid="tasks-empty">
+  <Alert variant="info" prefix={labels.alert.info} data-testid="tasks-empty">
     {labels.empty}
   </Alert>
 {:else}

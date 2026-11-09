@@ -68,7 +68,7 @@ const jsonLd = [
   <div aria-live="polite">
     {blog.status === 'error' ? (
       <div class="flex flex-col items-start gap-3">
-        <Alert variant="error" data-testid="blog-error">
+        <Alert variant="error" prefix={t.ui.alert.error} data-testid="blog-error">
           {t.blog.loadError}
         </Alert>
         <Button
@@ -81,7 +81,7 @@ const jsonLd = [
         </Button>
       </div>
     ) : articles.length === 0 ? (
-      <Alert variant="info" data-testid="blog-empty">
+      <Alert variant="info" prefix={t.ui.alert.info} data-testid="blog-empty">
         {activeSection ? t.blog.emptySection : t.blog.empty}
       </Alert>
     ) : (

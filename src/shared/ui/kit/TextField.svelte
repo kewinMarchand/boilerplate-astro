@@ -13,6 +13,8 @@
     type?: 'text' | 'email' | 'tel' | 'url' | 'password' | 'search'
     autocomplete?: HTMLInputElement['autocomplete'] | undefined
     required?: boolean
+    /** Mention des champs obligatoires, dans la langue de la page. */
+    requiredLabel?: string | undefined
     'data-testid'?: string | undefined
   }
 
@@ -27,6 +29,7 @@
     type = 'text',
     autocomplete,
     required = false,
+    requiredLabel,
     'data-testid': testId,
   }: Props = $props()
 
@@ -42,6 +45,7 @@
     {hint}
     error={errors?.[0]}
     {required}
+    {requiredLabel}
     {disabled}
     data-testid={testId}
     bind:value
@@ -54,6 +58,7 @@
     {hint}
     error={errors?.[0]}
     {required}
+    {requiredLabel}
     {disabled}
     {type}
     {autocomplete}

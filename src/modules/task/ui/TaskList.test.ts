@@ -9,16 +9,17 @@ const TASKS = [
   { id: '1', title: 'Écrire les tests', done: false },
   { id: '2', title: 'Livrer', done: true },
 ]
+const LABELS = { ...fr.tasks, alert: fr.ui.alert }
 
 describe('TaskList', () => {
   it('affiche un squelette pendant le chargement', () => {
-    render(TaskList, { status: 'pending', tasks: undefined, onRetry: () => {}, labels: fr.tasks })
+    render(TaskList, { status: 'pending', tasks: undefined, onRetry: () => {}, labels: LABELS })
     expect(screen.getByTestId('tasks-loading')).toBeInTheDocument()
   })
 
   it("affiche le message d'erreur et relance au clic", async () => {
     const onRetry = vi.fn()
-    render(TaskList, { status: 'error', tasks: undefined, onRetry, labels: fr.tasks })
+    render(TaskList, { status: 'error', tasks: undefined, onRetry, labels: LABELS })
 
     expect(screen.getByTestId('tasks-error')).toHaveTextContent(
       'Impossible de charger les tâches pour le moment.',
@@ -28,12 +29,12 @@ describe('TaskList', () => {
   })
 
   it('affiche un message quand la liste est vide', () => {
-    render(TaskList, { status: 'success', tasks: [], onRetry: () => {}, labels: fr.tasks })
+    render(TaskList, { status: 'success', tasks: [], onRetry: () => {}, labels: LABELS })
     expect(screen.getByTestId('tasks-empty')).toBeInTheDocument()
   })
 
   it('affiche chaque tâche avec son statut', () => {
-    render(TaskList, { status: 'success', tasks: TASKS, onRetry: () => {}, labels: fr.tasks })
+    render(TaskList, { status: 'success', tasks: TASKS, onRetry: () => {}, labels: LABELS })
     expect(screen.getAllByTestId('tasks-item')).toHaveLength(2)
     expect(screen.getByText('Terminée')).toBeInTheDocument()
   })

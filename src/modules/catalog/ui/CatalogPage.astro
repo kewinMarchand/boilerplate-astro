@@ -31,6 +31,10 @@ const t: CatalogLabels = {
   catalog: dictionary.catalog,
   language: dictionary.language,
   close: dictionary.layout.close,
+  ui: {
+    removeFilter: dictionary.ui.removeFilter,
+    alert: { info: dictionary.ui.alert.info, error: dictionary.ui.alert.error },
+  },
 }
 const firstImage = result.status === 'success' ? result.listing.products[0]?.image : undefined
 ---

@@ -34,6 +34,7 @@
           <Chip
             href={catalogHref(path, filter.query)}
             removable
+            removeLabel={t.ui.removeFilter}
             data-testid="catalog-active-filter"
           >
             {filter.label}

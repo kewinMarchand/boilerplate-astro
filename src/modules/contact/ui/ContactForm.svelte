@@ -25,6 +25,10 @@
       inquirySent: string
       sendError: string
       validation: ValidationMessages
+      /** Mentions de boilerplates-ui (`ui` du dictionnaire) : champ obligatoire, envoi en cours, préfixes des alertes. */
+      required: string
+      loading: string
+      alert: { success: string; error: string }
     }
     /** Langue de la page, envoyée avec le formulaire sur un site multilingue (l'action n'a pas de préfixe). */
     locale?: string | undefined
@@ -113,6 +117,7 @@
     label={props.labels.name}
     autocomplete="name"
     required
+    requiredLabel={props.labels.required}
     errors={errors.name}
     data-testid="contact-name"
     bind:value={values.name}
@@ -123,6 +128,7 @@
     type="email"
     autocomplete="email"
     required
+    requiredLabel={props.labels.required}
     errors={errors.email}
     data-testid="contact-email"
     bind:value={values.email}
@@ -132,6 +138,7 @@
     label={props.labels.message}
     multiline
     required
+    requiredLabel={props.labels.required}
     errors={errors.message}
     data-testid="contact-message"
     bind:value={values.message}
@@ -142,18 +149,26 @@
   {#if props.locale}
     <input type="hidden" name="locale" value={props.locale} />
   {/if}
-  <Button type="submit" icon="mail" loading={submitting} data-testid="contact-submit">
+  <Button
+    type="submit"
+    icon="mail"
+    loading={submitting}
+    loadingLabel={props.labels.loading}
+    data-testid="contact-submit"
+  >
     {props.labels.send}
   </Button>
   <div aria-live="polite">
     {#if status === 'sent'}
-      <Alert variant="success" data-testid="contact-success">
+      <Alert variant="success" prefix={props.labels.alert.success} data-testid="contact-success">
         {props.product ? props.labels.inquirySent : props.labels.sent}
       </Alert>
     {:else if errors.product}
-      <Alert variant="error" data-testid="contact-error">{errors.product.join(' ')}</Alert>
+      <Alert variant="error" prefix={props.labels.alert.error} data-testid="contact-error"
+        >{errors.product.join(' ')}</Alert
+      >
     {:else if status === 'error'}
-      <Alert variant="error" data-testid="contact-error">
+      <Alert variant="error" prefix={props.labels.alert.error} data-testid="contact-error">
         {props.labels.sendError}
       </Alert>
     {/if}

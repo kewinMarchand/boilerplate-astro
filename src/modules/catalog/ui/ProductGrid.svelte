@@ -30,14 +30,16 @@
   </div>
 {:else if status === 'error'}
   <div class="flex flex-col items-start gap-3">
-    <Alert variant="error" data-testid="catalog-error">{t.catalog.loadError}</Alert>
+    <Alert variant="error" prefix={t.ui.alert.error} data-testid="catalog-error"
+      >{t.catalog.loadError}</Alert
+    >
     <Button variant="outline" onclick={onRetry} data-testid="catalog-retry"
       ><Icon name="rotate-cw" />{t.catalog.retry}
     </Button>
   </div>
 {:else if products.length === 0}
   <div class="flex flex-col items-start gap-4" data-testid="catalog-empty">
-    <Alert variant="info">{t.catalog.empty}</Alert>
+    <Alert variant="info" prefix={t.ui.alert.info}>{t.catalog.empty}</Alert>
     {@render clearAction()}
   </div>
 {:else}

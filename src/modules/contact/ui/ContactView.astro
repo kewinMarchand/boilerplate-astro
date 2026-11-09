@@ -51,7 +51,12 @@ const status = sent ? 'sent' : outcome?.status === 'error' || result?.error ? 'e
     {values}
     {errors}
     {status}
-    {labels}
+    labels={{
+      ...labels,
+      required: t.ui.required,
+      loading: t.ui.loading,
+      alert: { success: t.ui.alert.success, error: t.ui.alert.error },
+    }}
     locale={locale.locales.length > 1 ? locale.locale : undefined}
   />
 </PageLayout>

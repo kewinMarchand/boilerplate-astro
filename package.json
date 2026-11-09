@@ -54,7 +54,7 @@
     "@eslint/js": "^10.0.1",
     "@fontsource-variable/inter": "^5.3.0",
     "@iconify-json/lucide": "^1.2.143",
-    "@kewinmarchand/boilerplates-ui": "github:kewinMarchand/boilerplates-ui#v0.12.0",
+    "@kewinmarchand/boilerplates-ui": "github:kewinMarchand/boilerplates-ui#v0.13.0",
     "@kewinmarchand/csp": "github:kewinMarchand/csp#v0.1.1",
     "@lhci/cli": "^0.16.0",
     "@playwright/test": "1.64.1",

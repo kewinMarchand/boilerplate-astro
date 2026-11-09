@@ -60,7 +60,7 @@ const seo = detail
 >
   {image && <ImagePreload slot="head" {image} sizes={IMAGE_SIZES} />}
   {article.status === 'error' ? (
-    <Alert variant="error" data-testid="article-error">
+    <Alert variant="error" prefix={t.ui.alert.error} data-testid="article-error">
       {t.blog.articleError}
     </Alert>
   ) : (

@@ -19,6 +19,17 @@ export const en: Dictionary = {
     'partiellement conforme': 'partially compliant',
     'totalement conforme': 'fully compliant',
   },
+  ui: {
+    alert: {
+      info: 'Information:',
+      success: 'Success:',
+      warning: 'Warning:',
+      error: 'Error:',
+    },
+    required: '(required)',
+    loading: '(loading)',
+    removeFilter: 'Remove filter:',
+  },
   layout: {
     skipLink: 'Skip to main content',
     mainNavigation: 'Main navigation',
